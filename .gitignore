@@ -34,3 +34,6 @@ node_modules
 
 #Node-gyp directory
 build
+
+#MAC
+.DS_Store
