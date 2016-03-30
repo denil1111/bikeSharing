@@ -10,7 +10,6 @@
 #include <queue>
 #include <cstdlib>
 #include <time.h>
-#include <fstream>
 
 // Matching
 #include <lemon/matching.h>
@@ -48,8 +47,6 @@ class MergeBSP
 {
 
 private:
-
-	ofstream _outFile;
 
 	// 正站点访问标记,如果访问过，就放进这个vector中。如果下次又轮到这个点，说明无解
 	// used for UncapacitatedBSP:
@@ -107,6 +104,13 @@ public:
 	void getZeroPath(int currentnumberofzeropiece);
 	void getZeroPathInFront();
 	void getPath();
+
+	//
+	void getZeroPathReverse(int currentnumberofzeropiece);
+	void getZeroPathBehindPositive(int &currentnumberofzeropiece);
+	void getZeroPathBehindNegative(int &currentnumberofzeropiece);
+	void getCompletePath();
+
 	int  getTSPSum();
 	int  getFinalSum();
 
@@ -115,16 +119,9 @@ public:
 	void printRandomDemand();
 	void printTSPtour();
 	void printSuperNodeInformation();
-	void printFinalPaht();
+	void printFinalPath();
 
 	void runRandom();
-
-
-	void outFileRandomPoints();
-	void outFileRandomDemand();
-	void outFileCost();
-
-	void outFileFinalPaht();
 
 };// class BikeSharing
 

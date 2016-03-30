@@ -4,10 +4,11 @@
 #ifdef  DEBUG
 #define PRINTFRandomDemand		printRandomDemand();
 #define PRINTFRandomPoints		printRandomPoints();
-#define PRINTFCost				printCost();
+//#define PRINTFCost				printCost();
+#define PRINTFCost				;
 #define PRINTFTSPtour			printTSPtour();
 #define PRINTFSuperNode			printSuperNodeInformation();
-#define PRINTFFinalPath			printFinalPaht();
+#define PRINTFFinalPath			printFinalPath();
 #define PRINTFReuslt			;
 #else
 #define PRINTFRandomDemand		;

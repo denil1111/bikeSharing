@@ -1,4 +1,4 @@
-#include <iostream>
+
 #include "uncapacitatedBSP.h"
 #include "capacitatedBSP.h"
 #include "mergeBSP.h"

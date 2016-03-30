@@ -1,7 +1,6 @@
 #include"mergeBSP.h"
 
 MergeBSP::MergeBSP(int num){
-	_outFile.open("random_point_file.txt");
 
 	// used for UncapacitatedBSP:
 	_startStation = -1;
@@ -217,19 +216,6 @@ void MergeBSP::getTspTour(const std::string &alg_name) {
 	PRINTFTSPtour
 }
 
-void MergeBSP::printTSPtour(){
-	int i = 0;
-	cout << "TSP tour：" << endl;
-	for (vector<int>::iterator it = _path.begin(); it < _path.end(); ++it){
-		cout << *it << " ";
-		if ((i++ + 1) % 30 == 0){
-			cout << endl;
-		}
-	}
-	cout << endl;
-	cout << "TSP tour demand sum: " << _sum << endl << endl;
-}
-
 void MergeBSP::getSuperNodePieces(){
 	int lastsupernodeflag = PIECE_0;
 
@@ -273,31 +259,6 @@ void MergeBSP::getSuperNodePieces(){
 		}
 	}
 
-}
-
-void MergeBSP::printSuperNodeInformation(){
-
-	cout << "_superNodeNumber_PIECE_P = " << _superNodeNumber_PIECE_P << endl;
-	cout << "_superNodeNumber_PIECE_N = " << _superNodeNumber_PIECE_N << endl;
-	cout << "_superNodeNumber_PIECE_0 = " << _superNodeNumber_PIECE_0 << endl;
-
-	cout << "Positive super node：" << endl;
-	for (int i = 0; i < _superNodeNumber / 2; i++){
-		cout << "startit = " << *_superNodeVector_PIECE_P[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_P[i].getEndIt();
-		cout << "  mincostpoint = " << _superNodeVector_PIECE_P[i].getMatchingNumber();
-		cout << "  matching point :" << *_minCostAmongSuperNode[i][_superNodeVector_PIECE_P[i].getMatchingNumber()].firstNodeIt << endl;
-	}
-	cout << "Negative super node：" << endl;
-	for (int i = 0; i < _superNodeNumber / 2; i++){
-		cout << "startit = " << *_superNodeVector_PIECE_N[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_N[i].getEndIt();
-		cout << "  mincostpoint = " << _superNodeVector_PIECE_N[i].getMatchingNumber() << endl;
-		cout << "  matching point :" << *_minCostAmongSuperNode[_superNodeVector_PIECE_N[i].getMatchingNumber()][i].secondNodeIt << endl;
-	}
-	cout << "0 super node：" << endl;
-	for (int i = 0; i < _superNodeNumber_PIECE_0; i++){
-		cout << "startit = " << *_superNodeVector_PIECE_0[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_0[i].getEndIt();
-	}
-	cout << endl;
 }
 
 void MergeBSP::initMinCostAmongSuperNode(){
@@ -481,21 +442,7 @@ void MergeBSP::machingSuperNode(){
 void MergeBSP::getZeroPathInFront(){
 	//cout << "最前面的零块：";
 	for (int i = 0; i < _zeroSuperNodeNumberInFront; i++){
-		getZeroPath(i);
-	}
-}
-
-void MergeBSP::getZeroPath(int currentnumberofzeropiece){
-	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
-	//cout << "这是一个零块:";
-	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
-		if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *it) || _finalPaht.size() == 0){
-			_finalPaht.push_back(*it);
-		}
-		//cout << *it << "零 ";
-		if (++it == _path.end()){
-			it = _path.begin();
-		}
+		getZeroPathBehindPositive(i);
 	}
 }
 
@@ -600,6 +547,194 @@ void MergeBSP::getPath(){
 	PRINTFFinalPath
 
 }
+
+void MergeBSP::getZeroPath(int currentnumberofzeropiece){
+	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
+	cout << "这是一个零块:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode() << endl;
+	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *it) || _finalPaht.size() == 0){
+			_finalPaht.push_back(*it);
+			cout << *it << "零 ";
+		}
+		if (++it == _path.end()){
+			it = _path.begin();
+		}
+	}
+}
+
+void MergeBSP::getZeroPathBehindPositive(int &currentnumberofzeropiece){
+	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
+	cout << endl << "这是一个零块:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode() << endl;
+	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *it) || _finalPaht.size() == 0){
+			_finalPaht.push_back(*it);
+			cout << *it << "零ha ";
+		}
+		if (++it == _path.end()){
+			it = _path.begin();
+		}
+	}
+}
+
+void MergeBSP::getZeroPathReverse(int currentnumberofzeropiece){
+	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getEndIt();
+	cout << endl << "回溯一个零块:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode()<<" ";
+	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *it) || _finalPaht.size() == 0){
+			_finalPaht.push_back(*it);
+			cout << *it << "零" << i << " ";
+		}
+		if (--it == _path.begin()){
+			it = _path.end() - 1;
+		}
+	}
+}
+
+void MergeBSP::getZeroPathBehindNegative(int &currentnumberofzeropiece){
+	int numberofzeropiece = 0;
+	int current = currentnumberofzeropiece;
+	if ((numberofzeropiece = _superNodeVector_PIECE_N[current].getNumberOfZeroPieceBehind()) != 0){
+		for (int i = 0; i < numberofzeropiece; i++){
+			getZeroPath(current);
+			++current;
+		}
+		for (int i = 0; i < numberofzeropiece; i++){
+			getZeroPathReverse(current);
+			--current;
+		}
+		currentnumberofzeropiece += numberofzeropiece;
+	}	
+}
+
+
+void MergeBSP::getCompletePath(){
+	int currentnumberofzeropiece = 0;
+
+	// get zero super node path in front:
+	if (_zeroSuperNodeNumberInFront != 0){
+		getZeroPathInFront();
+		currentnumberofzeropiece += _zeroSuperNodeNumberInFront;
+	}
+
+	if (_superNodeNumber >= 2){
+		cout << "_superNodeNUmber" << _superNodeNumber / 2;
+		for (int positivesupernode = 0; positivesupernode < _superNodeNumber / 2; positivesupernode++){
+
+			int negativesupernode = _superNodeVector_PIECE_P[positivesupernode].getMatchingNumber();
+			vector<int>::iterator positiveit = _superNodeVector_PIECE_P[positivesupernode].getStartIt();
+			cout << endl << endl << "This is a positive supernode: NO:" << positivesupernode ;
+			cout << " Number:" << _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode() << " Endlt:";
+			cout << *_superNodeVector_PIECE_P[positivesupernode].getEndIt() << endl;
+
+			for (int i = 0; i < _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode(); i++, ++positiveit){
+				if (positiveit == _path.end()){
+					positiveit = _path.begin();
+				}
+				// avoid some adjacent and  equivalent node added into the path:
+				if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *positiveit){
+					_finalPaht.push_back(*positiveit);
+					cout << *positiveit << "正 ";
+				}
+			    
+		
+				if (positiveit == _minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt){
+					cout << endl << "This is a negative supernode:" << _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode() << endl;
+					vector<int>::iterator negativestartit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
+					vector<int>::iterator negativeendit = _superNodeVector_PIECE_N[negativesupernode].getEndIt();
+					vector<int>::iterator nagetiveit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
+					vector<int>::iterator targetit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
+
+					if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+						_finalPaht.push_back(*nagetiveit);
+						cout << *nagetiveit << "负 ";
+					}
+
+					// until to the start node
+					while (nagetiveit != negativestartit){
+						if (nagetiveit == _path.begin()){
+							nagetiveit = _path.end() - 1;
+						}
+						else{
+							--nagetiveit;
+						}
+						if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+							_finalPaht.push_back(*nagetiveit);
+							cout << *nagetiveit << "负 ";
+						}
+					}
+
+					if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+						_finalPaht.push_back(*nagetiveit);
+						cout << *nagetiveit << "负 ";
+					}
+
+					for (int j = 1; j < _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode(); j++){
+						if (++nagetiveit == _path.end()){
+							nagetiveit = _path.begin();
+						}
+						if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+							_finalPaht.push_back(*nagetiveit);
+							cout << *nagetiveit << "负 ";
+						}
+					}
+
+					if (nagetiveit != negativeendit){
+						cout << "Oh My God!!!!!" << endl;
+					}
+
+					//
+					getZeroPathBehindNegative(negativesupernode);
+					
+					// return back from a zero super node:
+					if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+						_finalPaht.push_back(*nagetiveit);
+						cout << *nagetiveit << "负 ";
+					}
+					
+					while (nagetiveit != targetit){
+						if (nagetiveit == _path.begin()){
+							nagetiveit = _path.end() - 1;
+						}
+						else{
+							--nagetiveit;
+						}
+
+						if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+							_finalPaht.push_back(*nagetiveit);
+							cout << *nagetiveit << "负 ";
+						}
+					}
+					if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *nagetiveit){
+						_finalPaht.push_back(*targetit);
+						cout << *nagetiveit << "负 ";
+					}
+					
+					if (_finalPaht.size() == 0 || *(_finalPaht.end() - 1) != *positiveit){
+						_finalPaht.push_back(*positiveit);
+						cout << *positiveit << "正 ";
+					}
+				}// if negative
+				int numberofzeropiece = 0;
+				if (positiveit == _superNodeVector_PIECE_P[positivesupernode].getEndIt()
+					&& (numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
+					for (int i = 0; i < numberofzeropiece; i++){
+						cout << "caodian" << endl;
+						getZeroPathBehindPositive(currentnumberofzeropiece);
+						++currentnumberofzeropiece;
+					}
+				}
+			}//for positive
+			//cout << endl;
+		}// for positive and negative
+	}// if
+	cout << endl;
+
+	PRINTFFinalPath
+
+}
+
+
+
 
 int MergeBSP::getTSPSum(){
 	FullGraph::Node unode, vnode;
@@ -716,7 +851,8 @@ void MergeBSP::runRandom(){
 	cout << "\nmachingSuperNode:" << totaltime << "ms！" << endl;
 
 	start = clock();
-	getPath();
+	//getPath();
+	getCompletePath();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	cout << "\ngetPath:" << totaltime << "ms！" << endl;
@@ -743,15 +879,12 @@ void MergeBSP::printRandomPoints(){
 
 void MergeBSP::printRandomDemand(){
 	cout << "Station Demand:" << endl;
-	_outFile << _stationNum << "\n";
 	for (int i = 0; i < _stationNum; i++){
 		printf("%3d ", _stationDemand[i]);
-		_outFile << _stationDemand[i] << " ";
 		if ((i + 1) % 20 == 0){
 			cout << endl;
 		}
 	}
-	_outFile << "\n";
 	cout << endl << endl;
 }
 
@@ -759,27 +892,34 @@ void MergeBSP::printRandomDemand(){
 void MergeBSP::printCost(){
 	int i = 0;
 	cout << "Cost:" << endl;
-	_outFile << _stationNum << "\n";
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
 		cout << "Node: " << i++ << endl;
 		for (FullGraph::NodeIt v(*g); v != INVALID; ++v) {
 			if (u == v) {
 				cout << "  0 ";
-				_outFile << "100000 ";
 			}
 			else{
 				cout << (*cost)[(*g).edge(u, v)] << " ";
-				_outFile << (*cost)[(*g).edge(u, v)] << " ";
 			}
 		}
-		_outFile << "\n";
 		cout << endl << endl;
 	}
 }
 
+void MergeBSP::printTSPtour(){
+	int i = 0;
+	cout << "TSP tour：" << endl;
+	for (vector<int>::iterator it = _path.begin(); it < _path.end(); ++it){
+		cout << *it << " ";
+		if ((i++ + 1) % 30 == 0){
+			cout << endl;
+		}
+	}
+	cout << endl;
+	cout << "TSP tour demand sum: " << _sum << endl << endl;
+}
 
-
-void MergeBSP::printFinalPaht(){
+void MergeBSP::printFinalPath(){
 
 	cout << "TSP路径：" << _path.size() << endl;
 	for (int i = 0; i < _path.size(); i++){
@@ -794,46 +934,27 @@ void MergeBSP::printFinalPaht(){
 	cout << endl;
 }
 
+void MergeBSP::printSuperNodeInformation(){
 
+	cout << "_superNodeNumber_PIECE_P = " << _superNodeNumber_PIECE_P << endl;
+	cout << "_superNodeNumber_PIECE_N = " << _superNodeNumber_PIECE_N << endl;
+	cout << "_superNodeNumber_PIECE_0 = " << _superNodeNumber_PIECE_0 << endl;
 
-
-
-
-void MergeBSP::outFileRandomPoints(){
-	_outFile << _stationNum << "\n";
-	for (FullGraph::NodeIt u(*g); u != INVALID; ++u){
-		_outFile << "(" << (*pos)[u].x << "," << (*pos)[u].y << ") ";
+	cout << "Positive super node：" << endl;
+	for (int i = 0; i < _superNodeNumber / 2; i++){
+		cout << "startit = " << *_superNodeVector_PIECE_P[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_P[i].getEndIt();
+		cout << "  mincostpoint = " << _superNodeVector_PIECE_P[i].getMatchingNumber();
+		cout << "  matching point :" << *_minCostAmongSuperNode[i][_superNodeVector_PIECE_P[i].getMatchingNumber()].firstNodeIt << endl;
 	}
-	_outFile << "\n";
-}
-
-void MergeBSP::outFileCost(){
-	_outFile << _stationNum << "\n";
-	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
-		for (FullGraph::NodeIt v(*g); v != INVALID; ++v) {
-			if (u == v) {
-				_outFile << "0 ";
-			}
-			else{
-				_outFile << (*cost)[(*g).edge(u, v)] << " ";
-			}
-		}
-		_outFile << "\n";
+	cout << "Negative super node：" << endl;
+	for (int i = 0; i < _superNodeNumber / 2; i++){
+		cout << "startit = " << *_superNodeVector_PIECE_N[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_N[i].getEndIt();
+		cout << "  mincostpoint = " << _superNodeVector_PIECE_N[i].getMatchingNumber() << endl;
+		cout << "  matching point :" << *_minCostAmongSuperNode[_superNodeVector_PIECE_N[i].getMatchingNumber()][i].secondNodeIt << endl;
 	}
-}
-
-void MergeBSP::outFileRandomDemand(){
-	_outFile << _stationNum << "\n";
-	for (int i = 0; i < _stationNum; i++){
-		_outFile << _stationDemand[i] << " ";
+	cout << "0 super node：" << endl;
+	for (int i = 0; i < _superNodeNumber_PIECE_0; i++){
+		cout << "startit = " << *_superNodeVector_PIECE_0[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_0[i].getEndIt();
 	}
-	_outFile << "\n";
-}
-
-void MergeBSP::outFileFinalPaht(){
-	_outFile << _finalPaht.size() << "\n";
-	for (int i = 0; i < _finalPaht.size(); i++){
-		_outFile << _finalPaht[i] << " ";
-	}
-	_outFile << "\n";
+	cout << endl;
 }
