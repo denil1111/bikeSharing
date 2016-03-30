@@ -1,8 +1,11 @@
 #include "commenhead.h" 
+
+// used for . Min cost perfect matching convert to maximum matching.
 int M=100000;
 int STATION_CAPACITY=10;
 int VEHICLE_CAPACITY=30;
 int POINT_RANGE=100;
+
 char* itoa(long num, char* s, int len)
 {
         long n, m = 16;
