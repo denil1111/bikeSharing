@@ -10,6 +10,7 @@
 #include <queue>
 #include <cstdlib>
 #include <time.h>
+#include <math.h>
 
 // Matching
 #include <lemon/matching.h>
@@ -40,6 +41,11 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
+struct point{
+	int a;
+	int b;
+};
+
 class MergeBSP
 {
 
@@ -55,7 +61,6 @@ private:
 	double _sum;
 	int _finalTSPSum;
 	int _finalSum;
-	vector<int> _stationDemand;
 	int _startStationId;
 	FullGraph *g;
 	DoubleEdgeMap *cost;
@@ -75,6 +80,22 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_0;
 	vector< vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
 
+
+public:
+	// get data
+	vector<point> _point;
+	void getRandomPoints();
+	void getPoints();
+
+	vector<vector<int> > _cost;
+	void getCost();
+	void getRandomCost();
+
+	vector<int> _stationDemand;
+	void getRandomDemand();
+	void getDemand();
+
+
 public:
 	vector<int> _finalPaht;
 	bool isExistNotVisitedPositiveStation();
@@ -85,10 +106,9 @@ public:
 
 	MergeBSP(int num);
 
-	void getRandomDemand();
-	void getRandomPoints();
-	void getCost();
-	void getRandomCost();
+	
+	
+	
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 	void getSuperNodePieces();
@@ -118,7 +138,8 @@ public:
 	void printSuperNodeInformation();
 	void printFinalPath();
 
-	void runRandom();
+	void randomData();
+	void run();
 
 };// class BikeSharing
 

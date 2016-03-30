@@ -15,6 +15,7 @@
 #include <lemon/christofides_tsp.h>
 #include <iostream>
 #include <time.h>
+#include <math.h>
 #include "debug.h"
 #include "commenhead.h"
 using namespace lemon;

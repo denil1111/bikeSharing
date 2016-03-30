@@ -10,6 +10,7 @@
 #include <queue>
 #include <cstdlib>
 #include <time.h>
+#include <math.h>
 
 // Matching
 #include <lemon/matching.h>
