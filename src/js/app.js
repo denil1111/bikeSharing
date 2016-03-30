@@ -13,6 +13,10 @@ app.use(function*(next) {
 // response
 
 app.use(function*() {
+	var addon = require('../../build/Release/bike');
+	console.log("haha");
+	console.log(addon.runMerge(10)); 
+
 	this.body = 'Hello World';
 });
 

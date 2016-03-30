@@ -37,3 +37,7 @@ build
 
 #MAC
 .DS_Store
+
+#cpp excute
+*.out
+*.exe

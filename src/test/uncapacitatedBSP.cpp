@@ -6,6 +6,7 @@
 
 #include"uncapacitatedBSP.h"
 
+
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
 UncapacitatedBSP::UncapacitatedBSP(int num){

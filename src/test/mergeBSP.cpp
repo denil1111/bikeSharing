@@ -1,4 +1,5 @@
-#include"mergeBSP.h"
+ #include"mergeBSP.h"
+
 
 MergeBSP::MergeBSP(int num){
 	_outFile.open("random_point_file.txt");

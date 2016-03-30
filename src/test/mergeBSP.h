@@ -21,6 +21,7 @@
 #include <lemon/math.h>
 
 #include "test_tools.h"
+#include "commenhead.h"
 
 // Full Graph
 #include <lemon/full_graph.h>
@@ -37,10 +38,6 @@ using namespace lemon;
 using namespace std;
 
 // used for . Min cost perfect matching convert to maximum matching.
-#define M 1000000
-#define STATION_CAPACITY 10
-#define VEHICLE_CAPACITY 100
-#define POINT_RANGE 100
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
@@ -66,7 +63,7 @@ private:
 	FullGraph *g;
 	DoubleEdgeMap *cost;
 	vector<int> _path;
-	vector<int> _finalPaht;
+	
 
 	const int K = STATION_CAPACITY;
 	const int Q = VEHICLE_CAPACITY;
@@ -82,7 +79,7 @@ private:
 	vector< vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
 
 public:
-
+	vector<int> _finalPaht;
 	bool isExistNotVisitedPositiveStation();
 	bool isAPositiveStation(int number);
 	int  getStartStation();
