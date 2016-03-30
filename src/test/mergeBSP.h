@@ -12,6 +12,8 @@
 #include <time.h>
 #include <math.h>
 
+#include "tspbase.h"
+
 // Matching
 #include <lemon/matching.h>
 #include <lemon/smart_graph.h>
@@ -39,26 +41,10 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
-struct point{
-	int a;
-	int b;
-};
-
-class MergeBSP
+class MergeBSP :public TspBase
 {
 
 private:
-
-	// common data:
-	const int K = STATION_CAPACITY;
-	const int Q = VEHICLE_CAPACITY;
-	int _stationNum;
-	FullGraph::NodeMap<dim2::Point<double> > *pos;
-	FullGraph *g;
-	DoubleEdgeMap *cost;
-	int _tspSum;
-	vector<int> _path;	// tsp path
-
 
 	// used for UncapacitatedBSP:
 	vector<int> _positiveStationVisiteFlag;
@@ -78,28 +64,16 @@ private:
 	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
 
 public:
-	// get data
-	vector<point> _point;
-	void getRandomPoints();
-	void getPoints();
-
-	vector<vector<int> > _cost;
-	void getRandomCost();
-	void getCost();
-
-	vector<int> _stationDemand;
-	void getRandomDemand();
-	void getDemand();
 
 	vector<int> _finalPath;
 
-	void randomData();
 	void run();
 
 public:
 	
 	MergeBSP(int num);
 	~MergeBSP();
+
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 
@@ -115,17 +89,12 @@ public:
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
-	int  getStartStationId();
+	int  getStartStationCapacitatedBSP();
 	void getZeroPath(int currentnumberofzeropiece);
 	void getZeroPathInFront();
 	void getPath();
 	int  getFinalSum();
 
-	// printf something:
-	void printRandomPoints();
-	void printCost();
-	void printRandomDemand();
-	void printTSPtour();
 	void printSuperNodeInformation();
 	void printFinalPath();
 
