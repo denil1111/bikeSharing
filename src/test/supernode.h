@@ -23,9 +23,12 @@ using namespace lemon;
 using namespace std;
 
 // piece type:
+#ifndef SP
+#define SP
 #define PIECE_0	0
 #define PIECE_P	1
 #define PIECE_N -1
+#endif
 
 struct MinCostOfTwoSuperNode{
 	int cost;

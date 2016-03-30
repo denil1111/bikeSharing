@@ -4,7 +4,7 @@
       "target_name": "bike",
       'include_dirs': [
           '/usr/local/include/',
-
+	  "<!(node -e \"require('nan')\")"
         ],
       "libraries": [
       	"-lemon","-L /usr/local/lib/"
@@ -19,9 +19,15 @@
           }
         }]
       ],
-      "sources": [ 	"src/cpp/binding.cc",
-      				"src/cpp/test.cpp"
-      			 ]
+      "sources": [ 	#"src/cpp/binding.cc",
+      				      # "src/cpp/test.cpp",
+                    "src/test/commenhead.cpp",
+                    "src/test/capacitatedBSP.cpp",
+                    "src/test/uncapacitatedBSP.cpp",
+                    "src/test/supernode.cpp",
+                    "src/test/mergeBSP.cpp",
+                    "src/test/test.cpp"
+                  ]
     }
   ]
 }

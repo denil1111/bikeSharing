@@ -1,13 +1,14 @@
 {
-	"name":	"bikeSharing",
-	"version":	"0.0.1",
-	"description":	"a bike bikeSharing demo",
-	"dependencies": {
-	    "node-gyp":	"3.3.1",
-	    "koa":	"1.2.0"
-	},
-	"scripts": {
-		"configure":	"node-gyp configure",
-	    "start": "node-gyp build  && node src/js/app.js"
-	}
+  "name": "bikeSharing",
+  "version": "0.0.1",
+  "description": "a bike bikeSharing demo",
+  "dependencies": {
+    "koa": "1.2.0",
+    "nan": "^2.2.1",
+    "node-gyp": "3.3.1"
+  },
+  "scripts": {
+    "configure": "node-gyp configure",
+    "start": "node-gyp build  && node src/js/app.js"
+  }
 }

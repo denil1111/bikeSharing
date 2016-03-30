@@ -19,6 +19,7 @@
 #include <lemon/lgf_reader.h>
 #include <lemon/math.h>
 
+#include "commenhead.h"
 #include "test_tools.h"
 
 // Full Graph
@@ -32,13 +33,13 @@
 #include "supernode.h"
 #include "debug.h"
 
+
 using namespace lemon;
 using namespace std;
 
 // used for Matching. Min cost perfect matching convert to maximum matching.
-#define M 100000
-#define STATION_CAPACITY 10
-#define VEHICLE_CAPACITY 30
+
+
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 

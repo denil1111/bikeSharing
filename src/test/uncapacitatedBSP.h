@@ -16,12 +16,10 @@
 #include <iostream>
 #include <time.h>
 #include "debug.h"
-
+#include "commenhead.h"
 using namespace lemon;
 using namespace std;
 
-#define STATION_CAPACITY 10
-#define VEHICLE_CAPACITY 30
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 

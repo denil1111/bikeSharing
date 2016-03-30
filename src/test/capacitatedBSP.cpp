@@ -1,4 +1,4 @@
-#include"CapacitatedBSP.h"
+#include "CapacitatedBSP.h"
 
 CapacitatedBSP::CapacitatedBSP(int num){
 	_stationNum = num;
@@ -386,7 +386,6 @@ string CapacitatedBSP::getLGF(){
 	int label = 0;
 	for (int i = 0; i < _superNodeNumber / 2; i++){
 		for (int j = 0; j < _superNodeNumber / 2; j++){
-
 			itoa(i, tempstring, 10);
 			lgf += tempstring;
 			lgf += " ";
