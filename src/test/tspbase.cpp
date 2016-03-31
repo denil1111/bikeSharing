@@ -29,7 +29,7 @@ void TspBase::getPoints(){
 		_point[i].b = rand() % POINT_RANGE;
 		(*pos)[u] = dim2::Point<int>(_point[i].a, _point[i].b);
 	}
-	PRINTFRandomPoints
+	PRINTFPoints
 }
 
 // random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
@@ -46,7 +46,7 @@ void TspBase::getRandomDemand(){
 	sum -= temp;
 	_stationDemand[_stationNum - 1] = -sum;
 
-	PRINTFRandomDemand
+	PRINTFDemand
 }
 
 void TspBase::getDemand(){

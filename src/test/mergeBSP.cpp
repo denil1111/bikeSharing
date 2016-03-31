@@ -432,6 +432,10 @@ void MergeBSP::getPath(){
 		}// for positive and negative
 	}// if
 //	cout << endl;
+	if (currentnumberofzeropiece != _superNodeVector_PIECE_0.size()){
+		cout << "最后一个零块：" << endl;
+		getZeroPath(_superNodeVector_PIECE_0.size() - 1);
+	}
 
 	PRINTFFinalPath
 

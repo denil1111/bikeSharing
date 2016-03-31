@@ -22,7 +22,6 @@
 #include <lemon/lgf_reader.h>
 #include <lemon/math.h>
 
-#include "test_tools.h"
 #include "commenhead.h"
 
 // Full Graph

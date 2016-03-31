@@ -17,8 +17,6 @@
 #include <lemon/lgf_reader.h>
 #include <lemon/math.h>
 
-#include "test_tools.h"
-
 using namespace lemon;
 using namespace std;
 
