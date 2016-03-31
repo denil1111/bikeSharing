@@ -1,4 +1,4 @@
-#include "CapacitatedBSP.h"
+#include "capacitatedBSP.h"
 
 CapacitatedBSP::CapacitatedBSP(int num){
 	_stationNum = num;
@@ -15,7 +15,7 @@ CapacitatedBSP::CapacitatedBSP(int num){
 	_zeroSuperNodeNumberInFront = 0;
 }
 
-// 
+//
 void CapacitatedBSP::getRandomPoints(){
 	double a, b;
 	srand((unsigned)time(NULL));
@@ -30,7 +30,7 @@ void CapacitatedBSP::getRandomPoints(){
 }
 
 void CapacitatedBSP::printRandomPoints(){
-	cout << "Point£º" << endl;
+	cout << "Pointï¿½ï¿½" << endl;
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u){
 		cout << "(" << (*pos)[u].x << ", " << (*pos)[u].y << ") ";
@@ -41,7 +41,7 @@ void CapacitatedBSP::printRandomPoints(){
 	cout << endl << endl;
 }
 
-// random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
+// random:ï¿½ï¿½ -STATION_CAPACITYï¿½ï¿½STATION_CAPACITY ï¿½ï¿½
 void CapacitatedBSP::getRandomDemand(){
 	//TspCheck tspCheck;
 	int temp;
@@ -84,7 +84,7 @@ void CapacitatedBSP::getCost(){
 
 void CapacitatedBSP::printCost(){
 	int i = 0;
-	cout << "ÕâÀïÂðCost:" << endl;
+	cout << "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cost:" << endl;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
 		cout << "Node: " << i++ << endl;
 		cout << "wocao" << endl;
@@ -130,7 +130,7 @@ int e[5][5] = { { 100, 200, 10000, 100, 100 },
 { 100, 100, 100, 100, 100 },
 { 1000, 100, 100, 100, 100 }
 };
-cout << "»ñÈ¡Cost:" << endl;
+cout << "ï¿½ï¿½È¡Cost:" << endl;
 int i = 0, j = 0;
 for (FullGraph::NodeIt u(*g); u != INVALID; ++u, i++) {
 j = i;
@@ -173,7 +173,7 @@ void CapacitatedBSP::getTspTour(const std::string &alg_name) {
 		_path.push_back((*g).index(node));
 	}
 
-	// ÏÂÃæ¶¼ÊÇcheck
+	// ï¿½ï¿½ï¿½æ¶¼ï¿½ï¿½check
 	//tspCheck.check(tspCheck.checkTour(*g, vec), alg_name + ": Wrong node sequence");
 	//tspCheck.check(tspCheck.checkCost(*g, vec, *cost, alg.tourCost()), alg_name + ": Wrong tour cost");
 
@@ -182,7 +182,7 @@ void CapacitatedBSP::getTspTour(const std::string &alg_name) {
 
 void CapacitatedBSP::printTSPtour(){
 	int i = 0;
-	cout << "TSP tour£º" << endl;
+	cout << "TSP tourï¿½ï¿½" << endl;
 	for (vector<int>::iterator it = _path.begin(); it < _path.end(); ++it){
 		cout << *it << " ";
 		if ((i++ + 1) % 30 == 0){
@@ -201,7 +201,7 @@ void CapacitatedBSP::getSuperNodePieces(){
 		++it;
 	}
 	_startStationId = *it;
-	cout << "ÆðÊ¼µã£º" << _startStationId << endl << endl << endl;
+	cout << "ï¿½ï¿½Ê¼ï¿½ã£º" << _startStationId << endl << endl << endl;
 	int surplusdemand = 0;
 
 	bool flag = true;
@@ -244,19 +244,19 @@ void CapacitatedBSP::printSuperNodeInformation(){
 	cout << "_superNodeNumber_PIECE_N = " << _superNodeNumber_PIECE_N << endl;
 	cout << "_superNodeNumber_PIECE_0 = " << _superNodeNumber_PIECE_0 << endl;
 
-	cout << "Positive super node£º" << endl;
+	cout << "Positive super nodeï¿½ï¿½" << endl;
 	for (int i = 0; i < _superNodeNumber / 2; i++){
 		cout << "startit = " << *_superNodeVector_PIECE_P[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_P[i].getEndIt();
 		cout << "  mincostpoint = " << _superNodeVector_PIECE_P[i].getMatchingNumber();
 		cout << "  matching point :" << *_minCostAmongSuperNode[i][_superNodeVector_PIECE_P[i].getMatchingNumber()].firstNodeIt << endl;
 	}
-	cout << "Negative super node£º" << endl;
+	cout << "Negative super nodeï¿½ï¿½" << endl;
 	for (int i = 0; i < _superNodeNumber / 2; i++){
 		cout << "startit = " << *_superNodeVector_PIECE_N[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_N[i].getEndIt();
 		cout << "  mincostpoint = " << _superNodeVector_PIECE_N[i].getMatchingNumber() << endl;
 		cout << "  matching point :" << *_minCostAmongSuperNode[_superNodeVector_PIECE_N[i].getMatchingNumber()][i].secondNodeIt << endl;
 	}
-	cout << "0 super node£º" << endl;
+	cout << "0 super nodeï¿½ï¿½" << endl;
 	for (int i = 0; i < _superNodeNumber_PIECE_0; i++){
 		cout << "startit = " << *_superNodeVector_PIECE_0[i].getStartIt() << "  endit = " << *_superNodeVector_PIECE_0[i].getEndIt();
 	}
@@ -441,7 +441,7 @@ void CapacitatedBSP::machingSuperNode(){
 }
 
 void CapacitatedBSP::getZeroPathInFront(){
-	cout << "×îÇ°ÃæµÄÁã¿é£º";
+	cout << "ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é£º";
 	for (int i = 0; i < _zeroSuperNodeNumberInFront; i++){
 		getZeroPath(i);
 	}
@@ -449,12 +449,12 @@ void CapacitatedBSP::getZeroPathInFront(){
 
 void CapacitatedBSP::getZeroPath(int currentnumberofzeropiece){
 	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
-	cout << "ÕâÊÇÒ»¸öÁã¿é:";
+	cout << "ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:";
 	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
 		if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *it) || _finalPaht.size() == 0){
 			_finalPaht.push_back(*it);
 		}
-		cout << *it << "Áã ";
+		cout << *it << "ï¿½ï¿½ ";
 		if (++it == _path.end()){
 			it = _path.begin();
 		}
@@ -471,7 +471,7 @@ void CapacitatedBSP::getPath(){
 		for (int positivesupernode = 0; positivesupernode < _superNodeNumber / 2; positivesupernode++){
 			int negativesupernode = _superNodeVector_PIECE_P[positivesupernode].getMatchingNumber();
 			vector<int>::iterator positiveit = _superNodeVector_PIECE_P[positivesupernode].getStartIt();
-			cout << "ÕâÊÇÒ»¸öÕý¿é:";
+			cout << "ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:";
 			cout << " " << _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode() << " ";
 			for (int i = 0; i < _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode(); i++, ++positiveit){
 				if (positiveit == _path.end()){
@@ -481,13 +481,13 @@ void CapacitatedBSP::getPath(){
 					_finalPaht.push_back(*positiveit);
 				}
 
-				cout << *positiveit << "Õý ";
+				cout << *positiveit << "ï¿½ï¿½ ";
 				if (positiveit == _minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt){
 					vector<int>::iterator negativestartit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
 					vector<int>::iterator negativeendit = _superNodeVector_PIECE_N[negativesupernode].getEndIt();
 					vector<int>::iterator nagetiveit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
 					vector<int>::iterator targetit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
-					cout << "ÕâÊÇÒ»¸ö¸º¿é:";
+					cout << "ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:";
 					if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *nagetiveit) || _finalPaht.size() == 0){
 						_finalPaht.push_back(*nagetiveit);
 					}
@@ -515,7 +515,7 @@ void CapacitatedBSP::getPath(){
 						if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *nagetiveit) || _finalPaht.size() == 0){
 							_finalPaht.push_back(*nagetiveit);
 						}
-						cout << *nagetiveit << "¸º ";
+						cout << *nagetiveit << "ï¿½ï¿½ ";
 						if (nagetiveit == negativestartit){
 							nagetiveit = negativeendit;
 
@@ -538,11 +538,11 @@ void CapacitatedBSP::getPath(){
 					if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *targetit) || _finalPaht.size() == 0){
 						_finalPaht.push_back(*targetit);
 					}
-					cout << *nagetiveit << "¸º ";
+					cout << *nagetiveit << "ï¿½ï¿½ ";
 					if ((_finalPaht.size() > 0 && *(_finalPaht.end() - 1) != *positiveit) || _finalPaht.size() == 0){
 						_finalPaht.push_back(*positiveit);
 					}
-					cout << *positiveit << "Õý ";
+					cout << *positiveit << "ï¿½ï¿½ ";
 				}// if negative
 
 				int numberofzeropiece = 0;
@@ -582,13 +582,13 @@ int CapacitatedBSP::getFinalSum(){
 
 void CapacitatedBSP::printFinalPaht(){
 
-	cout << "TSPÂ·¾¶£º" << _path.size() << endl;
+	cout << "TSPÂ·ï¿½ï¿½ï¿½ï¿½" << _path.size() << endl;
 	for (int i = 0; i < _path.size(); i++){
 		cout << _path[i] << "(" << _stationDemand[_path[i]] << ") ";
 	}
 	cout << endl;
 
-	cout << "×îÖÕÂ·¾¶£º" << _finalPaht.size() << endl;
+	cout << "ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½" << _finalPaht.size() << endl;
 	for (int i = 0; i < _finalPaht.size(); i++){
 		cout << _finalPaht[i] << "(" << _stationDemand[_finalPaht[i]] << ") ";
 	}
@@ -610,53 +610,50 @@ void CapacitatedBSP::runRandom(){
 	getRandomPoints();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomPoints:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetRandomPoints:" << totaltime << "msï¿½ï¿½" << endl;
 
 	getCost();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetCost:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetCost:" << totaltime << "msï¿½ï¿½" << endl;
 
 	getRandomDemand();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomDemand:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetRandomDemand:" << totaltime << "msï¿½ï¿½" << endl;
 
 	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetTspTour:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetTspTour:" << totaltime << "msï¿½ï¿½" << endl;
 
 	getSuperNodePieces();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetSuperNodePieces:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetSuperNodePieces:" << totaltime << "msï¿½ï¿½" << endl;
 
 	calculateMinCostAmongSuperNode();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ncalculateMinCostAmongSuperNode:" << totaltime << "ms£¡" << endl;
+	cout << "\ncalculateMinCostAmongSuperNode:" << totaltime << "msï¿½ï¿½" << endl;
 
 	machingSuperNode();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\nmachingSuperNode:" << totaltime << "ms£¡" << endl;
+	cout << "\nmachingSuperNode:" << totaltime << "msï¿½ï¿½" << endl;
 
 	getPath();
 	start = finish;
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetPath:" << totaltime << "ms£¡" << endl;
+	cout << "\ngetPath:" << totaltime << "msï¿½ï¿½" << endl;
 
 	totaltime = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
-	cout << "\nCapacitated BSP time:" << totaltime << "ms£¡ Sum cost:" << getFinalSum() << endl << endl;
+	cout << "\nCapacitated BSP time:" << totaltime << "msï¿½ï¿½ Sum cost:" << getFinalSum() << endl << endl;
 }
-
-
-
