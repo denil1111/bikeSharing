@@ -10,7 +10,7 @@
 #include <queue>
 #include <cstdlib>
 #include <time.h>
-#include <fstream>
+#include <math.h>
 
 // Matching
 #include <lemon/matching.h>
@@ -37,38 +37,37 @@
 using namespace lemon;
 using namespace std;
 
-// used for . Min cost perfect matching convert to maximum matching.
-
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
+
+struct point{
+	int a;
+	int b;
+};
 
 class MergeBSP
 {
 
 private:
 
-	ofstream _outFile;
-
-	// 正站点访问标记,如果访问过，就放进这个vector中。如果下次又轮到这个点，说明无解
-	// used for UncapacitatedBSP:
-	vector<int> _positiveStationVisiteFlag;
-	int _startStation;
-
-	int _stationNum;
-	FullGraph::NodeMap<dim2::Point<double> > *pos;
-	double _sum;
-	int _finalTSPSum;
-	int _finalSum;
-	vector<int> _stationDemand;
-	int _startStationId;
-	FullGraph *g;
-	DoubleEdgeMap *cost;
-	vector<int> _path;
-	
-
+	// common data:
 	const int K = STATION_CAPACITY;
 	const int Q = VEHICLE_CAPACITY;
+	int _stationNum;
+	FullGraph::NodeMap<dim2::Point<double> > *pos;
+	FullGraph *g;
+	DoubleEdgeMap *cost;
+	int _tspSum;
+	vector<int> _path;	// tsp path
 
-	int _superNodeNumber;
+
+	// used for UncapacitatedBSP:
+	vector<int> _positiveStationVisiteFlag;
+	int _startStationUncapacitatedBSP;
+
+	// user for CapacitatedBSP:
+	int _startStationCapacitatedBSP;
+	int _sumCapacitatedBSP;
+	int _superNodeNumber; // positive plus negative plus last one zero super node
 	int _zeroSuperNodeNumberInFront;
 	int _superNodeNumber_PIECE_P;
 	int _superNodeNumber_PIECE_N;
@@ -76,24 +75,40 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_P;
 	vector<SuperNode> _superNodeVector_PIECE_N;
 	vector<SuperNode> _superNodeVector_PIECE_0;
-	vector< vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
 
 public:
-	vector<int> _finalPaht;
+	// get data
+	vector<point> _point;
+	void getRandomPoints();
+	void getPoints();
+
+	vector<vector<int> > _cost;
+	void getRandomCost();
+	void getCost();
+
+	vector<int> _stationDemand;
+	void getRandomDemand();
+	void getDemand();
+
+	vector<int> _finalPath;
+
+	void randomData();
+	void run();
+
+public:
+	
+	MergeBSP(int num);
+	~MergeBSP();
+	template <typename TSP>
+	void getTspTour(const std::string &alg_name);
+
+	// used for Uncapacitated BSP:
 	bool isExistNotVisitedPositiveStation();
 	bool isAPositiveStation(int number);
 	int  getStartStation();
 
-	void printResult();
-
-	MergeBSP(int num);
-
-	void getRandomDemand();
-	void getRandomPoints();
-	void getCost();
-	void getRandomCost();
-	template <typename TSP>
-	void getTspTour(const std::string &alg_name);
+	// used for Capacitated BSP:
 	void getSuperNodePieces();
 	void initMinCostAmongSuperNode();
 	void calculateMinCostOfTwoSuperNode(int first, int second);
@@ -104,24 +119,15 @@ public:
 	void getZeroPath(int currentnumberofzeropiece);
 	void getZeroPathInFront();
 	void getPath();
-	int  getTSPSum();
 	int  getFinalSum();
 
+	// printf something:
 	void printRandomPoints();
 	void printCost();
 	void printRandomDemand();
 	void printTSPtour();
 	void printSuperNodeInformation();
-	void printFinalPaht();
-
-	void runRandom();
-
-
-	void outFileRandomPoints();
-	void outFileRandomDemand();
-	void outFileCost();
-
-	void outFileFinalPaht();
+	void printFinalPath();
 
 };// class BikeSharing
 

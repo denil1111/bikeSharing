@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "description": "a bike bikeSharing demo",
   "dependencies": {
+    "co-views": "^2.1.0",
     "koa": "1.2.0",
+    "koa-route": "^2.4.2",
     "nan": "^2.2.1",
-    "node-gyp": "3.3.1"
+    "node-gyp": "3.3.1",
+    "swig": "^1.4.2"
   },
   "scripts": {
     "configure": "node-gyp configure",

@@ -4,7 +4,7 @@
 *
 */
 
-#include"uncapacitatedBSP.h"
+#include "uncapacitatedBSP.h"
 
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
@@ -75,7 +75,7 @@ void UncapacitatedBSP::getCost(){
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
 		for (FullGraph::NodeIt v = u; v != INVALID; ++v) {
 			if (u != v) {
-				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = ((*pos)[u] - (*pos)[v]).normSquare();
+				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = (int)sqrt(((*pos)[u] - (*pos)[v]).normSquare());
 			}
 		}
 	}
