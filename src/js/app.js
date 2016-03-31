@@ -28,10 +28,10 @@ app.use(route.get('/randomrun', function*() {
  //  		demand.push(data.demand);
 	// });
 	for (data of yield datas) {
-		point.push({x:data.x,y:data.y});
+		point.push({x:data.x,y:data.y,d:data.demand});
   		demand.push(data.demand);
 	}
-	this.body = yield render("index",{point:datas,path:path});
+	this.body = yield render("index",{point:point,path:path});
 }));
 
 app.listen(3000);
