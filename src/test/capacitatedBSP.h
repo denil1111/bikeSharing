@@ -12,6 +12,8 @@
 #include <time.h>
 #include <math.h>
 
+#include "tspbase.h"
+
 // Matching
 #include <lemon/matching.h>
 #include <lemon/smart_graph.h>
@@ -21,7 +23,6 @@
 #include <lemon/math.h>
 
 #include "commenhead.h"
-#include "test_tools.h"
 
 // Full Graph
 #include <lemon/full_graph.h>
@@ -34,36 +35,19 @@
 #include "supernode.h"
 #include "debug.h"
 
-
 using namespace lemon;
 using namespace std;
 
-// used for Matching. Min cost perfect matching convert to maximum matching.
-
-
-
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
-class CapacitatedBSP
+class CapacitatedBSP :public TspBase
 {
 
 private:
 
-	int _stationNum;
-	FullGraph::NodeMap<dim2::Point<double> > *pos;
-	double _sum;
-	int _finalSum;
-	vector<int> _stationDemand;
-	int _startStationId;
-	FullGraph *g;
-	DoubleEdgeMap *cost;
-	vector<int> _path;
-	vector<int> _finalPaht;
-
-	const int K = STATION_CAPACITY;
-	const int Q = VEHICLE_CAPACITY;
-
-	int _superNodeNumber;
+	int _startStationCapacitatedBSP;
+	int _sumCapacitatedBSP;
+	int _superNodeNumber; // positive plus negative plus last one zero super node
 	int _zeroSuperNodeNumberInFront;
 	int _superNodeNumber_PIECE_P;
 	int _superNodeNumber_PIECE_N;
@@ -71,38 +55,37 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_P;
 	vector<SuperNode> _superNodeVector_PIECE_N;
 	vector<SuperNode> _superNodeVector_PIECE_0;
-	vector< vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+
+public:
+
+	vector<int> _finalPath;
+	void run();
 
 public:
 
 	CapacitatedBSP(int num);
+	~CapacitatedBSP();
 
-	void getRandomDemand();
-	void getRandomPoints();
-	void getCost();
-	void getRandomCost();
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
+
 	void getSuperNodePieces();
 	void initMinCostAmongSuperNode();
 	void calculateMinCostOfTwoSuperNode(int first, int second);
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
+	int  getStartStationCapacitatedBSP();
 	void getZeroPath(int currentnumberofzeropiece);
 	void getZeroPathInFront();
 	void getPath();
 	int  getFinalSum();
 
-	void printRandomPoints();
-	void printCost();
-	void printRandomDemand();
-	void printTSPtour();
+	// printf something:
 	void printSuperNodeInformation();
-	void printFinalPaht();
+	void printFinalPath();
 
-	void runRandom();
-
-};// class BikeSharing
+};
 
 #endif
