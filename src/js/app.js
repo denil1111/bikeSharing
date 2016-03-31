@@ -16,8 +16,8 @@ app.use(function*(next) {
 
 app.use(route.get('/randomrun', function*() {
 	var addon = require('../../build/Release/bike');
-	var datas = addon.randomData(10); 
-	var path = addon.runMerge(10); 
+	var datas = addon.randomData(10);
+	var path = addon.runMerge(10);
 	console.log(datas);
 	console.log(path);
 	var point = [];
@@ -25,12 +25,12 @@ app.use(route.get('/randomrun', function*() {
 	// datas.forEach(function(data){
  //  		point.push({x:data.x,y:data.y});
  //  		demand.push(data.demand);
-	// }); 
+	// });
 	for (data of yield datas) {
 		point.push({x:data.x,y:data.y});
   		demand.push(data.demand);
 	}
-	this.body = yield render("index",{demand:demand,point:point,path:path});
+	this.body = yield render("index",{point:datas,path:path});
 }));
 
 app.listen(3000);
