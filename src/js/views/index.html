@@ -1,0 +1,14 @@
+<html>
+<head>
+      <meta charset="utf-8">
+      <title>Visualization</title>
+</head>
+<body>
+  <script type="text/javascript">
+  var stations = {{point|json_encode|raw}};
+  var tour =  {{path|json_encode}};
+  </script>
+  <script type="text/javascript" src="/d3.min.js"></script>
+  <script type="text/javascript" src="/index.js"></script>
+</body>
+</html>

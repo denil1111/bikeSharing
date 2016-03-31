@@ -1,6 +1,7 @@
 #include"capacitatedBSP.h"
 
 
+
 CapacitatedBSP::CapacitatedBSP(int num) :TspBase(num){
 	// used for CapacitatedBSP:
 	_startStationCapacitatedBSP = -1;
@@ -18,6 +19,7 @@ CapacitatedBSP::~CapacitatedBSP(){
 
 int CapacitatedBSP::getStartStationCapacitatedBSP(){
 	return _startStationCapacitatedBSP;
+
 }
 
 void CapacitatedBSP::getSuperNodePieces(){
@@ -64,6 +66,7 @@ void CapacitatedBSP::getSuperNodePieces(){
 	}
 
 }
+
 
 void CapacitatedBSP::initMinCostAmongSuperNode(){
 	for (int i = 0; i < _superNodeNumber / 2; i++){
@@ -319,7 +322,6 @@ void CapacitatedBSP::getPath(){
 						if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *nagetiveit) || _finalPath.size() == 0){
 							_finalPath.push_back(*nagetiveit);
 						}
-						//	cout << *nagetiveit << "¸º ";
 						if (nagetiveit == negativestartit){
 							nagetiveit = negativeendit;
 
@@ -408,6 +410,7 @@ void CapacitatedBSP::getTspTour(const std::string &alg_name) {
 	{
 		FullGraph::Node node = *it;
 		_path.push_back((*g).index(node));
+
 	}
 
 	PRINTFTSPtour
@@ -498,3 +501,4 @@ void CapacitatedBSP::printSuperNodeInformation(){
 	}
 	cout << endl;
 }
+
