@@ -2,8 +2,8 @@
 *
 */
 
-#ifndef CAPACITATED_BSP_H
-#define CAPACITATED_BSP_H
+#ifndef K_TIMES_CAPACITATED_BSP_H
+#define K_TIMES_CAPACITATED_BSP_H
 
 #include <iostream>
 #include <vector>
@@ -40,14 +40,12 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
-class CapacitatedBSP :public TspBase
+class KTimesCapacitatedBSP :public TspBase
 {
 
 private:
-
 	int _startFromWhichPiece;
 	int _startStationCapacitatedBSP;
-	int _sumCapacitatedBSP;
 	int _superNodeNumber; // positive plus negative plus last one zero super node
 	int _zeroSuperNodeNumberInFront;
 	int _superNodeNumber_PIECE_P;
@@ -60,18 +58,21 @@ private:
 
 public:
 
-	vector<int> _finalPath;
+	vector<vector<int> > _pathSet;
+	vector<int> _minCostPath;
+	int _minSum;
 	void run();
 
 public:
 
-	CapacitatedBSP(int num);
-	~CapacitatedBSP();
+	KTimesCapacitatedBSP(int num);
+	~KTimesCapacitatedBSP();
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 
 	void getSuperNodePieces(int number);
+	void initSuperNode();
 	void initMinCostAmongSuperNode();
 	void calculateMinCostOfTwoSuperNode(int first, int second);
 	void calculateMinCostAmongSuperNode();
@@ -85,10 +86,11 @@ public:
 	void getPathBeginNegative();
 	void getPathBeginPositive();
 	void getPath();
-	int  getFinalSum();
+	int  getFinalSum(vector<int> &path);
 
 	// printf something:
 	void printSuperNodeInformation();
+	void printTspPath();
 	void printFinalPath();
 
 };

@@ -9,10 +9,65 @@ TspBase::TspBase(int num){
 }
 
 TspBase::~TspBase(){
+	delete g;
+	delete cost;
+	delete pos;
+}
+
+// random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
+void TspBase::getRandomDemand(){
+	int temp;
+	int sum = 0;
+
+	srand((unsigned)time(NULL));
+	for (int i = 0; i < _stationNum; i++){
+		temp = rand() % (STATION_CAPACITY * 2 + 1) - STATION_CAPACITY;
+		_stationDemand.push_back(temp);
+		sum += temp;
+	}
+	sum -= temp;
+	srand((unsigned)time(NULL));
+	int pointnum;
+	if (sum > Q / 2){
+		_stationDemand[_stationNum - 1] = -(sum % (Q / 2));
+		while (sum > Q / 2){
+			pointnum = rand() % _stationNum;
+			_stationDemand.insert(_stationDemand.begin() + pointnum, -Q / 2);
+			sum -= Q / 2;
+			++_stationNum;
+		}
+		delete g;
+		delete cost;
+		delete pos;
+		g = new FullGraph(_stationNum);
+		cost = new DoubleEdgeMap(*g);
+		pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
+	}
+	else if (sum < -Q / 2){
+		_stationDemand[_stationNum - 1] = -(sum % (Q / 2));
+		while (sum < -Q / 2){
+			pointnum = rand() % _stationNum;
+			_stationDemand.insert(_stationDemand.begin() + pointnum, Q / 2);
+			sum += Q / 2;
+			++_stationNum;
+		}
+		delete g;
+		delete cost;
+		delete pos;
+		g = new FullGraph(_stationNum);
+		cost = new DoubleEdgeMap(*g);
+		pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
+	}
+	else{
+		_stationDemand[_stationNum - 1] = -sum;
+	}
+
+	PRINTFDemand
 
 }
 
 void TspBase::getRandomPoints(){
+	srand((unsigned)time(NULL));
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
 		point poss;
 		poss.a = rand() % POINT_RANGE;
@@ -30,23 +85,6 @@ void TspBase::getPoints(){
 		(*pos)[u] = dim2::Point<int>(_point[i].a, _point[i].b);
 	}
 	PRINTFPoints
-}
-
-// random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
-void TspBase::getRandomDemand(){
-	int temp;
-	int sum = 0;
-
-	srand((unsigned)time(NULL));
-	for (int i = 0; i < _stationNum; i++){
-		temp = rand() % (STATION_CAPACITY * 2 + 1) - STATION_CAPACITY;
-		_stationDemand.push_back(temp);
-		sum += temp;
-	}
-	sum -= temp;
-	_stationDemand[_stationNum - 1] = -sum;
-
-	PRINTFDemand
 }
 
 void TspBase::getDemand(){
@@ -81,7 +119,7 @@ void TspBase::getRandomCost(){
 		}
 		_cost.push_back(costrow);
 	}
-	PRINTFCost
+	// PRINTFCost
 }
 
 // Get a Random TSP sequence
@@ -116,6 +154,12 @@ void TspBase::randomData(){
 	cout << "station capacity:" << STATION_CAPACITY << endl;
 
 	start = clock();
+	getRandomDemand();
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
+
+	start = clock();
 	getRandomPoints();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
@@ -126,12 +170,6 @@ void TspBase::randomData(){
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	cout << "\ngetCost:" << totaltime << "ms!" << endl;
-
-	start = clock();
-	getRandomDemand();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
 
 }
 

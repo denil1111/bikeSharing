@@ -4,6 +4,7 @@
 
 CapacitatedBSP::CapacitatedBSP(int num) :TspBase(num){
 	// used for CapacitatedBSP:
+	_startFromWhichPiece = PIECE_0;
 	_startStationCapacitatedBSP = -1;
 	_superNodeNumber = 0;
 	_sumCapacitatedBSP = 0;
@@ -22,38 +23,56 @@ int CapacitatedBSP::getStartStationCapacitatedBSP(){
 
 }
 
-void CapacitatedBSP::getSuperNodePieces(){
-	int lastsupernodeflag = PIECE_0;
+void CapacitatedBSP::getSuperNodePieces(int number){
+	int lastsupernodeflag = PIECE_NULL;
 
 	vector<int>::iterator it = _path.begin();
-	while (_stationDemand[*it] < 0){
-		++it;
+	for (int i = 0; i < number; i++){
+		if (++it == _path.end()){
+			it = _path.begin();
+		}
 	}
 	_startStationCapacitatedBSP = *it;
-	cout << "Start station id:" << _startStationCapacitatedBSP << endl << endl;
+
+	//cout << "Start station id:" << _startStationCapacitatedBSP << " "<<_stationDemand[*it] <<endl << endl;
 	int surplusdemand = 0;
 
-	bool flag = true;
-	while (*it != _startStationCapacitatedBSP || flag){
+	int flag = true;
+	int stopflag = 0;
+	//while (*it != _startStationCapacitatedBSP || flag){
+	while (stopflag < _stationNum){
 		flag = false;
+
 		SuperNode newpiece(Q / 2);
-		surplusdemand = newpiece.getASuperNode(_path, _stationDemand, _startStationCapacitatedBSP, it, surplusdemand);
+		surplusdemand = newpiece.getASuperNode(_path, _stationDemand, _startStationCapacitatedBSP, it, surplusdemand, stopflag, _stationNum);
 		if (newpiece.getPieceTypeFlag() == PIECE_P){
 			_superNodeNumber_PIECE_P++;
 			++_superNodeNumber;
 			_superNodeVector_PIECE_P.push_back(newpiece);
 			lastsupernodeflag = PIECE_P;
+
+			if (_startFromWhichPiece == PIECE_0){
+				_startFromWhichPiece = PIECE_P;
+				cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+			}
+
 		}
 		else if (newpiece.getPieceTypeFlag() == PIECE_N){
 			_superNodeNumber_PIECE_N++;
 			++_superNodeNumber;
 			_superNodeVector_PIECE_N.push_back(newpiece);
 			lastsupernodeflag = PIECE_N;
+
+			if (_startFromWhichPiece == PIECE_0){
+				_startFromWhichPiece = PIECE_N;
+				cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+			}
+
 		}
 		else{
 			_superNodeVector_PIECE_0.push_back(newpiece);
 			_superNodeNumber_PIECE_0++;
-			if (lastsupernodeflag == PIECE_0){
+			if (lastsupernodeflag == PIECE_NULL){
 				++_zeroSuperNodeNumberInFront;
 			}
 			else if (lastsupernodeflag == PIECE_P){
@@ -64,7 +83,6 @@ void CapacitatedBSP::getSuperNodePieces(){
 			}
 		}
 	}
-
 }
 
 
@@ -245,41 +263,72 @@ void CapacitatedBSP::machingSuperNode(){
 
 }
 
-void CapacitatedBSP::getZeroPath(int currentnumberofzeropiece){
-	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
-	//cout << endl << "这是一个零块:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
-	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
-		if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *it) || _finalPath.size() == 0){
-			_finalPath.push_back(*it);
+void CapacitatedBSP::getPositivePath(int currentnumberofzeropiece, vector<int> &path){
+	vector<int>::iterator it = _superNodeVector_PIECE_P[currentnumberofzeropiece].getStartIt();
+	//cout << endl << "This is a positive piece:" << _superNodeVector_PIECE_P[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
+	for (int i = 0; i < _superNodeVector_PIECE_P[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
+			path.push_back(*it);
 
 		}
-		//cout << *it << "零 ";
+		//cout << *it << "P ";
 		if (++it == _path.end()){
 			it = _path.begin();
 		}
 	}
 }
 
-void CapacitatedBSP::getZeroPathInFront(){
-	//cout << "最前面的零块：";
-	for (int i = 0; i < _zeroSuperNodeNumberInFront; i++){
-		getZeroPath(i);
+void CapacitatedBSP::getNegativePath(int currentnumberofzeropiece, vector<int> &path){
+	vector<int>::iterator it = _superNodeVector_PIECE_N[currentnumberofzeropiece].getStartIt();
+	//cout << endl << "This is a negative piece:" << _superNodeVector_PIECE_N[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
+	for (int i = 0; i < _superNodeVector_PIECE_N[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
+			path.push_back(*it);
+
+		}
+		//cout << *it << "N ";
+		if (++it == _path.end()){
+			it = _path.begin();
+		}
 	}
 }
 
+void CapacitatedBSP::getZeroPath(int currentnumberofzeropiece, vector<int> &path){
+	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
+	//cout << endl << "This is a zero piece:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
+	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
+		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
+			path.push_back(*it);
 
-void CapacitatedBSP::getPath(){
+		}
+		//cout << *it << "& ";
+		if (++it == _path.end()){
+			it = _path.begin();
+		}
+	}
+}
+
+void CapacitatedBSP::getZeroPathInFront(vector<int> &path){
+	//cout << "Front zero pieces:" << _zeroSuperNodeNumberInFront;
+	for (int i = 0; i < _zeroSuperNodeNumberInFront; i++){
+		getZeroPath(i, path);
+	}
+	//cout << endl<<endl;
+}
+
+
+void CapacitatedBSP::getPathBeginPositive(){
 	int currentnumberofzeropiece = 0;
 	if (_zeroSuperNodeNumberInFront != 0){
-		getZeroPathInFront();
+		getZeroPathInFront(_finalPath);
 		currentnumberofzeropiece += _zeroSuperNodeNumberInFront;
 	}
 	if (_superNodeNumber >= 2){
 		for (int positivesupernode = 0; positivesupernode < _superNodeNumber / 2; positivesupernode++){
 			int negativesupernode = _superNodeVector_PIECE_P[positivesupernode].getMatchingNumber();
 			vector<int>::iterator positiveit = _superNodeVector_PIECE_P[positivesupernode].getStartIt();
-			//cout << "这是一个正块:";
-			//cout << " " << _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode() << " ";
+			//cout << "This is a positive piece:";
+			//cout << _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode() << " ";
 			for (int i = 0; i < _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode(); i++, ++positiveit){
 				if (positiveit == _path.end()){
 					positiveit = _path.begin();
@@ -287,75 +336,32 @@ void CapacitatedBSP::getPath(){
 				if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *positiveit) || _finalPath.size() == 0){
 					_finalPath.push_back(*positiveit);
 				}
+				//cout << *positiveit << "P ";
 
-				//cout << *positiveit << "正 ";
 				if (positiveit == _minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt){
-					vector<int>::iterator negativestartit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
-					vector<int>::iterator negativeendit = _superNodeVector_PIECE_N[negativesupernode].getEndIt();
-					vector<int>::iterator nagetiveit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
-					vector<int>::iterator targetit = _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt;
-					//cout << "这是一个负块:";
-					if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *nagetiveit) || _finalPath.size() == 0){
-						_finalPath.push_back(*nagetiveit);
-					}
-					//cout << *nagetiveit << " ";
-					if (nagetiveit == negativestartit){
+					//cout << "This is a negative piece:";
+					//	cout << "测试点5" << endl;
+					getNegativePath(negativesupernode, _finalPath);
 
-						int numberofzeropiece = 0;
-						if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
-							for (int i = 0; i < numberofzeropiece; i++){
-								getZeroPath(currentnumberofzeropiece);
-								++currentnumberofzeropiece;
-							}
-						}
-
-						nagetiveit = negativeendit;
-					}
-					else if (nagetiveit == _path.begin()){
-						nagetiveit = _path.end() - 1;
-					}
-					else{
-						--nagetiveit;
-					}
-
-					while (nagetiveit != targetit){
-						if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *nagetiveit) || _finalPath.size() == 0){
-							_finalPath.push_back(*nagetiveit);
-						}
-						if (nagetiveit == negativestartit){
-							nagetiveit = negativeendit;
-
-							int numberofzeropiece = 0;
-							if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
-								for (int i = 0; i < numberofzeropiece; i++){
-									getZeroPath(currentnumberofzeropiece);
-									++currentnumberofzeropiece;
-								}
-							}
-
-						}
-						else if (nagetiveit == _path.begin()){
-							nagetiveit = _path.end() - 1;
-						}
-						else{
-							--nagetiveit;
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPath(currentnumberofzeropiece, _finalPath);
+							++currentnumberofzeropiece;
 						}
 					}
-					if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *targetit) || _finalPath.size() == 0){
-						_finalPath.push_back(*targetit);
-					}
-					//cout << *nagetiveit << "负 ";
+
 					if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *positiveit) || _finalPath.size() == 0){
 						_finalPath.push_back(*positiveit);
 					}
-					//	cout << *positiveit << "正 ";
+					//		cout << *positiveit << "$$$$ ";
 				}// if negative
 
 				int numberofzeropiece = 0;
-				if (positiveit == _superNodeVector_PIECE_P[positivesupernode].getEndIt()
-					&& (numberofzeropiece = _superNodeVector_PIECE_P[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
+				if (positiveit == _superNodeVector_PIECE_P[positivesupernode].getEndIt() &&
+					(numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
 					for (int i = 0; i < numberofzeropiece; i++){
-						getZeroPath(currentnumberofzeropiece);
+						getZeroPath(currentnumberofzeropiece, _finalPath);
 						++currentnumberofzeropiece;
 					}
 				}
@@ -363,10 +369,78 @@ void CapacitatedBSP::getPath(){
 			//cout << endl;
 		}// for positive and negative
 	}// if
+	//cout << endl;
+
+	PRINTFFinalPath
+
+}
+
+void CapacitatedBSP::getPathBeginNegative(){
+	int currentnumberofzeropiece = 0;
+	if (_zeroSuperNodeNumberInFront != 0){
+		getZeroPathInFront(_finalPath);
+		currentnumberofzeropiece += _zeroSuperNodeNumberInFront;
+	}
+	if (_superNodeNumber >= 2){
+		for (int negativesupernode = 0; negativesupernode < _superNodeNumber / 2; negativesupernode++){
+			int positivesupernode = _superNodeVector_PIECE_N[negativesupernode].getMatchingNumber();
+			vector<int>::iterator negativeit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
+			//cout << "This is a negative piece:";
+			//cout << _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode() << " ";
+			for (int i = 0; i < _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode(); i++, ++negativeit){
+				if (negativeit == _path.end()){
+					negativeit = _path.begin();
+				}
+				if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *negativeit) || _finalPath.size() == 0){
+					_finalPath.push_back(*negativeit);
+				}
+				//	cout << *negativeit << "N ";
+
+				if (negativeit == _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt){
+					//		cout << "This is a positive piece:";
+					getPositivePath(positivesupernode, _finalPath);
+
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPath(currentnumberofzeropiece, _finalPath);
+							++currentnumberofzeropiece;
+						}
+					}
+
+					if ((_finalPath.size() > 0 && *(_finalPath.end() - 1) != *negativeit) || _finalPath.size() == 0){
+						_finalPath.push_back(*negativeit);
+					}
+					//		cout << *negativeit << "$$$$ ";
+				}// if negative
+
+				int numberofzeropiece = 0;
+				if (negativeit == _superNodeVector_PIECE_N[negativesupernode].getEndIt() &&
+					(numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
+					for (int i = 0; i < numberofzeropiece; i++){
+						getZeroPath(currentnumberofzeropiece, _finalPath);
+						++currentnumberofzeropiece;
+					}
+				}
+			}//for positive
+			//	cout << endl;
+		}// for positive and negative
+	}// if
 	//	cout << endl;
 
 	PRINTFFinalPath
 
+}
+
+void CapacitatedBSP::getPath(){
+	if (_startFromWhichPiece == PIECE_P){
+		cout << "_startFromWhichPiece:PIECE_P" << endl;
+		getPathBeginPositive();
+	}
+	else{
+		cout << "_startFromWhichPiece:PIECE_N" << endl;
+		getPathBeginNegative();
+	}
 }
 
 int CapacitatedBSP::getFinalSum(){
@@ -433,7 +507,7 @@ void CapacitatedBSP::run(){
 
 	sum = clock();
 	start = clock();
-	getSuperNodePieces();
+	getSuperNodePieces(0);
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	cout << "\ngetSuperNodePieces:" << totaltime << "ms!" << endl;

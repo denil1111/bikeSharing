@@ -23,9 +23,12 @@ using namespace std;
 // piece type:
 #ifndef SP
 #define SP
-#define PIECE_0	0
-#define PIECE_P	1
-#define PIECE_N -1
+
+#define PIECE_0		0
+#define PIECE_P		1
+#define PIECE_N		-1
+#define PIECE_NULL	250
+
 #endif
 
 struct MinCostOfTwoSuperNode{
@@ -84,6 +87,7 @@ public:
 	int getLastNodeDemand();
 	int getPieceTypeFlag();
 
+	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);
 	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand);
 };
 

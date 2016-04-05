@@ -50,6 +50,7 @@ private:
 	int _startStationUncapacitatedBSP;
 
 	// user for CapacitatedBSP:
+	int _startFromWhichPiece;
 	int _startStationCapacitatedBSP;
 	int _sumCapacitatedBSP;
 	int _superNodeNumber; // positive plus negative plus last one zero super node
@@ -65,7 +66,6 @@ private:
 public:
 
 	vector<int> _finalPath;
-
 	void run();
 
 public:
@@ -82,19 +82,24 @@ public:
 	int  getStartStation();
 
 	// used for Capacitated BSP:
-	void getSuperNodePieces();
+	void getSuperNodePieces(int number);
 	void initMinCostAmongSuperNode();
 	void calculateMinCostOfTwoSuperNode(int first, int second);
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
 	int  getStartStationCapacitatedBSP();
-	void getZeroPath(int currentnumberofzeropiece);
-	void getZeroPathInFront();
+	void getPositivePath(int currentnumberofzeropiece, vector<int> &path);
+	void getNegativePath(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPath(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPathInFront(vector<int> &path);
+	void getPathBeginNegative();
+	void getPathBeginPositive();
 	void getPath();
 	int  getFinalSum();
 
 	void printSuperNodeInformation();
+	void printTspPath();
 	void printFinalPath();
 
 };// class BikeSharing
