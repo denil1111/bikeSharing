@@ -32,8 +32,8 @@
                     "src/test/supernode.cpp",
                     "src/test/mergeBSP.cpp",
                     "src/test/test.cpp",
-	            "src/test/ktimescapacitatedBSP.cpp",
-		    "src/test/tspbase.cpp" 				
+	                  "src/test/ktimescapacitatedBSP.cpp",
+		                "src/test/tspbase.cpp" 				
                   ]
     }
   ]

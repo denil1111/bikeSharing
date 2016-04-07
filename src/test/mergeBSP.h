@@ -74,6 +74,7 @@ public:
 	vector<StationidAndDemand> _minCostPath;
 	int _minSum;
 	int _startStationCapacitatedBSP;
+	point _depot;
 
 public:
 	

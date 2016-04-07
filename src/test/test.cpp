@@ -40,7 +40,7 @@ int randomDataScript(int num,v8::Local<v8::Array> &retArr)
                 Nan::New(MainBSP->_point[i].a));
 		Nan::Set(pointI,Nan::New("y").ToLocalChecked(),
                 Nan::New(MainBSP->_point[i].b));
-		Nan::Set(pointI,Nan::New("demand").ToLocalChecked(),
+		Nan::Set(pointI,Nan::New("d").ToLocalChecked(),
                 Nan::New(MainBSP->_stationDemand[i]));
   		Nan::Set(retArr, i, pointI);
 	}
@@ -78,7 +78,7 @@ int runMergeScript(int num,v8::Local<v8::Array> &retArr)
         v8::Local<v8::Object> pointI = Nan::New<v8::Object>();
         Nan::Set(pointI,Nan::New("id").ToLocalChecked(),
                  Nan::New(MainBSP->_minCostPath[i].stationId));
-        Nan::Set(pointI,Nan::New("demand").ToLocalChecked(),
+        Nan::Set(pointI,Nan::New("d").ToLocalChecked(),
                  Nan::New(MainBSP->_minCostPath[i].stationDemand));
   		Nan::Set(retArr, i, pointI);
 	}
