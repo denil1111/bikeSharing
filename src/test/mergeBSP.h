@@ -66,9 +66,14 @@ private:
 
 public:
 
-	int _startStationCapacitatedBSP;
-	vector<int> _finalPath;
+	
+	//vector<int> _finalPath;
 	void run();
+
+	vector<vector<StationidAndDemand> > _pathSet;
+	vector<StationidAndDemand> _minCostPath;
+	int _minSum;
+	int _startStationCapacitatedBSP;
 
 public:
 	
@@ -86,33 +91,41 @@ public:
 	// used for Capacitated BSP:
 	void getSuperNodePieces(int number);
 	void initMinCostAmongSuperNode();
+	void initSuperNode();
 	void calculateMinCostOfTwoSuperNode(int first, int second);
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
 	int  getStartStationCapacitatedBSP();
 
-	// used for 
-	void getPositivePath(int currentnumberofzeropiece, vector<int> &path);
-	void getNegativePath(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPath(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPathInFront(vector<int> &path);
-	void getPathBeginNegative();
+	void pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp);
+	void getPositivePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getNegativePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathInFront(vector<StationidAndDemand> &tempVector);
 	void getPathBeginPositive();
+	void getPathBeginNegative();
 	void getPath();
-	int  getFinalSum(vector<int> &path);
+	int  getFinalSum(vector<StationidAndDemand> temp);
 
 	// used for opposite direction:
-	void getPositivePathReverse(int currentnumberofzeropiece, vector<int> &path);
-	void getNegativePathReverse(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPathReverse(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPathInBehind(vector<int> &path);
+	void getPositivePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getNegativePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathInBehind(vector<StationidAndDemand> &tempVector);
 	void getPathBeginPositiveReverse();
 	void getPathBeginNegativeReverse();
 
+	int getStartStationCapacitated();
+
+	// printf something:
 	void printSuperNodeInformation();
 	void printTspPath();
+	void printTempPath(vector<StationidAndDemand> temp);
 	void printFinalPath();
+
+	// check
+	bool checkSum();
 
 };// class BikeSharing
 

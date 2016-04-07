@@ -101,7 +101,7 @@ public:
 	void getPathBeginNegativeReverse();
 
 	// used for find a valid start point:
-	int  getStartStation();
+	int  getStartStationCapacitated();
 
 	// printf something:
 	void printSuperNodeInformation();

@@ -747,7 +747,7 @@ int KTimesCapacitatedBSP::getFinalSum(vector<StationidAndDemand> temp){
 	return tempsum;
 }
 
-int KTimesCapacitatedBSP::getStartStation(){
+int KTimesCapacitatedBSP::getStartStationCapacitated(){
 	vector<StationidAndDemand>::const_iterator it = _minCostPath.begin();
 	vector<StationidAndDemand>::const_iterator itt = _minCostPath.begin();
 
@@ -800,9 +800,6 @@ int KTimesCapacitatedBSP::getStartStation(){
 	return -1;
 }
 
-
-
-
 void KTimesCapacitatedBSP::run(){
 
 	clock_t start, finish, sum;
@@ -826,7 +823,8 @@ void KTimesCapacitatedBSP::run(){
 		cout << "Get a path " << i << endl << endl;
 	}
 	PRINTFFinalPath
-	getStartStation();
+
+	getStartStationCapacitated();
 	cout << "Mininum sum cost:" << _minSum << endl;
 	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
 	cout << "length:" << _minCostPath.size() << endl;
