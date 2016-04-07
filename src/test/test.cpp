@@ -73,9 +73,14 @@ int runMergeScript(int num,v8::Local<v8::Array> &retArr)
 		MainBSP->randomData();
 	}
     MainBSP->run();
-    retArr = Nan::New<v8::Array>(MainBSP->_finalPath.size());
-    for (int i = 0; i < MainBSP->_finalPath.size(); i++) {  
-  		Nan::Set(retArr, i, Nan::New(MainBSP->_finalPath[i]));
+    retArr = Nan::New<v8::Array>(MainBSP->_minCostPath.size());
+    for (int i = 0; i < MainBSP->_minCostPath.size(); i++) {
+        v8::Local<v8::Object> pointI = Nan::New<v8::Object>();
+        Nan::Set(pointI,Nan::New("id").ToLocalChecked(),
+                 Nan::New(MainBSP->_minCostPath[i].stationId));
+        Nan::Set(pointI,Nan::New("demand").ToLocalChecked(),
+                 Nan::New(MainBSP->_minCostPath[i].stationDemand));
+  		Nan::Set(retArr, i, pointI);
 	}
 }
 
