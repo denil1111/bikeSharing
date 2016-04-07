@@ -50,6 +50,8 @@ private:
 	int _sumCapacitatedBSP;
 	int _superNodeNumber; // positive plus negative plus last one zero super node
 	int _zeroSuperNodeNumberInFront;
+	//  opposite direction:
+	int _zeroSuperNodeNumberInEnd;
 	int _superNodeNumber_PIECE_P;
 	int _superNodeNumber_PIECE_N;
 	int _superNodeNumber_PIECE_0;
@@ -77,6 +79,7 @@ public:
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
+
 	int  getStartStationCapacitatedBSP();
 	void getPositivePath(int currentnumberofzeropiece, vector<int> &path);
 	void getNegativePath(int currentnumberofzeropiece, vector<int> &path);
@@ -85,7 +88,15 @@ public:
 	void getPathBeginNegative();
 	void getPathBeginPositive();
 	void getPath();
-	int  getFinalSum();
+	int  getFinalSum(vector<int> &path);
+
+	// used for opposite direction:
+	void getPositivePathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getNegativePathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPathInBehind(vector<int> &path);
+	void getPathBeginPositiveReverse();
+	void getPathBeginNegativeReverse();
 
 	// printf something:
 	void printSuperNodeInformation();

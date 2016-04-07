@@ -43,21 +43,29 @@ Algorithm describe:
 //#define DEBUG haha
 
 #ifdef  DEBUG
+
 #define PRINTFDemand			printDemand();
+#define CHECKRandomDemand		checkRandomDemand();
 #define PRINTFPoints			printPoints();
-//#define PRINTFCost				printCost();
+#define PRINTFCost				printCost();
 #define PRINTFTSPtour			printTSPtour();
 #define PRINTFSuperNode			printSuperNodeInformation();
 #define PRINTFFinalPath			printFinalPath();
 #define PRINTFReuslt			;
+#define PRINTFTempPath			printTempPath(tempVector);
 #define PRINTFTspPath			printTspPath();
+
 #else
+
 #define PRINTFDemand			;
+#define CHECKRandomDemand		;
 #define PRINTFPoints			;
 #define PRINTFCost				;
 #define PRINTFTSPtour			;
 #define PRINTFSuperNode			;
 #define PRINTFReuslt			;
-#define PRINTFFinalPath			;
 #define PRINTFTspPath			printTspPath();
+#define PRINTFTempPath			;
+#define PRINTFFinalPath			printFinalPath();
+
 #endif

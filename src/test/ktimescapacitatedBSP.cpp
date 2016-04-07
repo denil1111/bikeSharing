@@ -47,6 +47,11 @@ int KTimesCapacitatedBSP::getStartStationCapacitatedBSP(){
 }
 
 void KTimesCapacitatedBSP::getSuperNodePieces(int number){
+	int startstation;
+	// used for opposite direction:
+	int previousupernode = PIECE_0;
+	int previouszeronumber = 0;
+	// used for forward direction to record last one super node:
 	int lastsupernodeflag = PIECE_NULL;
 
 	vector<int>::iterator it = _path.begin();
@@ -55,46 +60,66 @@ void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 			it = _path.begin();
 		}
 	}
-	_startStationCapacitatedBSP = *it;
+	startstation = *it;
 
-	//cout << "Start station id:" << _startStationCapacitatedBSP << " "<<_stationDemand[*it] <<endl << endl;
+	//cout << "Start station id:" << startstation << " "<<_stationDemand[*it] <<endl << endl;
 	int surplusdemand = 0;
 
 	int flag = true;
 	int stopflag = 0;
-	//while (*it != _startStationCapacitatedBSP || flag){
 	while (stopflag < _stationNum){
 		flag = false;
 
 		SuperNode newpiece(Q / 2);
-		surplusdemand = newpiece.getASuperNode(_path, _stationDemand, _startStationCapacitatedBSP, it, surplusdemand, stopflag, _stationNum);
+		surplusdemand = newpiece.getASuperNode(_path, _stationDemand, startstation, it, surplusdemand, stopflag, _stationNum);
+
 		if (newpiece.getPieceTypeFlag() == PIECE_P){
 			_superNodeNumber_PIECE_P++;
 			++_superNodeNumber;
+
+			// used for opposite direction:
+			if (previouszeronumber != 0){
+				newpiece.setNumberOfZeroPieceFront(previouszeronumber);
+				previouszeronumber = 0;
+			}
+
 			_superNodeVector_PIECE_P.push_back(newpiece);
 			lastsupernodeflag = PIECE_P;
 
+			// used for record first non-zero super node.
 			if (_startFromWhichPiece == PIECE_0){
 				_startFromWhichPiece = PIECE_P;
-				cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+				//cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
 			}
 
 		}
 		else if (newpiece.getPieceTypeFlag() == PIECE_N){
 			_superNodeNumber_PIECE_N++;
 			++_superNodeNumber;
+
+			// used for opposite direction:
+			if (previouszeronumber != 0){
+				newpiece.setNumberOfZeroPieceFront(previouszeronumber);
+				previouszeronumber = 0;
+			}
+
 			_superNodeVector_PIECE_N.push_back(newpiece);
 			lastsupernodeflag = PIECE_N;
 
+			// used for record first non-zero super node.
 			if (_startFromWhichPiece == PIECE_0){
 				_startFromWhichPiece = PIECE_N;
-				cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+				//cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
 			}
 
 		}
 		else{
 			_superNodeVector_PIECE_0.push_back(newpiece);
 			_superNodeNumber_PIECE_0++;
+
+			previouszeronumber++;
+
+			// used for forward direction to record zero pieces to P or N super node:
 			if (lastsupernodeflag == PIECE_NULL){
 				++_zeroSuperNodeNumberInFront;
 			}
@@ -106,6 +131,11 @@ void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 			}
 		}
 	}
+
+	// used for opposite direction: 
+	_zeroSuperNodeNumberInEnd = previouszeronumber;
+
+	//cout << "_zeroSuperNodeNumberInFront:" << _zeroSuperNodeNumberInFront << " _zeroSuperNodeNumberInEnd:" << _zeroSuperNodeNumberInEnd << endl << endl;
 }
 
 void KTimesCapacitatedBSP::initMinCostAmongSuperNode(){
@@ -121,6 +151,21 @@ void KTimesCapacitatedBSP::initMinCostAmongSuperNode(){
 		}
 		_minCostAmongSuperNode.push_back(m);
 	}
+}
+
+void KTimesCapacitatedBSP::initSuperNode(){
+	_startFromWhichPiece = PIECE_0;
+	_startStationCapacitatedBSP = -1;
+	_superNodeNumber = 0;
+	_superNodeNumber_PIECE_P = 0;
+	_superNodeNumber_PIECE_N = 0;
+	_superNodeNumber_PIECE_0 = 0;
+	_zeroSuperNodeNumberInFront = 0;
+	_superNodeVector_PIECE_P.clear();
+	_superNodeVector_PIECE_N.clear();
+	_superNodeVector_PIECE_0.clear();
+	_minCostAmongSuperNode.clear();
+	initMinCostAmongSuperNode();
 }
 
 void KTimesCapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode, int negativesupernode){
@@ -286,194 +331,388 @@ void KTimesCapacitatedBSP::machingSuperNode(){
 
 }
 
-void KTimesCapacitatedBSP::getPositivePath(int currentnumberofzeropiece, vector<int> &path){
-	vector<int>::iterator it = _superNodeVector_PIECE_P[currentnumberofzeropiece].getStartIt();
-	//cout << endl << "This is a positive piece:" << _superNodeVector_PIECE_P[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
-	for (int i = 0; i < _superNodeVector_PIECE_P[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
-		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
-			path.push_back(*it);
-
-		}
-		//cout << *it << "P ";
-		if (++it == _path.end()){
-			it = _path.begin();
-		}
+void KTimesCapacitatedBSP::pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp){
+	if (tempVector.size() == 0){
+		tempVector.push_back(temp);
+	}
+	//else if (tempVector[tempVector.size() - 1].stationId == temp.stationId){
+	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << tempVector[tempVector.size() - 1].stationDemand << endl;
+	//	//tempVector[tempVector.size() - 1].stationDemand += temp.stationDemand;
+	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << temp.stationDemand << endl;
+	//	//
+	//}
+	else{
+		tempVector.push_back(temp);
 	}
 }
 
-void KTimesCapacitatedBSP::getNegativePath(int currentnumberofzeropiece, vector<int> &path){
-	vector<int>::iterator it = _superNodeVector_PIECE_N[currentnumberofzeropiece].getStartIt();
-	//cout << endl << "This is a negative piece:" << _superNodeVector_PIECE_N[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
-	for (int i = 0; i < _superNodeVector_PIECE_N[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
-		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
-			path.push_back(*it);
+void KTimesCapacitatedBSP::getPositivePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.end() - 1;
+	for (itt; itt > _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.begin(); --itt){
+		pushbackStationidAndDemand(tempVector, *itt);
+	}
+	// itt == _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.begin();
+	pushbackStationidAndDemand(tempVector, *itt);
+}
 
-		}
-		//cout << *it << "N ";
-		if (++it == _path.end()){
-			it = _path.begin();
-		}
+void KTimesCapacitatedBSP::getPositivePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.begin();
+	for (itt; itt < _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.end(); ++itt){
+		pushbackStationidAndDemand(tempVector, *itt);
 	}
 }
 
-void KTimesCapacitatedBSP::getZeroPath(int currentnumberofzeropiece, vector<int> &path){
-	vector<int>::iterator it = _superNodeVector_PIECE_0[currentnumberofzeropiece].getStartIt();
-	//cout << endl << "This is a zero piece:" << _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode() << "  ";
-	for (int i = 0; i < _superNodeVector_PIECE_0[currentnumberofzeropiece].getNodeNumberInSuperNode(); i++){
-		if ((path.size() > 0 && *(path.end() - 1) != *it) || path.size() == 0){
-			path.push_back(*it);
+void KTimesCapacitatedBSP::getNegativePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.end() - 1;
+	for (itt; itt > _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.begin(); --itt){
+		pushbackStationidAndDemand(tempVector, *itt);
+	}
+	// itt == _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.begin();
+	pushbackStationidAndDemand(tempVector, *itt);
+}
 
-		}
-		//cout << *it << "& ";
-		if (++it == _path.end()){
-			it = _path.begin();
-		}
+void KTimesCapacitatedBSP::getNegativePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.begin();
+	for (itt; itt < _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.end(); ++itt){
+		pushbackStationidAndDemand(tempVector, *itt);
 	}
 }
 
-void KTimesCapacitatedBSP::getZeroPathInFront(vector<int> &path){
-	//cout << "Front zero pieces:" << _zeroSuperNodeNumberInFront;
+void KTimesCapacitatedBSP::getZeroPathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_0[currentnumberofzeropiece]._stationidAndDemand.end() - 1;
+	for (itt; itt > _superNodeVector_PIECE_0[currentnumberofzeropiece]._stationidAndDemand.begin(); --itt){
+		pushbackStationidAndDemand(tempVector, *itt);
+	}
+	// itt == _superNodeVector_PIECE_0[currentnumberofzeropiece]._stationidAndDemand.begin();
+	pushbackStationidAndDemand(tempVector, *itt);
+}
+
+void KTimesCapacitatedBSP::getZeroPath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector){
+	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_0[currentnumberofzeropiece]._stationidAndDemand.begin();
+	for (itt; itt < _superNodeVector_PIECE_0[currentnumberofzeropiece]._stationidAndDemand.end(); ++itt){
+		pushbackStationidAndDemand(tempVector, *itt);
+	}
+}
+
+// used for opposite direction:
+void KTimesCapacitatedBSP::getZeroPathInBehind(vector<StationidAndDemand> &tempVector){
+	int zeronum = _superNodeVector_PIECE_0.size();
+	int i = zeronum - 1;
+	for (int j = 0; j < _zeroSuperNodeNumberInEnd; j++, i--){
+		getZeroPathReverse(i, tempVector);
+	}
+}
+
+void KTimesCapacitatedBSP::getZeroPathInFront(vector<StationidAndDemand> &tempVector){
 	for (int i = 0; i < _zeroSuperNodeNumberInFront; i++){
-		getZeroPath(i, path);
+		getZeroPath(i, tempVector);
 	}
-	//cout << endl<<endl;
 }
 
+void KTimesCapacitatedBSP::getPathBeginPositiveReverse(){
+	vector<StationidAndDemand> tempVector;
+
+	int currentnumberofzeropiece = _superNodeVector_PIECE_0.size() - 1;
+	if (_zeroSuperNodeNumberInEnd != 0){
+		getZeroPathInBehind(tempVector);
+		currentnumberofzeropiece -= _zeroSuperNodeNumberInEnd;
+	}
+
+	if (_superNodeNumber >= 2){
+		for (int positivesupernode = _superNodeNumber / 2 - 1; positivesupernode >= 0; positivesupernode--){
+			int negativesupernode = _superNodeVector_PIECE_P[positivesupernode].getMatchingNumber();
+			vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.end() - 1;
+
+			for (itt; itt > _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin(); --itt){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt)){
+					getNegativePathReverse(negativesupernode, tempVector);
+
+					// zero super node behind negative super node:
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+				}
+
+				int numberofzeropiece = 0;
+				if (itt == _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin()){
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+				}
+			}//	
+			if (itt == _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin()){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt)){
+					getNegativePathReverse(negativesupernode, tempVector);
+
+					// zero super node behind negative super node:
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+
+					pushbackStationidAndDemand(tempVector, *itt);
+					tempVector[tempVector.size() - 1].stationDemand = 0;
+				}
+
+				int numberofzeropiece = 0;
+				if (itt == _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin()){
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+				}
+			}
+		}// for positive 
+	}// if (_superNodeNumber >= 2)
+
+	_pathSet.push_back(tempVector);
+
+	int tempsum = 0;
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
+
+		_minSum = tempsum;
+		_minCostPath.clear();
+		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+			StationidAndDemand tt;
+			tt.stationId = (*it).stationId;
+			tt.stationDemand = (*it).stationDemand;
+			_minCostPath.push_back(tt);
+		}
+	}
+
+	PRINTFTempPath
+
+}
 
 void KTimesCapacitatedBSP::getPathBeginPositive(){
-	vector<int> temppath;
+	vector<StationidAndDemand> tempVector;
+
 	int currentnumberofzeropiece = 0;
 	if (_zeroSuperNodeNumberInFront != 0){
-		getZeroPathInFront(temppath);
+		getZeroPathInFront(tempVector);
 		currentnumberofzeropiece += _zeroSuperNodeNumberInFront;
 	}
 	if (_superNodeNumber >= 2){
-		for (int positivesupernode = 0; positivesupernode < _superNodeNumber / 2; positivesupernode++){
+		for (int positivesupernode = 0; positivesupernode < _superNodeNumber / 2; ++positivesupernode){
 			int negativesupernode = _superNodeVector_PIECE_P[positivesupernode].getMatchingNumber();
-			vector<int>::iterator positiveit = _superNodeVector_PIECE_P[positivesupernode].getStartIt();
-			//cout << "This is a positive piece:";
-			//cout << _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode() << " ";
-			for (int i = 0; i < _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode(); i++, ++positiveit){
-				if (positiveit == _path.end()){
-					positiveit = _path.begin();
-				}
-				if ((temppath.size() > 0 && *(temppath.end() - 1) != *positiveit) || temppath.size() == 0){
-					temppath.push_back(*positiveit);
-				}
-				//cout << *positiveit << "P ";
-				
-				if (positiveit == _minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt){
-					//cout << "This is a negative piece:";
-				//	cout << "²âÊÔµã5" << endl;
-					getNegativePath(negativesupernode, temppath);
 
+			vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin();
+			for (itt; itt < _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.end(); ++itt){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt)){
+					getNegativePath(negativesupernode, tempVector);
+
+					// zero super node behind negative super node:
 					int numberofzeropiece = 0;
 					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
 						for (int i = 0; i < numberofzeropiece; i++){
-							getZeroPath(currentnumberofzeropiece, temppath);
+							getZeroPath(currentnumberofzeropiece, tempVector);
 							++currentnumberofzeropiece;
 						}
 					}
 
-					if ((temppath.size() > 0 && *(temppath.end() - 1) != *positiveit) || temppath.size() == 0){
-						temppath.push_back(*positiveit);
-					}
-			//		cout << *positiveit << "$$$$ ";
-				}// if negative
+				}
 
 				int numberofzeropiece = 0;
-				if (positiveit == _superNodeVector_PIECE_P[positivesupernode].getEndIt() && 
-					(numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
-					for (int i = 0; i < numberofzeropiece; i++){
-						getZeroPath(currentnumberofzeropiece, temppath);
-						++currentnumberofzeropiece;
+				if (itt == _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.end() - 1){
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPath(currentnumberofzeropiece, tempVector);
+							++currentnumberofzeropiece;
+						}
 					}
 				}
-			}//for positive
-			//cout << endl;
-		}// for positive and negative
-	}// if
-	//cout << endl;
-	_pathSet.push_back(temppath);
+			}//				
+		}// for positive 
+	}// if (_superNodeNumber >= 2)
+
+	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
-	if ((tempsum = getFinalSum(temppath)) < _minSum){
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
+
 		_minSum = tempsum;
 		_minCostPath.clear();
-		for (vector<int>::iterator it = temppath.begin(); it < temppath.end(); ++it){
-			_minCostPath.push_back(*it);
+		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+			StationidAndDemand tt;
+			tt.stationId = (*it).stationId;
+			tt.stationDemand = (*it).stationDemand;
+			_minCostPath.push_back(tt);
 		}
 	}
 
-	PRINTFFinalPath
+	PRINTFTempPath
+
+}
+
+void KTimesCapacitatedBSP::getPathBeginNegativeReverse(){
+	vector<StationidAndDemand> tempVector;
+
+	int currentnumberofzeropiece = _superNodeVector_PIECE_0.size() - 1;
+	if (_zeroSuperNodeNumberInEnd != 0){
+		getZeroPathInBehind(tempVector);
+		currentnumberofzeropiece -= _zeroSuperNodeNumberInEnd;
+	}
+	if (_superNodeNumber >= 2){
+		for (int negativesupernode = _superNodeNumber / 2 - 1; negativesupernode >= 0; negativesupernode--){
+			int positivesupernode = _superNodeVector_PIECE_N[negativesupernode].getMatchingNumber();
+
+			vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.end() - 1;
+			for (itt; itt > _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin(); --itt){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt)){
+					getPositivePathReverse(positivesupernode, tempVector);
+
+					// zero super node behind positive super node:
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+
+				}
+
+				if (itt == _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin()){
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+				}
+			}//	
+			if (itt == _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin()){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt)){
+					getPositivePathReverse(positivesupernode, tempVector);
+
+					// zero super node behind positive super node:
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+
+				}
+
+				if (itt == _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin()){
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceFront()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPathReverse(currentnumberofzeropiece, tempVector);
+							--currentnumberofzeropiece;
+						}
+					}
+				}
+			}//	
+		}// for positive 
+	}// if (_superNodeNumber >= 2)
+
+	_pathSet.push_back(tempVector);
+
+	int tempsum = 0;
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
+
+		_minSum = tempsum;
+		_minCostPath.clear();
+		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+			StationidAndDemand tt;
+			tt.stationId = (*it).stationId;
+			tt.stationDemand = (*it).stationDemand;
+			_minCostPath.push_back(tt);
+		}
+	}
+
+	PRINTFTempPath
 
 }
 
 void KTimesCapacitatedBSP::getPathBeginNegative(){
-	vector<int> temppath;
+	vector<StationidAndDemand> tempVector;
+
 	int currentnumberofzeropiece = 0;
 	if (_zeroSuperNodeNumberInFront != 0){
-		getZeroPathInFront(temppath);
+		getZeroPathInFront(tempVector);
 		currentnumberofzeropiece += _zeroSuperNodeNumberInFront;
 	}
+
 	if (_superNodeNumber >= 2){
-		for (int negativesupernode = 0; negativesupernode < _superNodeNumber / 2; negativesupernode++){
+		for (int negativesupernode = 0; negativesupernode < _superNodeNumber / 2; ++negativesupernode){
 			int positivesupernode = _superNodeVector_PIECE_N[negativesupernode].getMatchingNumber();
-			vector<int>::iterator negativeit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
-			//cout << "This is a negative piece:";
-			//cout << _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode() << " ";
-			for (int i = 0; i < _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode(); i++, ++negativeit){
-				if (negativeit == _path.end()){
-					negativeit = _path.begin();
-				}
-				if ((temppath.size() > 0 && *(temppath.end() - 1) != *negativeit) || temppath.size() == 0){
-					temppath.push_back(*negativeit);
-				}
-			//	cout << *negativeit << "N ";
 
-				if (negativeit == _minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt){
-			//		cout << "This is a positive piece:";
-					getPositivePath(positivesupernode, temppath);
+			vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin();
+			for (itt; itt < _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.end(); ++itt){
+				pushbackStationidAndDemand(tempVector, *itt);
+				// matching station:
+				if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt)){
+					getPositivePath(positivesupernode, tempVector);
 
+					// zero super node behind positive super node:
 					int numberofzeropiece = 0;
 					if ((numberofzeropiece = _superNodeVector_PIECE_P[positivesupernode].getNumberOfZeroPieceBehind()) != 0){
 						for (int i = 0; i < numberofzeropiece; i++){
-							getZeroPath(currentnumberofzeropiece, temppath);
+							getZeroPath(currentnumberofzeropiece, tempVector);
 							++currentnumberofzeropiece;
 						}
 					}
 
-					if ((temppath.size() > 0 && *(temppath.end() - 1) != *negativeit) || temppath.size() == 0){
-						temppath.push_back(*negativeit);
-					}
-			//		cout << *negativeit << "$$$$ ";
-				}// if negative
+					pushbackStationidAndDemand(tempVector, *itt);
+					tempVector[tempVector.size() - 1].stationDemand = 0;
+				}
 
-				int numberofzeropiece = 0;
-				if (negativeit == _superNodeVector_PIECE_N[negativesupernode].getEndIt() &&
-					(numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
-					for (int i = 0; i < numberofzeropiece; i++){
-						getZeroPath(currentnumberofzeropiece, temppath);
-						++currentnumberofzeropiece;
+				if (itt == _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.end() - 1){
+					int numberofzeropiece = 0;
+					if ((numberofzeropiece = _superNodeVector_PIECE_N[negativesupernode].getNumberOfZeroPieceBehind()) != 0){
+						for (int i = 0; i < numberofzeropiece; i++){
+							getZeroPath(currentnumberofzeropiece, tempVector);
+							++currentnumberofzeropiece;
+						}
 					}
 				}
-			}//for positive
-		//	cout << endl;
-		}// for positive and negative
-	}// if
-//	cout << endl;
-	_pathSet.push_back(temppath);
+			}//				
+		}// for positive 
+	}// if (_superNodeNumber >= 2)
+
+	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
-	if ((tempsum = getFinalSum(temppath)) < _minSum){
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
+
 		_minSum = tempsum;
 		_minCostPath.clear();
-		for (vector<int>::iterator it = temppath.begin(); it < temppath.end(); ++it){
-			_minCostPath.push_back(*it);
+		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+			StationidAndDemand tt;
+			tt.stationId = (*it).stationId;
+			tt.stationDemand = (*it).stationDemand;
+			_minCostPath.push_back(tt);
 		}
 	}
 
-	PRINTFFinalPath
+	PRINTFTempPath
 
 }
 
@@ -481,51 +720,88 @@ void KTimesCapacitatedBSP::getPath(){
 	if (_startFromWhichPiece == PIECE_P){
 		cout << "_startFromWhichPiece:PIECE_P" << endl;
 		getPathBeginPositive();
+		getPathBeginNegativeReverse();
 	}
 	else{
 		cout << "_startFromWhichPiece:PIECE_N" << endl;
 		getPathBeginNegative();
+		getPathBeginPositiveReverse();
 	}
 }
 
-int KTimesCapacitatedBSP::getFinalSum(vector<int> &path){
+int KTimesCapacitatedBSP::getFinalSum(vector<StationidAndDemand> temp){
 	FullGraph::Node unode, vnode;
 	int i = 0;
 	int tempsum = 0;
+	vector<StationidAndDemand>::iterator it = temp.begin();
 
-	vector<int>::iterator it = path.begin();
-	unode = (*g)(*(it++));
-	//vnode = (*g)(*negativeit);
-	for (; it < path.end(); ++it){
-		vnode = (*g)(*it);
+	unode = (*g)((*it++).stationId);
+	for (; it < temp.end() - 1; ++it){
+		vnode = (*g)((*it).stationId);
 		if (vnode != unode){
 			tempsum += (*cost)[(*g).edge(unode, vnode)];
-			///*cout << (*cost)[(*g).edge(unode, vnode)] << " ";
-			//if (i++ % 20 == 0){
-			//	cout << endl;
-			//}*/
 		}
 		unode = vnode;
 	}
-	//cout << endl;
 
 	return tempsum;
 }
 
-void KTimesCapacitatedBSP::initSuperNode(){
-	_startFromWhichPiece = PIECE_0;
-	_startStationCapacitatedBSP = -1;
-	_superNodeNumber = 0;
-	_superNodeNumber_PIECE_P = 0;
-	_superNodeNumber_PIECE_N = 0;
-	_superNodeNumber_PIECE_0 = 0;
-	_zeroSuperNodeNumberInFront = 0;
-	_superNodeVector_PIECE_P.clear();
-	_superNodeVector_PIECE_N.clear();
-	_superNodeVector_PIECE_0.clear();
-	_minCostAmongSuperNode.clear();
-	initMinCostAmongSuperNode();
+int KTimesCapacitatedBSP::getStartStation(){
+	vector<StationidAndDemand>::const_iterator it = _minCostPath.begin();
+	vector<StationidAndDemand>::const_iterator itt = _minCostPath.begin();
+
+	if (checkSum()){
+	//if (true){
+		/*while (true){
+			cout << "*";
+			 //find a station which demond is positive:
+			if ((*it).stationDemand >= 0){
+				_startStationCapacitatedBSP = (*it).stationId;
+				int tempSum = (*it).stationDemand;
+				int tempNum = 1;
+
+				while (tempSum >= 0 && tempNum < _minCostPath.size()){
+					++it;
+					++tempNum;
+					if (it == _minCostPath.end()){
+						it = _minCostPath.begin();
+					}
+					tempSum += (*it).stationDemand;
+
+				}
+
+				if (tempNum == _minCostPath.size()){
+					return _startStationCapacitatedBSP;
+				}
+			}
+
+			if (++itt == _minCostPath.end()){
+				itt = _minCostPath.begin();
+			}
+			it = itt;
+		}*/
+		for (itt; itt < _minCostPath.end(); ++itt){
+			it = itt;
+			_startStationCapacitatedBSP = (*it).stationId;
+			int sum = 0;
+			for (int i = 0; i < _minCostPath.size(); i++){
+				sum += (*it).stationDemand;
+				if (++it == _minCostPath.end()){
+					it = _minCostPath.begin();
+				}
+			}
+			if (sum == 0){
+				return _startStationCapacitatedBSP;
+			}
+		}
+	}
+
+	return -1;
 }
+
+
+
 
 void KTimesCapacitatedBSP::run(){
 
@@ -539,46 +815,20 @@ void KTimesCapacitatedBSP::run(){
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
 
-	// Capacitated BSP:
 	cout << endl << "CapacitatedBSP:" << endl;
 
-	///*sum = clock();
-	//start = clock();
-	//getSuperNodePieces();
-	//finish = clock();
-	//totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetSuperNodePieces:" << totaltime << "ms!" << endl;
-
-	//start = clock();
-	//calculateMinCostAmongSuperNode();
-	//finish = clock();
-	//totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ncalculateMinCostAmongSuperNode:" << totaltime << "ms!" << endl;
-
-	//start = clock();
-	//machingSuperNode();
-	//finish = clock();
-	//totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\nmachingSuperNode:" << totaltime << "ms!" << endl;
-
-	//start = clock();
-	//getPath();
-	//finish = clock();
-	//totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetPath:" << totaltime << "ms!" << endl;
-
-	//totaltime2 = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
-	//cout << "\nCapacitated BSP time:" << totaltime2 << "ms! Sum cost:" << _minSum << endl;
-	//cout << "length:" << _minCostPath.size() << endl;*/
 	for (int i = 0; i < Q / 2; i++){
 		initSuperNode();
 		getSuperNodePieces(i);
 		calculateMinCostAmongSuperNode();
 		machingSuperNode();
 		getPath();
-		cout << "Get a path " << i << endl;
+		cout << "Get a path " << i << endl << endl;
 	}
-	cout <<"Mininum sum cost:" << _minSum << endl;
+	PRINTFFinalPath
+	getStartStation();
+	cout << "Mininum sum cost:" << _minSum << endl;
+	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
 	cout << "length:" << _minCostPath.size() << endl;
 	cout << "Path set size:" << _pathSet.size() << endl;
 
@@ -596,7 +846,7 @@ void KTimesCapacitatedBSP::printFinalPath(){
 
 	cout << "Final Path:" << _minCostPath.size() << endl;
 	for (int i = 0; i < _minCostPath.size(); i++){
-		cout << _minCostPath[i] << "(" << _stationDemand[_minCostPath[i]] << ") ";
+		cout << _minCostPath[i].stationId << "(" << _minCostPath[i].stationDemand << ") ";
 	}
 	cout << endl;
 }
@@ -626,3 +876,27 @@ void KTimesCapacitatedBSP::printSuperNodeInformation(){
 	cout << endl;
 }
 
+void KTimesCapacitatedBSP::printTempPath(vector<StationidAndDemand> temp){
+	int sum = 0;
+	cout << "size:" << temp.size() << endl;
+	for (int i = 0; i < temp.size(); i++){
+		cout << temp[i].stationId << "(" << temp[i].stationDemand << ") ";
+		sum += temp[i].stationDemand;
+	}
+	cout << "sum: " << sum << endl;
+	cout << endl;
+}
+
+bool  KTimesCapacitatedBSP::checkSum(){
+	int sum = 0;
+	for (int i = 0; i < _minCostPath.size(); i++){
+		sum += _minCostPath[i].stationDemand;
+	}
+	if (sum != 0){
+		cout << "Final sum != 0!!!!!!!" << endl;
+		return false;
+	}
+	else{
+		return true;
+	}
+}

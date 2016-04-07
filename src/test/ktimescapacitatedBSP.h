@@ -42,12 +42,22 @@ typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
 class KTimesCapacitatedBSP :public TspBase
 {
+public:
+
+	vector<vector<StationidAndDemand> > _pathSet;
+	vector<StationidAndDemand> _minCostPath;
+	int _minSum;
+	int _startStationCapacitatedBSP;
+
+	void run();
 
 private:
 	int _startFromWhichPiece;
-	int _startStationCapacitatedBSP;
-	int _superNodeNumber; // positive plus negative plus last one zero super node
+	// positive plus negative plus last one zero super node
+	int _superNodeNumber; 
 	int _zeroSuperNodeNumberInFront;
+	//  opposite direction:
+	int _zeroSuperNodeNumberInEnd;
 	int _superNodeNumber_PIECE_P;
 	int _superNodeNumber_PIECE_N;
 	int _superNodeNumber_PIECE_0;
@@ -58,19 +68,11 @@ private:
 
 public:
 
-	vector<vector<int> > _pathSet;
-	vector<int> _minCostPath;
-	int _minSum;
-	void run();
-
-public:
-
 	KTimesCapacitatedBSP(int num);
 	~KTimesCapacitatedBSP();
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
-
 	void getSuperNodePieces(int number);
 	void initSuperNode();
 	void initMinCostAmongSuperNode();
@@ -78,20 +80,37 @@ public:
 	void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
+
 	int  getStartStationCapacitatedBSP();
-	void getPositivePath(int currentnumberofzeropiece, vector<int> &path);
-	void getNegativePath(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPath(int currentnumberofzeropiece, vector<int> &path);
-	void getZeroPathInFront(vector<int> &path);
-	void getPathBeginNegative();
+	void pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp);
+	void getPositivePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getNegativePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathInFront(vector<StationidAndDemand> &tempVector);
 	void getPathBeginPositive();
+	void getPathBeginNegative();
 	void getPath();
-	int  getFinalSum(vector<int> &path);
+	int  getFinalSum(vector<StationidAndDemand> temp);
+
+	// used for opposite direction:
+	void getPositivePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getNegativePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
+	void getZeroPathInBehind(vector<StationidAndDemand> &tempVector);
+	void getPathBeginPositiveReverse();
+	void getPathBeginNegativeReverse();
+
+	// used for find a valid start point:
+	int  getStartStation();
 
 	// printf something:
 	void printSuperNodeInformation();
 	void printTspPath();
+	void printTempPath(vector<StationidAndDemand> temp);
 	void printFinalPath();
+
+	// check
+	bool  checkSum();
 
 };
 

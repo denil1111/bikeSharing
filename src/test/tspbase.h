@@ -77,6 +77,9 @@ public:
 	void printCost();
 	void printTSPtour();
 
+	// check
+	void checkRandomDemand();
+
 };// class BikeSharing
 
 #endif

@@ -37,6 +37,11 @@ struct MinCostOfTwoSuperNode{
 	vector<int>::iterator secondNodeIt;
 };
 
+struct StationidAndDemand{
+	int stationId;
+	int stationDemand;
+};
+
 class SuperNode{
 
 private:
@@ -46,9 +51,9 @@ private:
 	int _nowPieceTypeFlag;
 	bool _isFirstTime;
 	int _numberOfZeroPieceBehind;
+	//  opposite direction:
+	int _numberOfZeroPieceFront;
 
-	bool _isHaveCutNode;
-	int _firstNodeDemand;
 	int _lastNodeDemand;
 	// matching number to another super node
 	int _matchingNumber;
@@ -74,10 +79,21 @@ public:
 
 	SuperNode(int excessnumber);
 
+	vector<StationidAndDemand> _stationidAndDemand;
+
+	// used for record front and behind overplus demand:
+	bool _isCutNodeInFront;
+	bool _isCutNodeInBehind;
+	int _demandInFront;
+	int _demandInBehind;
+
 	void setMinCostMatchingNumber(int number);
 	void setsuperNodeNumber(int supernodeId);
 	void setMatchingNumber(int number);
 	int& getNumberOfZeroPieceBehind();
+	//  opposite direction:
+	int& getNumberOfZeroPieceFront();
+	void setNumberOfZeroPieceFront(int number);
 	int getMatchingNumber();
 	int getSuperNodeId();
 	vector<int>::iterator getStartIt();

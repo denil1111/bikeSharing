@@ -51,9 +51,10 @@ private:
 
 	// user for CapacitatedBSP:
 	int _startFromWhichPiece;
-	int _startStationCapacitatedBSP;
 	int _sumCapacitatedBSP;
 	int _superNodeNumber; // positive plus negative plus last one zero super node
+	//  opposite direction:
+	int _zeroSuperNodeNumberInEnd;
 	int _zeroSuperNodeNumberInFront;
 	int _superNodeNumber_PIECE_P;
 	int _superNodeNumber_PIECE_N;
@@ -65,6 +66,7 @@ private:
 
 public:
 
+	int _startStationCapacitatedBSP;
 	vector<int> _finalPath;
 	void run();
 
@@ -89,6 +91,8 @@ public:
 	string getLGF();
 	void machingSuperNode();
 	int  getStartStationCapacitatedBSP();
+
+	// used for 
 	void getPositivePath(int currentnumberofzeropiece, vector<int> &path);
 	void getNegativePath(int currentnumberofzeropiece, vector<int> &path);
 	void getZeroPath(int currentnumberofzeropiece, vector<int> &path);
@@ -96,7 +100,15 @@ public:
 	void getPathBeginNegative();
 	void getPathBeginPositive();
 	void getPath();
-	int  getFinalSum();
+	int  getFinalSum(vector<int> &path);
+
+	// used for opposite direction:
+	void getPositivePathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getNegativePathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPathReverse(int currentnumberofzeropiece, vector<int> &path);
+	void getZeroPathInBehind(vector<int> &path);
+	void getPathBeginPositiveReverse();
+	void getPathBeginNegativeReverse();
 
 	void printSuperNodeInformation();
 	void printTspPath();
