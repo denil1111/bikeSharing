@@ -6,9 +6,6 @@
           '/usr/local/include/',
 	  "<!(node -e \"require('nan')\")"
         ],
-      "libraries": [
-      	"-lemon","-L /usr/local/lib/"
-      ],
       "cflags": [ "-O2" ],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
@@ -16,7 +13,15 @@
         ['OS=="mac"', {
           'xcode_settings': {
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
-          }
+          },
+          "libraries": [
+            "-lemon","-L /usr/local/lib/"
+          ]
+        }],
+        ['OS=="linux"', {
+          "libraries": [
+            "-llemon","-L /usr/local/lib/"
+          ]
         }]
       ],
       "sources": [ 	#"src/cpp/binding.cc",
