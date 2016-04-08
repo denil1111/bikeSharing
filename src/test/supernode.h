@@ -54,8 +54,8 @@ private:
 	//  opposite direction:
 	int _numberOfZeroPieceFront;
 
-	int _lastNodeDemand;
-	// matching number to another super node
+	//int _lastNodeDemand;
+	//// matching number to another super node
 	int _matchingNumber;
 	// mincostmatchingnumber
 	int _minCostMatchingNumber;
@@ -65,14 +65,13 @@ private:
 	int _nodeNumberInSuperNode;
 	// super node ID
 	int _superNodeId;
-	// start id in _path
+	// start iterator in _path
 	vector<int>::iterator _startIt;
-	// end id in _path
+	// end iterator in _path
 	vector<int>::iterator _endIt;
 	// piece type:( 0: 0-piece, 1:p-piece, -1:n-piece
 	int _pieceTypeFlag;
 	// sum of piece
-	int _sum;
 	bool flag;
 
 public:
@@ -80,12 +79,6 @@ public:
 	SuperNode(int excessnumber);
 
 	vector<StationidAndDemand> _stationidAndDemand;
-
-	// used for record front and behind overplus demand:
-	bool _isCutNodeInFront;
-	bool _isCutNodeInBehind;
-	int _demandInFront;
-	int _demandInBehind;
 
 	void setMinCostMatchingNumber(int number);
 	void setsuperNodeNumber(int supernodeId);
@@ -99,8 +92,6 @@ public:
 	vector<int>::iterator getStartIt();
 	vector<int>::iterator getEndIt();
 	int getNodeNumberInSuperNode();
-	int getFirstNodeDemand();
-	int getLastNodeDemand();
 	int getPieceTypeFlag();
 
 	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);

@@ -1,9 +1,17 @@
 #include"ktimescapacitatedBSP.h"
 
-
-
 KTimesCapacitatedBSP::KTimesCapacitatedBSP(int num) :TspBase(num){
-	// used for CapacitatedBSP:
+	_startFromWhichPiece = PIECE_0;
+	_startStationCapacitatedBSP = -1;
+	_superNodeNumber = 0;
+	_minSum = MM;
+	_superNodeNumber_PIECE_P = 0;
+	_superNodeNumber_PIECE_N = 0;
+	_superNodeNumber_PIECE_0 = 0;
+	_zeroSuperNodeNumberInFront = 0;
+}
+
+KTimesCapacitatedBSP::KTimesCapacitatedBSP(int num, int x, int y) :TspBase(num, x, y){
 	_startFromWhichPiece = PIECE_0;
 	_startStationCapacitatedBSP = -1;
 	_superNodeNumber = 0;
@@ -18,7 +26,6 @@ KTimesCapacitatedBSP::~KTimesCapacitatedBSP(){
 
 }
 
-// Get a Random TSP sequence
 // getTspSequence<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
 template <typename TSP>
 void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
@@ -39,11 +46,6 @@ void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
 	}
 
 	PRINTFTspPath
-}
-
-int KTimesCapacitatedBSP::getStartStationCapacitatedBSP(){
-	return _startStationCapacitatedBSP;
-
 }
 
 void KTimesCapacitatedBSP::getSuperNodePieces(int number){
@@ -332,15 +334,21 @@ void KTimesCapacitatedBSP::machingSuperNode(){
 }
 
 void KTimesCapacitatedBSP::pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp){
-	if (tempVector.size() == 0){
+	int num = tempVector.size();
+	if (num == 0){
 		tempVector.push_back(temp);
 	}
-	//else if (tempVector[tempVector.size() - 1].stationId == temp.stationId){
-	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << tempVector[tempVector.size() - 1].stationDemand << endl;
-	//	//tempVector[tempVector.size() - 1].stationDemand += temp.stationDemand;
-	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << temp.stationDemand << endl;
-	//	//
-	//}
+	/*else if (tempVector[num - 1].stationId == temp.stationId){
+	int number = tempVector[num - 1].stationDemand;
+	number += temp.stationDemand;
+
+	tempVector[num - 1].stationDemand = number;
+	cout << "ºÏ²¢£º" << tempVector[num - 1].stationId << endl;
+	haha.push_back(temp);
+	}*/
+	/*else if ((*(tempVector.end() - 1)).stationId == temp.stationId){
+	(*(tempVector.end() - 1)).stationDemand += temp.stationDemand;
+	}*/
 	else{
 		tempVector.push_back(temp);
 	}
@@ -394,7 +402,6 @@ void KTimesCapacitatedBSP::getZeroPath(int currentnumberofzeropiece, vector<Stat
 	}
 }
 
-// used for opposite direction:
 void KTimesCapacitatedBSP::getZeroPathInBehind(vector<StationidAndDemand> &tempVector){
 	int zeronum = _superNodeVector_PIECE_0.size();
 	int i = zeronum - 1;
@@ -487,12 +494,12 @@ void KTimesCapacitatedBSP::getPathBeginPositiveReverse(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -549,12 +556,12 @@ void KTimesCapacitatedBSP::getPathBeginPositive(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -638,12 +645,12 @@ void KTimesCapacitatedBSP::getPathBeginNegativeReverse(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -703,12 +710,12 @@ void KTimesCapacitatedBSP::getPathBeginNegative(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -747,15 +754,32 @@ int KTimesCapacitatedBSP::getFinalSum(vector<StationidAndDemand> temp){
 	return tempsum;
 }
 
+int KTimesCapacitatedBSP::getStartStationCapacitatedBSP(){
+	return _startStationCapacitatedBSP;
+}
+
+void KTimesCapacitatedBSP::deleteRepeatStationPoint(){
+	vector<StationidAndDemand>::iterator it = _minMediumCostPath.begin();
+	_minCostPath.push_back(*it);
+	for (it++; it < _minMediumCostPath.end(); ++it){
+		if ((*it).stationId == _minCostPath[_minCostPath.size() - 1].stationId){
+			_minCostPath[_minCostPath.size() - 1].stationDemand += (*it).stationDemand;
+		}
+		else{
+			_minCostPath.push_back(*it);
+		}
+	}
+}
+
 int KTimesCapacitatedBSP::getStartStationCapacitated(){
 	vector<StationidAndDemand>::const_iterator it = _minCostPath.begin();
 	vector<StationidAndDemand>::const_iterator itt = _minCostPath.begin();
-
+	_startPoint = 0;
 	if (checkSum()){
-	//if (true){
-		/*while (true){
+		//if (true){
+		while (true){
 			cout << "*";
-			 //find a station which demond is positive:
+			// find a station which demond is positive :
 			if ((*it).stationDemand >= 0){
 				_startStationCapacitatedBSP = (*it).stationId;
 				int tempSum = (*it).stationDemand;
@@ -772,6 +796,7 @@ int KTimesCapacitatedBSP::getStartStationCapacitated(){
 				}
 
 				if (tempNum == _minCostPath.size()){
+					cout << endl;
 					return _startStationCapacitatedBSP;
 				}
 			}
@@ -780,24 +805,21 @@ int KTimesCapacitatedBSP::getStartStationCapacitated(){
 				itt = _minCostPath.begin();
 			}
 			it = itt;
-		}*/
-		for (itt; itt < _minCostPath.end(); ++itt){
-			it = itt;
-			_startStationCapacitatedBSP = (*it).stationId;
-			int sum = 0;
-			for (int i = 0; i < _minCostPath.size(); i++){
-				sum += (*it).stationDemand;
-				if (++it == _minCostPath.end()){
-					it = _minCostPath.begin();
-				}
-			}
-			if (sum == 0){
-				return _startStationCapacitatedBSP;
-			}
-		}
-	}
+			_startPoint++;
+		}// while
+	}// if
 
 	return -1;
+}
+
+void KTimesCapacitatedBSP::revertPath(){
+	for (int i = 0; i < _startPoint; i++){
+		StationidAndDemand temp;
+		temp.stationId = (*_minCostPath.begin()).stationId;
+		temp.stationDemand = (*_minCostPath.begin()).stationDemand;
+		_minCostPath.erase(_minCostPath.begin());
+		_minCostPath.push_back(temp);
+	}
 }
 
 void KTimesCapacitatedBSP::run(){
@@ -822,9 +844,13 @@ void KTimesCapacitatedBSP::run(){
 		getPath();
 		cout << "Get a path " << i << endl << endl;
 	}
+
+	deleteRepeatStationPoint();
+	getStartStationCapacitated();
+	revertPath();
+
 	PRINTFFinalPath
 
-	getStartStationCapacitated();
 	cout << "Mininum sum cost:" << _minSum << endl;
 	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
 	cout << "length:" << _minCostPath.size() << endl;
@@ -842,10 +868,25 @@ void KTimesCapacitatedBSP::printTspPath(){
 
 void KTimesCapacitatedBSP::printFinalPath(){
 
-	cout << "Final Path:" << _minCostPath.size() << endl;
+	cout << "Final Path:" << _minMediumCostPath.size() << endl;
+	for (int i = 0; i < _minMediumCostPath.size(); i++){
+		cout << _minMediumCostPath[i].stationId << "(" << _minMediumCostPath[i].stationDemand << ") ";
+	}
+	cout << endl;
+
+	cout << "_minCostPath Path:" << _minCostPath.size() << endl;
 	for (int i = 0; i < _minCostPath.size(); i++){
 		cout << _minCostPath[i].stationId << "(" << _minCostPath[i].stationDemand << ") ";
 	}
+
+	int sum = 0;
+	for (int i = 0; i < _minCostPath.size(); i++){
+		sum += _minCostPath[i].stationDemand;
+	}
+	if (sum != 0){
+		cout << "_minCostPath sum != 0!!!!!!!" << endl;
+	}
+
 	cout << endl;
 }
 

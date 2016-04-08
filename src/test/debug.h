@@ -45,7 +45,6 @@ Algorithm describe:
 #ifdef  DEBUG
 
 #define PRINTFDemand			printDemand();
-#define CHECKRandomDemand		checkRandomDemand();
 #define PRINTFPoints			printPoints();
 #define PRINTFCost				printCost();
 #define PRINTFTSPtour			printTSPtour();
@@ -58,7 +57,6 @@ Algorithm describe:
 #else
 
 #define PRINTFDemand			;
-#define CHECKRandomDemand		;
 #define PRINTFPoints			;
 #define PRINTFCost				;
 #define PRINTFTSPtour			;

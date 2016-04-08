@@ -6,12 +6,30 @@ TspBase::TspBase(int num){
 	g = new FullGraph(num);
 	cost = new DoubleEdgeMap(*g);
 	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
+	_depot.a = 0;
+	_depot.b = 0;
+}
+
+TspBase::TspBase(int num, int x, int y){
+	_tspSum = 0;
+	_stationNum = num;
+	g = new FullGraph(num);
+	cost = new DoubleEdgeMap(*g);
+	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
+	_depot.a = x;
+	_depot.b = y;
 }
 
 TspBase::~TspBase(){
 	delete g;
 	delete cost;
 	delete pos;
+}
+
+
+void TspBase::setDepot(int x, int y){
+	_depot.a = x;
+	_depot.b = y;
 }
 
 // random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
@@ -64,12 +82,16 @@ void TspBase::getRandomDemand(){
 		_stationDemand[_stationNum - 1] = -sum;
 	}
 
-	CHECKRandomDemand
+	checkDemand();
 	PRINTFDemand
 
 }
 
-void TspBase::checkRandomDemand(){
+void TspBase::getDemand(){
+	checkDemand();
+}
+
+void TspBase::checkDemand(){
 	int sum = 0;
 	for (int i = 0; i < _stationNum; i++){
 		sum += _stationDemand[i];
@@ -96,15 +118,9 @@ void TspBase::getRandomPoints(){
 void TspBase::getPoints(){
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
-		_point[i].a = rand() % POINT_RANGE;
-		_point[i].b = rand() % POINT_RANGE;
 		(*pos)[u] = dim2::Point<int>(_point[i].a, _point[i].b);
 	}
 	PRINTFPoints
-}
-
-void TspBase::getDemand(){
-
 }
 
 void TspBase::getCost(){
@@ -158,6 +174,35 @@ void TspBase::getTspTour(const std::string &alg_name) {
 	}
 
 	PRINTFTSPtour
+}
+
+void TspBase::data(){
+
+	clock_t start, finish, sum;
+	double totaltime, totaltime0, totaltime1, totaltime2;
+	sum = clock();
+
+	cout << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
+	cout << "station capacity:" << STATION_CAPACITY << endl;
+
+	start = clock();
+	getDemand();
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
+
+	start = clock();
+	getPoints();
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
+
+	start = clock();
+	getRandomCost();
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetCost:" << totaltime << "ms!" << endl;
+
 }
 
 void TspBase::randomData(){

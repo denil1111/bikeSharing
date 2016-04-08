@@ -1,7 +1,3 @@
-/*
-*
-*
-*/
 
 #include "supernode.h"
 
@@ -12,15 +8,10 @@ SuperNode::SuperNode(int excessnumber){
 	_numberOfZeroPieceFront = 0;
 
 	_excessNumber = excessnumber;
-	_sum = 0;
-	_lastNodeDemand = 0;
+	//_sum = 0;
+	//_lastNodeDemand = 0;
 	_nodeNumberInSuperNode = 0;
 	flag = true;
-	
-	_isCutNodeInFront = false;
-	_isCutNodeInBehind = false;
-	_demandInFront = 0;
-	_demandInBehind = 0;
 }
 
 void SuperNode::setsuperNodeNumber(int supernodeId){
@@ -64,12 +55,6 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++_nodeNumberInSuperNode;
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_P;
-			_sum = _excessNumber;
-
-			_isCutNodeInFront = true;
-			_isCutNodeInBehind = true;
-			_demandInFront = _excessNumber;
-			_demandInBehind = _excessNumber;
 
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
@@ -82,32 +67,20 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++_nodeNumberInSuperNode;
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_N;
-			_sum = -_excessNumber;
 
-			_isCutNodeInFront = true;
-			_isCutNodeInBehind = true;
-			_demandInFront = -_excessNumber;
-			_demandInBehind = -_excessNumber;
-			
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = -_excessNumber;
 			_stationidAndDemand.push_back(temp);
-	
+
 			return surplusdemand - _excessNumber;
 		}
 		else if (surplusdemand == _excessNumber){
 			++_nodeNumberInSuperNode;
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_P;
-			_sum = _excessNumber;
 			++stopflag;
-			
-			_isCutNodeInFront = true;
-			_isCutNodeInBehind = true;
-			_demandInFront = _excessNumber;
-			_demandInBehind = _excessNumber;
-			
+
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = _excessNumber;
@@ -122,14 +95,8 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++_nodeNumberInSuperNode;
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_N;
-			_sum = -_excessNumber;
 			++stopflag;
-			
-			_isCutNodeInFront = true;
-			_isCutNodeInBehind = true;
-			_demandInFront = -_excessNumber;
-			_demandInBehind = -_excessNumber;
-			
+
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = -_excessNumber;
@@ -143,9 +110,6 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		sum += surplusdemand;
 		++_nodeNumberInSuperNode;
 		++stopflag;
-
-		_isCutNodeInFront = true;
-		_demandInFront = surplusdemand;
 
 		StationidAndDemand temp;
 		temp.stationId = *currentIt;
@@ -161,16 +125,14 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		flag = false;
 		sum += demand[*currentIt];
 		++_nodeNumberInSuperNode;
-		
+
 		if (_nowPieceTypeFlag == PIECE_P && sum <= 0){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_0;
-			_sum = 0;
-			_lastNodeDemand = sum;
 
 			if (sum == 0){
 				++stopflag;
-				
+
 				StationidAndDemand temp;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt];
@@ -181,9 +143,6 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 				return 0;
 			}
 			else{
-				_isCutNodeInBehind = true;
-				_demandInBehind = demand[*currentIt] - sum;
-
 				StationidAndDemand temp;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt] - sum;
@@ -194,12 +153,10 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		else if (_nowPieceTypeFlag == PIECE_N && sum >= 0){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_0;
-			_sum = 0;
-			_lastNodeDemand = sum;
 
 			if (sum == 0){
 				++stopflag;
-				
+
 				StationidAndDemand temp;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt];
@@ -210,9 +167,6 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 				return 0;
 			}
 			else{
-				_isCutNodeInBehind = true;
-				_demandInBehind = demand[*currentIt] - sum;
-
 				StationidAndDemand temp;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt] - sum;
@@ -224,9 +178,8 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		else if (sum == _excessNumber){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_P;
-			_sum = sum;
 			++stopflag;
-			
+
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt];
@@ -240,12 +193,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		else if (sum > _excessNumber){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_P;
-			_sum = _excessNumber;
-			_lastNodeDemand = demand[*currentIt] - (sum - _excessNumber);
 
-			_isCutNodeInBehind = true;
-			_demandInBehind = demand[*currentIt] - (sum - _excessNumber);
-			
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt] - (sum - _excessNumber);
@@ -256,7 +204,6 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		else if (sum == -_excessNumber){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_N;
-			_sum = sum;
 			++stopflag;
 
 			StationidAndDemand temp;
@@ -269,15 +216,10 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			return 0;
 		}
 		// need cut:
-		else if(sum < -_excessNumber){
+		else if (sum < -_excessNumber){
 			_endIt = currentIt;
 			_pieceTypeFlag = PIECE_N;
-			_sum = -_excessNumber;
-			_lastNodeDemand = demand[*currentIt] - (sum - _excessNumber);
 
-			_isCutNodeInBehind = true;
-			_demandInBehind = demand[*currentIt] - (sum + _excessNumber);
-			
 			StationidAndDemand temp;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt] - (sum + _excessNumber);
@@ -285,7 +227,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			return sum + _excessNumber;
 		}
 		++stopflag;
-		
+
 		StationidAndDemand temp;
 		temp.stationId = *currentIt;
 		temp.stationDemand = demand[*currentIt];
@@ -299,11 +241,11 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 	if (*currentIt == startnode){
 		if ((currentIt) == path.begin()){
 			_endIt = path.end() - 1;
-		}		else{
+		}
+		else{
 			_endIt = currentIt - 1;
 		}
 		_pieceTypeFlag = PIECE_0;
-		_sum = 0;
 
 		StationidAndDemand temp;
 		temp.stationId = *currentIt;
@@ -328,10 +270,6 @@ vector<int>::iterator SuperNode::getEndIt(){
 
 int SuperNode::getMatchingNumber(){
 	return _matchingNumber;
-}
-
-int SuperNode::getLastNodeDemand(){
-	return _lastNodeDemand;
 }
 
 int SuperNode::getPieceTypeFlag(){

@@ -2,9 +2,23 @@
 
 
 
-MergeBSP::MergeBSP(int num):TspBase(num){
+MergeBSP::MergeBSP(int num) :TspBase(num){
 
+	// used for UncapacitatedBSP:
+	_startStationUncapacitatedBSP = -1;
 
+	// used for CapacitatedBSP:
+	_startFromWhichPiece = PIECE_0;
+	_startStationCapacitatedBSP = -1;
+	_superNodeNumber = 0;
+	_minSum = MM;
+	_superNodeNumber_PIECE_P = 0;
+	_superNodeNumber_PIECE_N = 0;
+	_superNodeNumber_PIECE_0 = 0;
+	_zeroSuperNodeNumberInFront = 0;
+}
+
+MergeBSP::MergeBSP(int num, int x, int y) :TspBase(num, x, y){
 	// used for UncapacitatedBSP:
 	_startStationUncapacitatedBSP = -1;
 
@@ -21,6 +35,25 @@ MergeBSP::MergeBSP(int num):TspBase(num){
 
 MergeBSP::~MergeBSP(){
 
+}
+
+// getTspSequence<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+template <typename TSP>
+void MergeBSP::getTspTour(const std::string &alg_name) {
+	GRAPH_TYPEDEFS(FullGraph);
+
+	TSP alg(*g, *cost);
+	_tspSum = alg.run();
+
+	std::vector<Node> vec;
+	alg.tourNodes(std::back_inserter(vec));
+	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+	{
+		FullGraph::Node node = *it;
+		_path.push_back((*g).index(node));
+	}
+
+	PRINTFTspPath
 }
 
 bool MergeBSP::isExistNotVisitedPositiveStation(){
@@ -91,10 +124,6 @@ int MergeBSP::getStartStation(){
 	}// while
 
 	return -1;
-}
-
-int MergeBSP::getStartStationCapacitatedBSP(){
-	return _startStationCapacitatedBSP;
 }
 
 void MergeBSP::getSuperNodePieces(int number){
@@ -382,15 +411,21 @@ void MergeBSP::machingSuperNode(){
 }
 
 void MergeBSP::pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp){
-	if (tempVector.size() == 0){
+	int num = tempVector.size();
+	if (num == 0){
 		tempVector.push_back(temp);
 	}
-	//else if (tempVector[tempVector.size() - 1].stationId == temp.stationId){
-	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << tempVector[tempVector.size() - 1].stationDemand << endl;
-	//	//tempVector[tempVector.size() - 1].stationDemand += temp.stationDemand;
-	//	//cout << "tempVector.size():" << tempVector.size() << " tempVector[tempVector.size() - 1].stationDemand:" << temp.stationDemand << endl;
-	//	//
-	//}
+	/*else if (tempVector[num - 1].stationId == temp.stationId){
+	int number = tempVector[num - 1].stationDemand;
+	number += temp.stationDemand;
+
+	tempVector[num - 1].stationDemand = number;
+	cout << "合并：" << tempVector[num - 1].stationId << endl;
+	haha.push_back(temp);
+	}*/
+	/*else if ((*(tempVector.end() - 1)).stationId == temp.stationId){
+	(*(tempVector.end() - 1)).stationDemand += temp.stationDemand;
+	}*/
 	else{
 		tempVector.push_back(temp);
 	}
@@ -444,7 +479,6 @@ void MergeBSP::getZeroPath(int currentnumberofzeropiece, vector<StationidAndDema
 	}
 }
 
-// used for opposite direction:
 void MergeBSP::getZeroPathInBehind(vector<StationidAndDemand> &tempVector){
 	int zeronum = _superNodeVector_PIECE_0.size();
 	int i = zeronum - 1;
@@ -537,12 +571,12 @@ void MergeBSP::getPathBeginPositiveReverse(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -599,12 +633,12 @@ void MergeBSP::getPathBeginPositive(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -688,12 +722,12 @@ void MergeBSP::getPathBeginNegativeReverse(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -753,12 +787,12 @@ void MergeBSP::getPathBeginNegative(){
 	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
-		_minCostPath.clear();
+		_minMediumCostPath.clear();
 		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
 			StationidAndDemand tt;
 			tt.stationId = (*it).stationId;
 			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+			_minMediumCostPath.push_back(tt);
 		}
 	}
 
@@ -811,89 +845,77 @@ bool  MergeBSP::checkSum(){
 	}
 }
 
+int MergeBSP::getStartStationCapacitatedBSP(){
+	return _startStationCapacitatedBSP;
+}
+
 int MergeBSP::getStartStationCapacitated(){
 	vector<StationidAndDemand>::const_iterator it = _minCostPath.begin();
 	vector<StationidAndDemand>::const_iterator itt = _minCostPath.begin();
-
+	_startPoint = 0;
 	if (checkSum()){
 		//if (true){
-		/*while (true){
-		cout << "*";
-		//find a station which demond is positive:
-		if ((*it).stationDemand >= 0){
-		_startStationCapacitatedBSP = (*it).stationId;
-		int tempSum = (*it).stationDemand;
-		int tempNum = 1;
+		while (true){
+			cout << "*";
+			// find a station which demond is positive :
+			if ((*it).stationDemand >= 0){
+				_startStationCapacitatedBSP = (*it).stationId;
+				int tempSum = (*it).stationDemand;
+				int tempNum = 1;
 
-		while (tempSum >= 0 && tempNum < _minCostPath.size()){
-		++it;
-		++tempNum;
-		if (it == _minCostPath.end()){
-		it = _minCostPath.begin();
-		}
-		tempSum += (*it).stationDemand;
+				while (tempSum >= 0 && tempNum < _minCostPath.size()){
+					++it;
+					++tempNum;
+					if (it == _minCostPath.end()){
+						it = _minCostPath.begin();
+					}
+					tempSum += (*it).stationDemand;
 
-		}
+				}
 
-		if (tempNum == _minCostPath.size()){
-		return _startStationCapacitatedBSP;
-		}
-		}
-
-		if (++itt == _minCostPath.end()){
-		itt = _minCostPath.begin();
-		}
-		it = itt;
-		}*/
-		for (itt; itt < _minCostPath.end(); ++itt){
-			it = itt;
-			_startStationCapacitatedBSP = (*it).stationId;
-			int sum = 0;
-			for (int i = 0; i < _minCostPath.size(); i++){
-				sum += (*it).stationDemand;
-				if (++it == _minCostPath.end()){
-					it = _minCostPath.begin();
+				if (tempNum == _minCostPath.size()){
+					cout << endl;
+					return _startStationCapacitatedBSP;
 				}
 			}
-			if (sum == 0){
-				return _startStationCapacitatedBSP;
+
+			if (++itt == _minCostPath.end()){
+				itt = _minCostPath.begin();
 			}
-		}
-	}
+			it = itt;
+			_startPoint++;
+		}// while
+	}// if
 
 	return -1;
 }
 
-// Get a Random TSP sequence
-// getTspSequence<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
-template <typename TSP>
-void MergeBSP::getTspTour(const std::string &alg_name) {
-	GRAPH_TYPEDEFS(FullGraph);
-
-	//TspCheck tspCheck;
-	TSP alg(*g, *cost);
-
-	_tspSum = alg.run();
-
-	//tspCheck.check(alg.run() > 0, alg_name + ": Wrong total cost");
-
-	std::vector<Node> vec;
-	alg.tourNodes(std::back_inserter(vec));
-
-	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
-	{
-		FullGraph::Node node = *it;
-		_path.push_back((*g).index(node));
+void MergeBSP::revertPath(){
+	for (int i = 0; i < _startPoint; i++){
+		StationidAndDemand temp;
+		temp.stationId = (*_minCostPath.begin()).stationId;
+		temp.stationDemand = (*_minCostPath.begin()).stationDemand;
+		_minCostPath.erase(_minCostPath.begin());
+		_minCostPath.push_back(temp);
 	}
-
-	// 下面都是check
-	//tspCheck.check(tspCheck.checkTour(*g, vec), alg_name + ": Wrong node sequence");
-	//tspCheck.check(tspCheck.checkCost(*g, vec, *cost, alg.tourCost()), alg_name + ": Wrong tour cost");
-
-	PRINTFTspPath
 }
 
-void MergeBSP::run(){
+void MergeBSP::deleteRepeatStationPoint(){
+	vector<StationidAndDemand>::iterator it = _minMediumCostPath.begin();
+	_minCostPath.push_back(*it);
+	for (it++; it < _minMediumCostPath.end(); ++it){
+		if ((*it).stationId == _minCostPath[_minCostPath.size() - 1].stationId){
+			_minCostPath[_minCostPath.size() - 1].stationDemand += (*it).stationDemand;
+		}
+		else{
+			_minCostPath.push_back(*it);
+		}
+	}
+}
+
+void MergeBSP::runRandom(){
+
+	randomData();
 
 	clock_t start, finish, sum;
 	double totaltime, totaltime0, totaltime1, totaltime2;
@@ -933,74 +955,73 @@ void MergeBSP::run(){
 	getPath();
 	cout << "Get a path " << i << endl << endl;
 	//}
-	PRINTFFinalPath
+	deleteRepeatStationPoint();
 	getStartStationCapacitated();
+	revertPath();
+
+	PRINTFFinalPath
+
 	cout << "Mininum sum cost:" << _minSum << endl;
 	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
-	cout << "length:" << _minCostPath.size() << endl;
+	cout << "length:" << _minMediumCostPath.size() << endl;
 	cout << "Path set size:" << _pathSet.size() << endl;
 
 }
 
-//void MergeBSP::run(){
-//
-//	clock_t start, finish, sum;
-//	double totaltime,totaltime0,totaltime1,totaltime2;
-//	sum = clock();
-//
-//	start = clock();
-//	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
-//
-//	totaltime0 = finish - sum;
-//
-//	// Uncapacitated BSP:
-//	cout << endl << "UncapacitatedBSP:" << endl;
-//	sum = clock();
-//	start = clock();
-//	getStartStation();
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\ngetStartStation:" << totaltime << "ms!" << endl;
-//
-//	totaltime1 = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
-//	cout << "\nUncapacitated BSP time:" << totaltime1 << "ms! Sum cost:" << _tspSum << endl << endl;
-//
-//	// Capacitated BSP:
-//	cout << endl << "CapacitatedBSP:" << endl;
-//
-//	sum = clock();
-//	start = clock();
-//	getSuperNodePieces(0);
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\ngetSuperNodePieces:" << totaltime << "ms!" << endl;
-//
-//	start = clock();
-//	calculateMinCostAmongSuperNode();
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\ncalculateMinCostAmongSuperNode:" << totaltime << "ms!" << endl;
-//
-//	start = clock();
-//	machingSuperNode();
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\nmachingSuperNode:" << totaltime << "ms!" << endl;
-//
-//	start = clock();
-//	getPath();
-//	finish = clock();
-//	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-//	cout << "\ngetPath:" << totaltime << "ms!" << endl;
-//
-//	totaltime2 = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
-//	cout << "\nCapacitated BSP time:" << totaltime2 << "ms! Sum cost:" << getFinalSum(_finalPath) << endl;
-//	cout << "length:" << _finalPath.size() << endl;
-//
-//}
+void MergeBSP::run(){
+
+	data();
+
+	clock_t start, finish, sum;
+	double totaltime, totaltime0, totaltime1, totaltime2;
+	sum = clock();
+
+	start = clock();
+	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
+
+	totaltime0 = finish - sum;
+
+	// Uncapacitated BSP:
+	cout << endl << "UncapacitatedBSP:" << endl;
+	sum = clock();
+	start = clock();
+	getStartStation();
+	finish = clock();
+	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
+	cout << "\ngetStartStation:" << totaltime << "ms!" << endl;
+
+	totaltime1 = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
+	cout << "\nUncapacitated BSP time:" << totaltime1 << "ms! Sum cost:" << _tspSum << endl << endl;
+
+
+
+
+	cout << endl << "CapacitatedBSP:" << endl;
+
+	//for (int i = 0; i < Q / 2; i++){
+	int i = 0;
+	initSuperNode();
+	getSuperNodePieces(i);
+	calculateMinCostAmongSuperNode();
+	machingSuperNode();
+	getPath();
+	cout << "Get a path " << i << endl << endl;
+	//}
+	deleteRepeatStationPoint();
+	getStartStationCapacitated();
+	revertPath();
+
+	PRINTFFinalPath
+
+		cout << "Mininum sum cost:" << _minSum << endl;
+	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
+	cout << "length:" << _minMediumCostPath.size() << endl;
+	cout << "Path set size:" << _pathSet.size() << endl;
+
+}
 
 void MergeBSP::printTspPath(){
 	cout << "TSP tour:" << _path.size() << endl;
@@ -1012,10 +1033,25 @@ void MergeBSP::printTspPath(){
 
 void MergeBSP::printFinalPath(){
 
-	cout << "Final Path:" << _minCostPath.size() << endl;
+	cout << "Final Path:" << _minMediumCostPath.size() << endl;
+	for (int i = 0; i < _minMediumCostPath.size(); i++){
+		cout << _minMediumCostPath[i].stationId << "(" << _minMediumCostPath[i].stationDemand << ") ";
+	}
+	cout << endl;
+
+	cout << "_minCostPath Path:" << _minCostPath.size() << endl;
 	for (int i = 0; i < _minCostPath.size(); i++){
 		cout << _minCostPath[i].stationId << "(" << _minCostPath[i].stationDemand << ") ";
 	}
+
+	int sum = 0;
+	for (int i = 0; i < _minCostPath.size(); i++){
+		sum += _minCostPath[i].stationDemand;
+	}
+	if (sum != 0){
+		cout << "_minCostPath sum != 0!!!!!!!" << endl;
+	}
+
 	cout << endl;
 }
 

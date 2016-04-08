@@ -46,12 +46,14 @@ public:
 
 	vector<vector<StationidAndDemand> > _pathSet;
 	vector<StationidAndDemand> _minCostPath;
+	vector<StationidAndDemand> _minMediumCostPath;
 	int _minSum;
 	int _startStationCapacitatedBSP;
 
 	void run();
 
 private:
+
 	int _startFromWhichPiece;
 	// positive plus negative plus last one zero super node
 	int _superNodeNumber; 
@@ -65,10 +67,12 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_N;
 	vector<SuperNode> _superNodeVector_PIECE_0;
 	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+	int _startPoint;
 
 public:
 
 	KTimesCapacitatedBSP(int num);
+	KTimesCapacitatedBSP(int num, int x, int y);
 	~KTimesCapacitatedBSP();
 
 	template <typename TSP>
@@ -102,6 +106,8 @@ public:
 
 	// used for find a valid start point:
 	int  getStartStationCapacitated();
+	void deleteRepeatStationPoint();
+	void revertPath();
 
 	// printf something:
 	void printSuperNodeInformation();

@@ -43,6 +43,18 @@ typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 class MergeBSP :public TspBase
 {
 
+public:
+
+	void run();
+	void runRandom();
+
+	vector<vector<StationidAndDemand> > _pathSet;
+	vector<StationidAndDemand> _minCostPath;
+	vector<StationidAndDemand> _minMediumCostPath;
+	int _minSum;
+	int _startStationCapacitatedBSP;
+	point _depot;
+
 private:
 
 	// used for UncapacitatedBSP:
@@ -52,7 +64,8 @@ private:
 	// user for CapacitatedBSP:
 	int _startFromWhichPiece;
 	int _sumCapacitatedBSP;
-	int _superNodeNumber; // positive plus negative plus last one zero super node
+	// positive plus negative plus last one zero super node
+	int _superNodeNumber; 
 	//  opposite direction:
 	int _zeroSuperNodeNumberInEnd;
 	int _zeroSuperNodeNumberInFront;
@@ -63,21 +76,12 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_N;
 	vector<SuperNode> _superNodeVector_PIECE_0;
 	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
-
-public:
-
-	
-	//vector<int> _finalPath;
-	void run();
-
-	vector<vector<StationidAndDemand> > _pathSet;
-	vector<StationidAndDemand> _minCostPath;
-	int _minSum;
-	int _startStationCapacitatedBSP;
+	int _startPoint;
 
 public:
 	
 	MergeBSP(int num);
+	MergeBSP(int num, int x, int y);
 	~MergeBSP();
 
 	template <typename TSP>
@@ -116,7 +120,9 @@ public:
 	void getPathBeginPositiveReverse();
 	void getPathBeginNegativeReverse();
 
-	int getStartStationCapacitated();
+	int  getStartStationCapacitated();
+	void deleteRepeatStationPoint();
+	void revertPath();
 
 	// printf something:
 	void printSuperNodeInformation();
@@ -127,6 +133,6 @@ public:
 	// check
 	bool checkSum();
 
-};// class BikeSharing
+};
 
 #endif

@@ -38,6 +38,14 @@ class TspBase
 
 public:
 
+	point _depot;
+	vector<int> _stationDemand;
+	vector<point> _point;
+	void randomData();
+	void data();
+
+public:
+
 	const int K = STATION_CAPACITY;
 	const int Q = VEHICLE_CAPACITY;
 	int _stationNum;
@@ -45,40 +53,34 @@ public:
 	FullGraph *g;
 	DoubleEdgeMap *cost;
 	vector<int> _path;
-
-public:
-
-	vector<point> _point;
-	void getRandomPoints();
-	void getPoints();
-
 	vector<vector<int> > _cost;
-	void getRandomCost();
-	void getCost();
-
-	vector<int> _stationDemand;
-	void getRandomDemand();
-	void getDemand();
-
-	void randomData();
-
 	int _tspSum;
 
 public:
 
 	TspBase(int num);
+	TspBase(int num, int x, int y);
 	~TspBase();
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 
+	void setDepot(int x, int y);
+	void getRandomPoints();
+	void getPoints();
+	void getRandomCost();
+	void getCost();
+	void getRandomDemand();
+	void getDemand();
+
+	// print something
 	void printPoints();
 	void printDemand();
 	void printCost();
 	void printTSPtour();
 
 	// check
-	void checkRandomDemand();
+	void checkDemand();
 
 };// class BikeSharing
 
