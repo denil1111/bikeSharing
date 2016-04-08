@@ -76,6 +76,7 @@ private:
 	vector<SuperNode> _superNodeVector_PIECE_N;
 	vector<SuperNode> _superNodeVector_PIECE_0;
 	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+
 	int _startPoint;
 
 public:

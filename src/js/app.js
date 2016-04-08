@@ -22,15 +22,6 @@ app.use(route.get('/randomrun', function*() {
 	console.log(datas);
 	console.log(path);
 	var point = [];
-	var demand = [];
-	// datas.forEach(function(data){
- //  		point.push({x:data.x,y:data.y});
- //  		demand.push(data.demand);
-	// });
-	for (data of yield datas) {
-		point.push({x:data.x,y:data.y,d:data.demand});
-  		demand.push(data.demand);
-	}
 	this.body = yield render("index",{point:point,path:path});
 }));
 
