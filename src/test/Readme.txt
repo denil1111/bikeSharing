@@ -6,8 +6,8 @@ MergeBSP(int num, int x, int y);
 
 2.随机调用顺序：
 mbsp.runRandom();
-注：之前的 mbsp.randomData();
-被合并到了run()方法里面。
+注：之前的 mbsp.randomData(); 被合并到了runRandom()方法里面。
+注：随机输入的时候由于最后一个点的demand可能会很大，因此将最后一个点的demand打散随机插入到了之前的站点中，因此会出现实际站点数量大于_stationNum，所以在调用mbsp.runRandom()后重新读取_stationNum!
 
 3.用户输入调用顺序：
 （1）输入demand，定义如下：

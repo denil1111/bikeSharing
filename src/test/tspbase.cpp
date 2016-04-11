@@ -198,7 +198,7 @@ void TspBase::data(){
 	cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
 
 	start = clock();
-	getRandomCost();
+	getCost();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	cout << "\ngetCost:" << totaltime << "ms!" << endl;
