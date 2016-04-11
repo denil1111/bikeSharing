@@ -19,7 +19,9 @@ struct point{
 	int a;
 	int b;
 };
-（3）调用：
+（3）输入cost，定义如下：
+vector<vector<int> > _cost;
+（4）调用：
 mbsp.run();
 
 注意：输入的demand总和一定要为0，不然程序检测到以后就会输出正确结果。

@@ -41,6 +41,7 @@ public:
 	point _depot;
 	vector<int> _stationDemand;
 	vector<point> _point;
+	vector<vector<int> > _cost;
 	void randomData();
 	void data();
 
@@ -53,7 +54,7 @@ public:
 	FullGraph *g;
 	DoubleEdgeMap *cost;
 	vector<int> _path;
-	vector<vector<int> > _cost;
+	
 	int _tspSum;
 
 public:
