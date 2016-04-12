@@ -1,8 +1,8 @@
 1.merge类有两个构造函数，分别是：
 MergeBSP(int num);
-MergeBSP(int num, int x, int y);
+MergeBSP(int num, double x, double y);
 其中x,y代表depot的坐标，默认为（0，0）。
-也可以调用 void setDepot(int x, int y); 方法来设置depot位置。
+也可以调用 void setDepot(double x, double y); 方法来设置depot位置。
 
 2.随机调用顺序：
 mbsp.runRandom();
@@ -16,8 +16,8 @@ vector<int> _stationDemand;
 vector<point> _point;
 其中point的定义如下：
 struct point{
-	int a;
-	int b;
+	double a;
+	double b;
 };
 （3）输入cost，定义如下：
 vector<vector<int> > _cost;

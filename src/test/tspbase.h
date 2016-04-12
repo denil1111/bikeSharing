@@ -29,8 +29,8 @@ using namespace std;
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
 struct point{
-	int a;
-	int b;
+	double a;
+	double b;
 };
 
 class TspBase
@@ -41,7 +41,7 @@ public:
 	point _depot;
 	vector<int> _stationDemand;
 	vector<point> _point;
-	vector<vector<int> > _cost;
+	vector<vector<double> > _cost;
 	void randomData();
 	void data();
 
@@ -60,13 +60,13 @@ public:
 public:
 
 	TspBase(int num);
-	TspBase(int num, int x, int y);
+	TspBase(int num, double x, double y);
 	~TspBase();
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 
-	void setDepot(int x, int y);
+	void setDepot(double x, double y);
 	void getRandomPoints();
 	void getPoints();
 	void getRandomCost();

@@ -10,7 +10,7 @@ TspBase::TspBase(int num){
 	_depot.b = 0;
 }
 
-TspBase::TspBase(int num, int x, int y){
+TspBase::TspBase(int num, double x, double y){
 	_tspSum = 0;
 	_stationNum = num;
 	g = new FullGraph(num);
@@ -27,7 +27,7 @@ TspBase::~TspBase(){
 }
 
 
-void TspBase::setDepot(int x, int y){
+void TspBase::setDepot(double x, double y){
 	_depot.a = x;
 	_depot.b = y;
 }
@@ -110,7 +110,7 @@ void TspBase::getRandomPoints(){
 		point poss;
 		poss.a = rand() % POINT_RANGE;
 		poss.b = rand() % POINT_RANGE;
-		(*pos)[u] = dim2::Point<int>(poss.a, poss.b);
+		(*pos)[u] = dim2::Point<double>(poss.a, poss.b);
 		_point.push_back(poss);
 	}
 }
@@ -118,7 +118,7 @@ void TspBase::getRandomPoints(){
 void TspBase::getPoints(){
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
-		(*pos)[u] = dim2::Point<int>(_point[i].a, _point[i].b);
+		(*pos)[u] = dim2::Point<double>(_point[i].a, _point[i].b);
 	}
 	PRINTFPoints
 }
@@ -139,11 +139,11 @@ void TspBase::getRandomCost(){
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
 		int j = 0;
-		vector<int> costrow;
+		vector<double> costrow;
 		for (FullGraph::NodeIt v = u; v != INVALID; ++v, ++j) {
 			if (u != v) {
-				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = (int)sqrt(((*pos)[u] - (*pos)[v]).normSquare());
-				costrow.push_back((int)sqrt(((*pos)[u] - (*pos)[v]).normSquare()));
+				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = (double)sqrt(((*pos)[u] - (*pos)[v]).normSquare());
+				costrow.push_back((double)sqrt(((*pos)[u] - (*pos)[v]).normSquare()));
 			}
 			else{
 				costrow.push_back(0);
