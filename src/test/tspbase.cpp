@@ -149,8 +149,18 @@ void TspBase::getRandomCost(){
 				costrow.push_back(0);
 			}
 		}
+		costrow.push_back((double)sqrt(((*pos)[u]).normSquare()));
 		_cost.push_back(costrow);
 	}
+
+	// for depot:
+	vector<double> costrow;
+	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
+		costrow.push_back((double)sqrt(((*pos)[u]).normSquare()));
+	}
+	costrow.push_back(0);
+	_cost.push_back(costrow);
+
 	// PRINTFCost
 }
 
