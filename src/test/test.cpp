@@ -65,13 +65,8 @@ void randomData(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 	
 	info.GetReturnValue().Set(retArr);  
 }
-int runMergeScript(int num,v8::Local<v8::Array> &retArr)
+int runMergeScript(v8::Local<v8::Array> &retArr)
 {
-	if (MainBSP == nullptr)
-	{
-		MainBSP = new MergeBSP(num);
-		MainBSP->randomData();
-	}
     MainBSP->run();
     retArr = Nan::New<v8::Array>(MainBSP->_minCostPath.size());
     for (int i = 0; i < MainBSP->_minCostPath.size(); i++) {
@@ -96,19 +91,45 @@ void runMerge(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 //        return;
 //    }
 //    
-    int arg0 = info[0]->NumberValue();
+    // int arg0 = info[0]->NumberValue();
     
     // double arg1 = info[1]->NumberValue();
     v8::Local<v8::Array> retArr;  
-	Nan::New(runMergeScript(arg0,retArr));
+	Nan::New(runMergeScript(retArr));
 	
 	info.GetReturnValue().Set(retArr);  
 }
 
+void input(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    int stationNum = info[0]->NumberValue();
+    MainBSP = new MergeBSP(stationNum);
+    for (int i=0;i<stationNum;i++)
+    {
+        point x;
+        x.a = info[1]->ToObject()->Get(i)->ToObject()->Get(Nan::New("x").ToLocalChecked())->NumberValue();
+        x.b = info[1]->ToObject()->Get(i)->ToObject()->Get(Nan::New("y").ToLocalChecked())->NumberValue();
+        int demand = info[1]->ToObject()->Get(i)->ToObject()->Get(Nan::New("d").ToLocalChecked())->NumberValue(); 
+        MainBSP->_point.push_back(x);
+        MainBSP->_stationDemand.push_back(demand);
+        std::cout<<"x:"<<x.a<<","<<x.b<<"d:"<<demand<<std::endl;
+    }
+    for (int i=0;i<stationNum+1;i++) {
+        std::vector<double> v;
+        for (int j=0;j<stationNum+1;j++) { 
+            v.push_back(info[2]->ToObject()->Get(i)->ToObject()->Get(j)->NumberValue());
+            std::cout<<" "<<v[j];
+        }
+        MainBSP->_cost.push_back(v);
+        std::cout<<std::endl;
+    }
+}
 void Init(v8::Local<v8::Object> exports) {
     exports->Set(Nan::New("runMerge").ToLocalChecked(),
                  Nan::New<v8::FunctionTemplate>(runMerge)->GetFunction());
     exports->Set(Nan::New("randomData").ToLocalChecked(),
                  Nan::New<v8::FunctionTemplate>(randomData)->GetFunction());
+    exports->Set(Nan::New("input").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(input)->GetFunction());
+
 }
 NODE_MODULE(addon, Init)

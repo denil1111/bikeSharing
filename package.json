@@ -3,8 +3,11 @@
   "version": "0.0.1",
   "description": "a bike bikeSharing demo",
   "dependencies": {
+    "co-body": "^4.0.0",
     "co-views": "^2.1.0",
     "koa": "1.2.0",
+    "koa-body": "^1.4.0",
+    "koa-logger": "^1.3.0",
     "koa-route": "^2.4.2",
     "koa-static": "^2.0.0",
     "nan": "^2.2.1",
