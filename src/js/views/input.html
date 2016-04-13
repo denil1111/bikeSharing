@@ -57,7 +57,7 @@
   var depot = {x:0,y:0};
   var stationWithDepot = [];
   var depotMarker = new BMap.Marker(new BMap.Point(0,0));
-  depotMarker.setLabel(new BMap.Label("depot"));
+  depotMarker.setLabel(new BMap.Label("depot",{offset:new BMap.Size(-7,-20)}));
   map.addOverlay(depotMarker);
   var distance = [[]];
 	map.addEventListener("click", function(e) {

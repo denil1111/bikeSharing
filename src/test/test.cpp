@@ -110,7 +110,7 @@ void input(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         x.b = info[1]->ToObject()->Get(i)->ToObject()->Get(Nan::New("y").ToLocalChecked())->NumberValue();
         int demand = info[1]->ToObject()->Get(i)->ToObject()->Get(Nan::New("d").ToLocalChecked())->NumberValue(); 
         MainBSP->_point.push_back(x);
-        MainBSP->_stationDemand.push_back(demand);
+        MainBSP->_allStationDemand.push_back(demand);
         std::cout<<"x:"<<x.a<<","<<x.b<<"d:"<<demand<<std::endl;
     }
     for (int i=0;i<stationNum+1;i++) {
