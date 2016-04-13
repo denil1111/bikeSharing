@@ -165,7 +165,7 @@ console.log(distance);
 // );
 }
 function path(route) {
-    var p1 = new BMap.Point(stationList[route[0].id].x, stationList[route[0].id].y);
+    var p1 = new BMap.Point(depot.x, depot.y);
     var options = {
     renderOptions: {panel: "r-result"},
         onSearchComplete: function(results) {
@@ -207,10 +207,7 @@ function path(route) {
     var driving = new BMap.DrivingRoute(map, options);
     var waypoints = [];
     route.forEach(function(routeX, index) {
-        if (index != 0) {
-            waypoints.push(new BMap.Point(stationList[routeX.id].x, stationList[routeX.id].y));
-            // waypoints.push(new BMap.Point(station.x,station.y));
-        }
+        waypoints.push(new BMap.Point(stationList[routeX.id].x, stationList[routeX.id].y));
     });
     driving.search(p1, p1, {
         waypoints: waypoints
