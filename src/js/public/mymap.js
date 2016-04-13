@@ -33,8 +33,9 @@ var depotTag = false;
 var stationList = [];
 var depot = {x:0,y:0};
 var stationWithDepot = [];
-var depotMarker = new BMap.Marker(new BMap.Point(0,0));
-depotMarker.setLabel(new BMap.Label("depot"));
+var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32,32));
+var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64,51));
+var depotMarker = new BMap.Marker(new BMap.Point(0,0),{icon:depotIcon});
 map.addOverlay(depotMarker);
 var distance = [[]];
 map.addEventListener("click", function(e) {
@@ -46,7 +47,8 @@ map.addEventListener("click", function(e) {
             x: e.point.lng,
             y: e.point.lat
         });
-        var stationMarker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat));
+        var stationMarker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat),{icon:bikeIcon});
+        stationMarker.setLabel(new BMap.Label(demand,{offset:new BMap.Size(20,-10)}));
         stationMarker.addEventListener("click", function() {
             if (deleteTag == true) {
                 map.removeOverlay(this);
