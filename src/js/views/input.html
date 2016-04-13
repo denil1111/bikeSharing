@@ -22,7 +22,7 @@
   <script type="text/javascript" src="/jquery.min.js"></script>
   <script type = "text/javascript" >
    // 百度地图API功能
-  var map = new BMap.Map("allmap"); // 创建Map实例
+  var map = new BMap.Map("allmap",{enableMapClick:false}); // 创建Map实例
 	// map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
 	// map.addControl(new BMap.MapTypeControl()); //添加地图类型控件
 	map.centerAndZoom("杭州", 15); // 设置地图显示的城市 此项是必须设置的
@@ -86,18 +86,33 @@
 	});
 
 	function createStation() {
+    if (!createTag) {
+      map.setDefaultCursor("crosshair");  
+    } else {
+      map.setDefaultCursor("");
+    }
 		createTag = !createTag;
 		deleteTag = false;
     depotTag = false;
 	}
 
 	function deleteStation() {
+    if (!deleteTag) {
+      map.setDefaultCursor("crosshair");  
+    } else {
+      map.setDefaultCursor("");
+    }
 		deleteTag = !deleteTag;
 		createTag = false;
     depotTag = false;
 	}
   
   function setDepot() {
+    if (!depotTag) {
+      map.setDefaultCursor("crosshair");  
+    } else {
+      map.setDefaultCursor("");
+    }
     depotTag = !depotTag
     deleteTag = false;
     createTag = false;
