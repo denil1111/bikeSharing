@@ -40,6 +40,9 @@ public:
 
 	point _depot;
 	vector<int> _stationDemand;
+	vector<int> _allStationDemand;
+	vector<int> _mapPartToAll;
+	vector<int> _mapAllToPart;
 	vector<point> _point;
 	vector<vector<double> > _cost;
 	void randomData();

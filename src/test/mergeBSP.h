@@ -124,6 +124,7 @@ public:
 	int  getStartStationCapacitated();
 	void deleteRepeatStationPoint();
 	void revertPath();
+	void mapPath();
 
 	// printf something:
 	void printSuperNodeInformation();

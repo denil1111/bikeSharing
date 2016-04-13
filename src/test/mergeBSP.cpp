@@ -900,6 +900,12 @@ void MergeBSP::revertPath(){
 	}
 }
 
+void MergeBSP::mapPath(){
+	for (vector<StationidAndDemand>::iterator it = _minCostPath.begin(); it < _minCostPath.end(); it++){
+		(*it).stationId = _mapPartToAll[(*it).stationId];
+	}
+}
+
 void MergeBSP::deleteRepeatStationPoint(){
 	vector<StationidAndDemand>::iterator it = _minMediumCostPath.begin();
 	_minCostPath.push_back(*it);
@@ -1013,10 +1019,11 @@ void MergeBSP::run(){
 	deleteRepeatStationPoint();
 	getStartStationCapacitated();
 	revertPath();
+	mapPath();
 
 	PRINTFFinalPath
 
-		cout << "Mininum sum cost:" << _minSum << endl;
+	cout << "Mininum sum cost:" << _minSum << endl;
 	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
 	cout << "length:" << _minMediumCostPath.size() << endl;
 	cout << "Path set size:" << _pathSet.size() << endl;

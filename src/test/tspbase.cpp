@@ -88,6 +88,26 @@ void TspBase::getRandomDemand(){
 }
 
 void TspBase::getDemand(){
+	int num = _stationNum;
+	int j = 0;
+	for (int i = 0; i < num; i++){
+		if (_allStationDemand[i] == 0){
+			_mapAllToPart.push_back(-1);
+			_stationNum--;
+			continue;
+		}
+		_stationDemand.push_back(_allStationDemand[i]);
+		_mapAllToPart.push_back(j++);
+		_mapPartToAll.push_back(i);
+	}
+
+	delete g;
+	delete cost;
+	delete pos;
+	g = new FullGraph(_stationNum);
+	cost = new DoubleEdgeMap(*g);
+	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
+
 	checkDemand();
 }
 
@@ -126,8 +146,14 @@ void TspBase::getPoints(){
 void TspBase::getCost(){
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
+		while (_mapAllToPart[i] == -1){
+			++i;
+		}
 		int j = 0;
 		for (FullGraph::NodeIt v = u; v != INVALID; ++v, ++j) {
+			while (_mapAllToPart[j] == -1){
+				++j;
+			}
 			if (u != v) {
 				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = _cost[i][j];
 			}

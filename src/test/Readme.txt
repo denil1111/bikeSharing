@@ -11,7 +11,12 @@ mbsp.runRandom();
 
 3.用户输入调用顺序：
 （1）输入demand，定义如下：
-vector<int> _stationDemand;
+vector<int> _allStationDemand;
+映射关系：
+vector<int> _mapPartToAll;
+vector<int> _mapAllToPart;
+_mapAllToPart[i] == -1 表示i点的demand为0。
+
 （2）输入station坐标，定义如下：
 vector<point> _point;
 其中point的定义如下：
@@ -19,8 +24,10 @@ struct point{
 	double a;
 	double b;
 };
+
 （3）输入cost，定义如下：
-vector<vector<int> > _cost;
+vector<vector<double> > _cost;
+
 （4）调用：
 mbsp.run();
 
