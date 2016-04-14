@@ -31,10 +31,12 @@ var createTag = false;
 var deleteTag = false;
 var depotTag = false;
 var stationList = [];
+var stationMList = [];
 var depot = {x:0,y:0};
 var stationWithDepot = [];
 var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32,32));
 var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64,51));
+var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40,27));
 var depotMarker = new BMap.Marker(new BMap.Point(0,0),{icon:depotIcon});
 map.addOverlay(depotMarker);
 var distance = [[]];
@@ -49,6 +51,7 @@ map.addEventListener("click", function(e) {
         });
         var stationMarker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat),{icon:bikeIcon});
         stationMarker.setLabel(new BMap.Label(demand,{offset:new BMap.Size(20,-10)}));
+        stationMList.push(stationMarker);
         stationMarker.addEventListener("click", function() {
             if (deleteTag == true) {
                 map.removeOverlay(this);
@@ -166,7 +169,7 @@ console.log(distance);
 // }
 // );
 }
-function path(route) {
+function path(routePath) {
     var p1 = new BMap.Point(depot.x, depot.y);
     var options = {
     renderOptions: {panel: "r-result"},
@@ -175,28 +178,60 @@ function path(route) {
                 var plan = results.getPlan(0);
                 var s = [];
                 var pts = [];
+                var keyPts = [];
+                console.log(plan.getNumRoutes());
                 for (var j = 0; j < plan.getNumRoutes(); j++) {
-                    var route = plan.getRoute(j);
+                    var route = plan.getRoute(j);    
                     var ppts = route.getPath();
                     var polyline = new BMap.Polyline(ppts);
                     map.addOverlay(polyline);
                     pts = pts.concat(ppts);
+                    keyPts.push(pts.length)
                 }
                 var paths = pts.length;
-                var carMk = new BMap.Marker(pts[0]);
+                var bikeOnV = 0;
+                var carMk = new BMap.Marker(pts[0],{icon:vehicleIcon});
+                carMk.setLabel(new BMap.Label(bikeOnV,{offset:new BMap.Size(30,0)}));
                 map.addOverlay(carMk);
                 i = 0;
-
+                j = 0;
+                console.log(keyPts);
+                var currentDemand = [];
+                for (var index=0;index<stationList.length;index++) {
+                    currentDemand[index] = stationList[index].d;
+                }
                 function resetMkPoint(i) {
                     carMk.setPosition(pts[i]);
                     if (i < paths) {
-                        setTimeout(function() {
+                        if (keyPts[j]==i) {
+                            console.log(routePath);
+                            console.log(j);
+                            console.log(routePath[j]);
+                            (function(j){
+                                setTimeout(function() {
+                                    stationLB = stationMList[routePath[j].id].getLabel();
+                                    currentDemand[routePath[j].id] -= routePath[j].d;
+                                    stationLB.setContent(currentDemand[routePath[j].id]);
+                                    bikeOnV+=routePath[j].d;
+                                    carMk.getLabel().setContent(bikeOnV);
+                                },1000);
+                            }(j));
+                            j++;
                             i++;
-                            resetMkPoint(i);
-                        }, 100);
+                            setTimeout(function() {
+                                resetMkPoint(i);
+                            }, 2000);
+                        }
+                        else {
+                            i++;
+                            setTimeout(function() {
+                                resetMkPoint(i);
+                            }, 100);
+                        } 
                     } else {
                         i = 0;
-                        resetMkPoint(i);
+                        carMk.getLabel().setContent("finish!");
+                        // resetMkPoint(i);
                     }
                 }
                 setTimeout(function() {
@@ -208,7 +243,7 @@ function path(route) {
     };
     var driving = new BMap.DrivingRoute(map, options);
     var waypoints = [];
-    route.forEach(function(routeX, index) {
+    routePath.forEach(function(routeX, index) {
         waypoints.push(new BMap.Point(stationList[routeX.id].x, stationList[routeX.id].y));
     });
     driving.search(p1, p1, {
