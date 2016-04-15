@@ -25,18 +25,42 @@
             width: 100%;
         }
     </style>
+    <link rel="stylesheet" href="/jquery-ui.min.css" />
 </head>
 
 <body>
+    <input type="button" onclick="CancelTag()" value="View" />
     <input type="button" onclick="createStation()" value="Create station" />
     <input type="button" onclick="deleteStation()" value="Delete station" />
     <input type="button" onclick="setDepot()" value="Set depot" />
     <input type="button" onclick="run()" value="go" />
+    <input type="button" onclick="reset()" value="Reset" />
     <div id="allmap"></div>
-    <div id="r-result">
-        </dv>
+    <div id="r-result"></dv>
+    <div id="demandInput" title="Input Demand">
+        <form>
+        <label>Demand:</label><input id="demandInputData" type="text"></input>
+
+        </form>
+    </div>
+    <div id="demandChange" title="Input Demand">
+        <form>
+        <label>Demand:</label><input id="demandChangeData" type="text"></input>
+
+        </form>
+    </div>
 </body>
-<script type="text/javascript" src="/jquery.min.js"></script>
-<script type="text/javascript" src="/mymap.js"></script>
+    <script type="text/javascript" src="/jquery.min.js"></script>
+    <script type="text/javascript" src="/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/mymap.js"></script>
+    <script>
+    $(function() {
+        $( "input[type=button], a, button" )
+        .button()
+        .click(function( event ) {
+            event.preventDefault();
+        });
+    });
+    </script>
 
 </html>

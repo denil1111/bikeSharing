@@ -1,5 +1,7 @@
 // 百度地图API功能
-var map = new BMap.Map("allmap",{enableMapClick:false}); // 创建Map实例
+var map = new BMap.Map("allmap", {
+    enableMapClick: false
+}); // 创建Map实例
 // map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
 // map.addControl(new BMap.MapTypeControl()); //添加地图类型控件
 map.centerAndZoom("杭州", 15); // 设置地图显示的城市 此项是必须设置的
@@ -32,147 +34,220 @@ var deleteTag = false;
 var depotTag = false;
 var stationList = [];
 var stationMList = [];
-var depot = {x:0,y:0};
+var depot = {
+    x: 0,
+    y: 0
+};
 var stationWithDepot = [];
-var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32,32));
-var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64,51));
-var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40,27));
-var depotMarker = new BMap.Marker(new BMap.Point(0,0),{icon:depotIcon});
-map.addOverlay(depotMarker);
-var distance = [[]];
-map.addEventListener("click", function(e) {
-    if (createTag == true) {
-        var demand = prompt("demand");
-        // alert(e.point.lng + "," + e.point.lat);
-        stationList.push({
-            d: demand,
-            x: e.point.lng,
-            y: e.point.lat
-        });
-        var stationMarker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat),{icon:bikeIcon});
-        stationMarker.setLabel(new BMap.Label(demand,{offset:new BMap.Size(20,-10)}));
-        stationMList.push(stationMarker);
-        stationMarker.addEventListener("click", function() {
-            if (deleteTag == true) {
-                map.removeOverlay(this);
-            }
-        });
-        map.addOverlay(stationMarker);
-    }
-else if (depotTag == true)
-{
-    depot.x = e.point.lng;
-    depot.y = e.point.lat;
-    depotMarker.setPosition(new BMap.Point(e.point.lng, e.point.lat));
-}
+var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32, 32));
+var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64, 51));
+var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40, 27));
+var depotMarker = new BMap.Marker(new BMap.Point(0, 0), {
+    icon: depotIcon
 });
-
-function createStation() {
-if (!createTag) {
-    map.setDefaultCursor("crosshair");  
-} else {
-    map.setDefaultCursor("");
+map.addOverlay(depotMarker);
+var distance = [
+    []
+];
+$("#demandInput").dialog({
+    autoOpen: false,
+});
+map.addEventListener("click", function(e) {
+    $("#demandInput").dialog({
+        autoOpen: false,
+        open: function() {
+            $(this).off('submit').on('submit', function() {
+                var demand = $("#demandInputData").val();
+                $("#demandInputData").val("");
+                $(this).dialog('close');
+                stationList.push({
+                    d: demand,
+                    x: e.point.lng,
+                    y: e.point.lat
+                });
+                var index = stationList.length - 1;
+                var stationMarker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat), {
+                    icon: bikeIcon
+                });
+                stationMarker.setLabel(new BMap.Label(demand, {
+                    offset: new BMap.Size(20, -10)
+                }));
+                stationMList.push(stationMarker);
+                stationMarker.addEventListener("click", function() {
+                    if (deleteTag == true) {
+                        map.removeOverlay(this);
+                    }
+                    $("#demandChange").dialog({
+                        autoOpen: false,
+                        open: function() {
+                            $("#demandChangeData").attr("placeholder", stationList[index].d);
+                            $(this).off('submit').on('submit', function() {
+                                var demand = $("#demandChangeData").val();
+                                $("#demandChangetData").val("");
+                                $(this).dialog('close');
+                                stationList[index].d = demand;
+                                stationMarker.getLabel().setContent(stationList[index].d);
+                                return false;
+                            });
+                        },
+                        buttons: {
+                            "Ok": function() {
+                                $(this).find('form').submit();
+                                $(this).dialog("close");
+                            },
+                            "Cancel": function() {
+                                $(this).dialog("close");
+                            }
+                        }
+                    });
+                    $("#demandChange").dialog("open");
+                });
+                map.addOverlay(stationMarker);
+                return false;
+            });
+        },
+        buttons: {
+            "Ok": function() {
+                $(this).find('form').submit();
+                $(this).dialog("close");
+            },
+            "Cancel": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+    if (createTag == true) {
+        // var demand = prompt("demand");
+        $("#demandInput").dialog("open");
+        // alert(e.point.lng + "," + e.point.lat);
+    } else if (depotTag == true) {
+        depot.x = e.point.lng;
+        depot.y = e.point.lat;
+        depotMarker.setPosition(new BMap.Point(e.point.lng, e.point.lat));
+    }
+});
+function reset() {
+    // map.removeOverlay(carMk);
+    map.clearOverlays();
+    stationMList.forEach(function(stationM,i) {
+        stationM.setLabel(new BMap.Label(stationList[i].d, {
+                    offset: new BMap.Size(20, -10)
+                }));
+        map.addOverlay(stationM);
+    });
+    map.addOverlay(depotMarker);
 }
-    createTag = !createTag;
+function CancelTag() {
+    map.setDefaultCursor("");
+    createTag = false;
     deleteTag = false;
     depotTag = false;
 }
 
-function deleteStation() {
-if (!deleteTag) {
-    map.setDefaultCursor("crosshair");  
-} else {
-    map.setDefaultCursor("");
+function createStation() {
+    CancelTag();
+    map.setDefaultCursor("crosshair");
+    createTag = true;
 }
-    deleteTag = !deleteTag;
-    createTag = false;
-depotTag = false;
+
+function deleteStation() {
+    CancelTag();
+    map.setDefaultCursor("crosshair");
+    deleteTag = true;
 }
 
 function setDepot() {
-if (!depotTag) {
-    map.setDefaultCursor("crosshair");  
-} else {
-    map.setDefaultCursor("");
+    CancelTag();
+    map.setDefaultCursor("crosshair");
+    depotTag = true;
 }
-depotTag = !depotTag
-deleteTag = false;
-createTag = false;
+
+function Reset() {
+    CancelTag();
+    map.setDefaultCursor("crosshair");
+    depotTag = true;
 }
 
 function postData() {
-console.log(JSON.stringify({stationList:stationList,distance:distance}
-    ))
-$.ajax({  
-    url : "/run",  
-    type : 'POST',  
-    data : JSON.stringify({
-    stationList:stationList,
-    distance:distance,
-    depot:depot
-    }),  
-    dataType : 'json',  
-    contentType : 'application/json',  
-    success : function(data, status, xhr) {  
-    console.log(data);
-//         Do Anything After get Return data  
-//          $.each(data.payload, function(index){  
-//              $("#result").append("</br>" + data.payload[index].beanStr);  
-//          });  
-        path(data);
-    },  
-    Error : function(xhr, error, exception) {  
-        // handle the error.    
-        alert(exception.toString());  
-    }  
-});  
-}
-function run() {
-distance = new Array(stationList.length+1);
-var i = 0;
-for (i = 0; i < stationList.length+1; i++) {
-    distance[i] = new Array(stationList.length+1);
-}
-var k = 0;
-stationWithDepot = [];
-for (i=0;i<stationList.length;i++) {
-    stationWithDepot.push(stationList[i]);
-}
-stationWithDepot.push(depot);
-stationWithDepot.forEach(function(station_i,i){
-    stationWithDepot.forEach(function(station_j,j){
-    if (i!=j) {
-        var driving = new BMap.DrivingRoute(map,{onSearchComplete: function (results){
-        if (driving.getStatus() != BMAP_STATUS_SUCCESS){
-            return ;
+    console.log(JSON.stringify({
+        stationList: stationList,
+        distance: distance
+    }))
+    $.ajax({
+        url: "/run",
+        type: 'POST',
+        data: JSON.stringify({
+            stationList: stationList,
+            distance: distance,
+            depot: depot
+        }),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+            console.log(data);
+            //         Do Anything After get Return data  
+            //          $.each(data.payload, function(index){  
+            //              $("#result").append("</br>" + data.payload[index].beanStr);  
+            //          });  
+            path(data);
+        },
+        Error: function(xhr, error, exception) {
+            // handle the error.    
+            alert(exception.toString());
         }
-        var plan = results.getPlan(0);
-        distance[i][j] = plan.getDistance(false);  
-        k++;
-        if (k == stationWithDepot.length*(stationWithDepot.length-1))     
-        {
-            postData();
-        } 
-        }});
-        var p1 = new BMap.Point(station_i.x, station_i.y);
-        var p2 = new BMap.Point(station_j.x, station_j.y);
-        driving.search(p1,p2); 
-    } else {
-        distance[i][j] = 0;
-    }
     });
-});
-console.log(distance);
-// $.post("/run",
-// {
-//   x:"xx"
-// }
-// );
 }
+
+function run() {
+    distance = new Array(stationList.length + 1);
+    var i = 0;
+    for (i = 0; i < stationList.length + 1; i++) {
+        distance[i] = new Array(stationList.length + 1);
+    }
+    var k = 0;
+    stationWithDepot = [];
+    for (i = 0; i < stationList.length; i++) {
+        stationWithDepot.push(stationList[i]);
+    }
+    stationWithDepot.push(depot);
+    stationWithDepot.forEach(function(station_i, i) {
+        stationWithDepot.forEach(function(station_j, j) {
+            if (i != j) {
+                var driving = new BMap.DrivingRoute(map, {
+                    onSearchComplete: function(results) {
+                        if (driving.getStatus() != BMAP_STATUS_SUCCESS) {
+                            return;
+                        }
+                        var plan = results.getPlan(0);
+                        distance[i][j] = plan.getDistance(false);
+                        k++;
+                        if (k == stationWithDepot.length * (stationWithDepot.length - 1)) {
+                            postData();
+                        }
+                    }
+                });
+                var p1 = new BMap.Point(station_i.x, station_i.y);
+                var p2 = new BMap.Point(station_j.x, station_j.y);
+                driving.search(p1, p2);
+            } else {
+                distance[i][j] = 0;
+            }
+        });
+    });
+    console.log(distance);
+    // $.post("/run",
+    // {
+    //   x:"xx"
+    // }
+    // );
+}
+var carMk;
 function path(routePath) {
     var p1 = new BMap.Point(depot.x, depot.y);
     var options = {
-    renderOptions: {panel: "r-result"},
+        renderOptions: {
+            panel: "r-result"
+        },
         onSearchComplete: function(results) {
             if (driving.getStatus() == BMAP_STATUS_SUCCESS) {
                 var plan = results.getPlan(0);
@@ -181,7 +256,7 @@ function path(routePath) {
                 var keyPts = [];
                 console.log(plan.getNumRoutes());
                 for (var j = 0; j < plan.getNumRoutes(); j++) {
-                    var route = plan.getRoute(j);    
+                    var route = plan.getRoute(j);
                     var ppts = route.getPath();
                     var polyline = new BMap.Polyline(ppts);
                     map.addOverlay(polyline);
@@ -190,44 +265,48 @@ function path(routePath) {
                 }
                 var paths = pts.length;
                 var bikeOnV = 0;
-                var carMk = new BMap.Marker(pts[0],{icon:vehicleIcon});
-                carMk.setLabel(new BMap.Label(bikeOnV,{offset:new BMap.Size(30,0)}));
+                carMk = new BMap.Marker(pts[0], {
+                    icon: vehicleIcon
+                });
+                carMk.setLabel(new BMap.Label(bikeOnV, {
+                    offset: new BMap.Size(30, 0)
+                }));
                 map.addOverlay(carMk);
                 i = 0;
                 j = 0;
                 console.log(keyPts);
                 var currentDemand = [];
-                for (var index=0;index<stationList.length;index++) {
+                for (var index = 0; index < stationList.length; index++) {
                     currentDemand[index] = stationList[index].d;
                 }
+
                 function resetMkPoint(i) {
                     carMk.setPosition(pts[i]);
                     if (i < paths) {
-                        if (keyPts[j]==i) {
+                        if (keyPts[j] == i) {
                             console.log(routePath);
                             console.log(j);
                             console.log(routePath[j]);
-                            (function(j){
+                            (function(j) {
                                 setTimeout(function() {
                                     stationLB = stationMList[routePath[j].id].getLabel();
                                     currentDemand[routePath[j].id] -= routePath[j].d;
                                     stationLB.setContent(currentDemand[routePath[j].id]);
-                                    bikeOnV+=routePath[j].d;
+                                    bikeOnV += routePath[j].d;
                                     carMk.getLabel().setContent(bikeOnV);
-                                },1000);
+                                }, 1000);
                             }(j));
                             j++;
                             i++;
                             setTimeout(function() {
                                 resetMkPoint(i);
                             }, 2000);
-                        }
-                        else {
+                        } else {
                             i++;
                             setTimeout(function() {
                                 resetMkPoint(i);
                             }, 100);
-                        } 
+                        }
                     } else {
                         i = 0;
                         carMk.getLabel().setContent("finish!");
