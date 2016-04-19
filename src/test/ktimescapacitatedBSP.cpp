@@ -1,17 +1,7 @@
 #include"ktimescapacitatedBSP.h"
 
-KTimesCapacitatedBSP::KTimesCapacitatedBSP(int num) :TspBase(num){
-	_startFromWhichPiece = PIECE_0;
-	_startStationCapacitatedBSP = -1;
-	_superNodeNumber = 0;
-	_minSum = MM;
-	_superNodeNumber_PIECE_P = 0;
-	_superNodeNumber_PIECE_N = 0;
-	_superNodeNumber_PIECE_0 = 0;
-	_zeroSuperNodeNumberInFront = 0;
-}
-
-KTimesCapacitatedBSP::KTimesCapacitatedBSP(int num, int x, int y) :TspBase(num, x, y){
+KTimesCapacitatedBSP::KTimesCapacitatedBSP(TspBase &tspbase){
+	_tspBase = tspbase;
 	_startFromWhichPiece = PIECE_0;
 	_startStationCapacitatedBSP = -1;
 	_superNodeNumber = 0;
@@ -31,9 +21,9 @@ template <typename TSP>
 void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
 	GRAPH_TYPEDEFS(FullGraph);
 
-	TSP alg(*g, *cost);
+	TSP alg(*_tspBase.g, *_tspBase.cost);
 
-	_tspSum = alg.run();
+	_tspBase._tspSum = alg.run();
 
 	std::vector<Node> vec;
 	alg.tourNodes(std::back_inserter(vec));
@@ -41,7 +31,7 @@ void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
 	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		FullGraph::Node node = *it;
-		_path.push_back((*g).index(node));
+		_tspBase._path.push_back((*_tspBase.g).index(node));
 
 	}
 
@@ -56,10 +46,10 @@ void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 	// used for forward direction to record last one super node:
 	int lastsupernodeflag = PIECE_NULL;
 
-	vector<int>::iterator it = _path.begin();
+	vector<int>::iterator it = _tspBase._path.begin();
 	for (int i = 0; i < number; i++){
-		if (++it == _path.end()){
-			it = _path.begin();
+		if (++it == _tspBase._path.end()){
+			it = _tspBase._path.begin();
 		}
 	}
 	startstation = *it;
@@ -69,11 +59,11 @@ void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 
 	int flag = true;
 	int stopflag = 0;
-	while (stopflag < _stationNum){
+	while (stopflag < _tspBase._stationNum){
 		flag = false;
 
-		SuperNode newpiece(Q / 2);
-		surplusdemand = newpiece.getASuperNode(_path, _stationDemand, startstation, it, surplusdemand, stopflag, _stationNum);
+		SuperNode newpiece(_tspBase.VEHICLE_CAPACITY / 2);
+		surplusdemand = newpiece.getASuperNode(_tspBase._path, _tspBase._stationDemand, startstation, it, surplusdemand, stopflag, _tspBase._stationNum);
 
 		if (newpiece.getPieceTypeFlag() == PIECE_P){
 			_superNodeNumber_PIECE_P++;
@@ -147,8 +137,8 @@ void KTimesCapacitatedBSP::initMinCostAmongSuperNode(){
 		for (int j = 0; j < _superNodeNumber / 2; j++){
 			MinCostOfTwoSuperNode minCostOfTwoSuperNode;
 			minCostOfTwoSuperNode.cost = M;
-			minCostOfTwoSuperNode.firstNodeIt = _path.end();
-			minCostOfTwoSuperNode.secondNodeIt = _path.end();
+			minCostOfTwoSuperNode.firstNodeIt = _tspBase._path.end();
+			minCostOfTwoSuperNode.secondNodeIt = _tspBase._path.end();
 			m.push_back(minCostOfTwoSuperNode);
 		}
 		_minCostAmongSuperNode.push_back(m);
@@ -171,7 +161,7 @@ void KTimesCapacitatedBSP::initSuperNode(){
 }
 
 void KTimesCapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode, int negativesupernode){
-	// firstit and secondit point to _path.
+	// firstit and secondit point to _tspBase._path.
 	vector<int>::iterator positiveit = _superNodeVector_PIECE_P[positivesupernode].getStartIt();
 	vector<int>::iterator negativeit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
 	FullGraph::Node unode, vnode;
@@ -179,18 +169,18 @@ void KTimesCapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode,
 	_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt = negativeit;
 
 	for (int i = 0; i < _superNodeVector_PIECE_P[positivesupernode].getNodeNumberInSuperNode(); i++){
-		unode = (*g)(*positiveit);
-		vnode = (*g)(*negativeit);
+		unode = (*_tspBase.g)(*positiveit);
+		vnode = (*_tspBase.g)(*negativeit);
 		if (unode == vnode){
 			_minCostAmongSuperNode[positivesupernode][negativesupernode].cost = 0;
 		}
 		else{
-			_minCostAmongSuperNode[positivesupernode][negativesupernode].cost = (*cost)[(*g).edge(unode, vnode)];
+			_minCostAmongSuperNode[positivesupernode][negativesupernode].cost = (*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)];
 		}
 
 		negativeit = _superNodeVector_PIECE_N[negativesupernode].getStartIt();
 		for (int j = 0; j < _superNodeVector_PIECE_N[negativesupernode].getNodeNumberInSuperNode(); j++){
-			// FullGraph::NodeIt u(*g); (*cost)[(*g).edge(v, u)]
+			// FullGraph::NodeIt u(*_tspBase.g); (*_tspBase.cost)[(*_tspBase.g).edge(v, u)]
 			// use node id get node,
 			if (*positiveit == *negativeit){
 				_minCostAmongSuperNode[positivesupernode][negativesupernode].cost = 0;
@@ -198,19 +188,19 @@ void KTimesCapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode,
 				_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt = negativeit;
 				continue;
 			}
-			vnode = (*g)(*negativeit);
+			vnode = (*_tspBase.g)(*negativeit);
 			int currentcost;
-			if ((currentcost = (*cost)[(*g).edge(unode, vnode)]) < _minCostAmongSuperNode[positivesupernode][negativesupernode].cost){
+			if ((currentcost = (*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)]) < _minCostAmongSuperNode[positivesupernode][negativesupernode].cost){
 				_minCostAmongSuperNode[positivesupernode][negativesupernode].cost = currentcost;
 				_minCostAmongSuperNode[positivesupernode][negativesupernode].firstNodeIt = positiveit;
 				_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt = negativeit;
 			}
-			if (++negativeit == _path.end()){
-				negativeit = _path.begin();
+			if (++negativeit == _tspBase._path.end()){
+				negativeit = _tspBase._path.begin();
 			}
 		}
-		if (++positiveit == _path.end()){
-			positiveit = _path.begin();
+		if (++positiveit == _tspBase._path.end()){
+			positiveit = _tspBase._path.begin();
 		}
 	}
 	return;
@@ -725,12 +715,12 @@ void KTimesCapacitatedBSP::getPathBeginNegative(){
 
 void KTimesCapacitatedBSP::getPath(){
 	if (_startFromWhichPiece == PIECE_P){
-		cout << "_startFromWhichPiece:PIECE_P" << endl;
+		//cout << "_startFromWhichPiece:PIECE_P" << endl;
 		getPathBeginPositive();
 		getPathBeginNegativeReverse();
 	}
 	else{
-		cout << "_startFromWhichPiece:PIECE_N" << endl;
+		//cout << "_startFromWhichPiece:PIECE_N" << endl;
 		getPathBeginNegative();
 		getPathBeginPositiveReverse();
 	}
@@ -742,11 +732,11 @@ int KTimesCapacitatedBSP::getFinalSum(vector<StationidAndDemand> temp){
 	int tempsum = 0;
 	vector<StationidAndDemand>::iterator it = temp.begin();
 
-	unode = (*g)((*it++).stationId);
+	unode = (*_tspBase.g)((*it++).stationId);
 	for (; it < temp.end() - 1; ++it){
-		vnode = (*g)((*it).stationId);
+		vnode = (*_tspBase.g)((*it).stationId);
 		if (vnode != unode){
-			tempsum += (*cost)[(*g).edge(unode, vnode)];
+			tempsum += (*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)];
 		}
 		unode = vnode;
 	}
@@ -778,7 +768,7 @@ int KTimesCapacitatedBSP::getStartStationCapacitated(){
 	if (checkSum()){
 		//if (true){
 		while (true){
-			cout << "*";
+		//	cout << "*";
 			// find a station which demond is positive :
 			if ((*it).stationDemand >= 0){
 				_startStationCapacitatedBSP = (*it).stationId;
@@ -796,7 +786,7 @@ int KTimesCapacitatedBSP::getStartStationCapacitated(){
 				}
 
 				if (tempNum == _minCostPath.size()){
-					cout << endl;
+					//cout << endl;
 					return _startStationCapacitatedBSP;
 				}
 			}
@@ -832,17 +822,17 @@ void KTimesCapacitatedBSP::run(){
 	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
+	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
 
-	cout << endl << "CapacitatedBSP:" << endl;
+	cout << endl << "ktimescapacitatedBSP:" << endl;
 
-	for (int i = 0; i < Q / 2; i++){
+	for (int i = 0; i < _tspBase.VEHICLE_CAPACITY / 2; i++){
 		initSuperNode();
 		getSuperNodePieces(i);
 		calculateMinCostAmongSuperNode();
 		machingSuperNode();
 		getPath();
-		cout << "Get a path " << i << endl << endl;
+		//cout << "Get a path " << i << endl << endl;
 	}
 
 	deleteRepeatStationPoint();
@@ -851,29 +841,23 @@ void KTimesCapacitatedBSP::run(){
 
 	PRINTFFinalPath
 
-	cout << "Mininum sum cost:" << _minSum << endl;
-	cout << "StartStation:" << _startStationCapacitatedBSP << endl;
-	cout << "length:" << _minCostPath.size() << endl;
-	cout << "Path set size:" << _pathSet.size() << endl;
+	cout << "ktimescapacitatedBSP sum cost:" << _minSum << endl;
+	//cout << "Mininum sum cost:" << _minSum << endl;
+	//cout << "StartStation:" << _startStationCapacitatedBSP << endl;
+	//cout << "length:" << _minCostPath.size() << endl;
+	//cout << "Path set size:" <<_pathSet.size() << endl;
 
 }
 
 void KTimesCapacitatedBSP::printTspPath(){
-	cout << "TSP tour:" << _path.size() << endl;
-	for (int i = 0; i < _path.size(); i++){
-		cout << _path[i] << "(" << _stationDemand[_path[i]] << ") ";
+	cout << "TSP tour:" << _tspBase._path.size() << endl;
+	for (int i = 0; i < _tspBase._path.size(); i++){
+		cout << _tspBase._path[i] << "(" << _tspBase._stationDemand[_tspBase._path[i]] << ") ";
 	}
 	cout << endl;
 }
 
 void KTimesCapacitatedBSP::printFinalPath(){
-
-	cout << "Final Path:" << _minMediumCostPath.size() << endl;
-	for (int i = 0; i < _minMediumCostPath.size(); i++){
-		cout << _minMediumCostPath[i].stationId << "(" << _minMediumCostPath[i].stationDemand << ") ";
-	}
-	cout << endl;
-
 	cout << "_minCostPath Path:" << _minCostPath.size() << endl;
 	for (int i = 0; i < _minCostPath.size(); i++){
 		cout << _minCostPath[i].stationId << "(" << _minCostPath[i].stationDemand << ") ";

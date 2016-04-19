@@ -30,17 +30,22 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
-class UncapacitatedBSP :public TspBase
+class UncapacitatedBSP
 {
+
+public:
+
+	TspBase _tspBase;
+	vector<int> _minCostPath;
 
 private:
 
 	vector<int> _positiveStationVisiteFlag;
 	int _startStationUncapacitatedBSP;
+	int _startPoint;
 
 public:
-
-	UncapacitatedBSP(int num);
+	UncapacitatedBSP(TspBase &tspbase);
 	~UncapacitatedBSP();
 
 	template <typename TSP>
@@ -49,8 +54,10 @@ public:
 	bool isExistNotVisitedPositiveStation();
 	bool isAPositiveStation(int number);
 	int  getStartStation();
+	void revertPath();
 	void run();
 
+	void printFinalPath();
 };
 
 #endif

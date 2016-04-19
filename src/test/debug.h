@@ -62,7 +62,7 @@ Algorithm describe:
 #define PRINTFTSPtour			;
 #define PRINTFSuperNode			;
 #define PRINTFReuslt			;
-#define PRINTFTspPath			printTspPath();
+#define PRINTFTspPath			;
 #define PRINTFTempPath			;
 #define PRINTFFinalPath			printFinalPath();
 

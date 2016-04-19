@@ -2,8 +2,8 @@
 *
 */
 
-#ifndef MERGE_BSP_H
-#define MERGE_BSP_H
+#ifndef CAPACITATED_BSP_H
+#define CAPACITATED_BSP_H_BSP_H
 
 #include <iostream>
 #include <vector>
@@ -40,7 +40,7 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
-class MergeBSP :public TspBase
+class CapacitatedBSP
 {
 
 public:
@@ -48,6 +48,7 @@ public:
 	void run();
 	void runRandom();
 
+	TspBase _tspbase;
 	vector<vector<StationidAndDemand> > _pathSet;
 	vector<StationidAndDemand> _minCostPath;
 	vector<StationidAndDemand> _minMediumCostPath;
@@ -57,11 +58,6 @@ public:
 
 private:
 
-	// used for UncapacitatedBSP:
-	vector<int> _positiveStationVisiteFlag;
-	int _startStationUncapacitatedBSP;
-
-	// user for CapacitatedBSP:
 	int _startFromWhichPiece;
 	int _sumCapacitatedBSP;
 	// positive plus negative plus last one zero super node
@@ -81,19 +77,12 @@ private:
 
 public:
 	
-	MergeBSP(int num);
-	MergeBSP(int num, int x, int y);
-	~MergeBSP();
+	CapacitatedBSP(TspBase &tspbase);
+	~CapacitatedBSP();
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
 
-	// used for Uncapacitated BSP:
-	bool isExistNotVisitedPositiveStation();
-	bool isAPositiveStation(int number);
-	int  getStartStation();
-
-	// used for Capacitated BSP:
 	void getSuperNodePieces(int number);
 	void initMinCostAmongSuperNode();
 	void initSuperNode();
@@ -121,9 +110,11 @@ public:
 	void getPathBeginPositiveReverse();
 	void getPathBeginNegativeReverse();
 
-	int  getStartStationCapacitated();
-	void deleteRepeatStationPoint();
-	void revertPath();
+	int  getStartStationCapacitated(vector<StationidAndDemand> &mincostpath);
+	void deleteRepeatStationPoint(vector<StationidAndDemand> &mincostpath);
+	void revertPath(vector<StationidAndDemand> &mincostpath);
+	void tryToMeetPositive(vector<StationidAndDemand> &mincostpath);
+	void tryToMeetNegative(vector<StationidAndDemand> &mincostpath);
 	void mapPath();
 
 	// printf something:
@@ -135,6 +126,11 @@ public:
 	// check
 	bool checkSum();
 
+	// new 
+	void beginPositive(int positivesupernode, int negativesupernode);
+	void beginPositiveReverse(int positivesupernode, int negativesupernode);
+	void beginNegative(int positivesupernode, int negativesupernode);
+	void beginNegativeReverse(int positivesupernode, int negativesupernode);
 };
 
 #endif
