@@ -7,41 +7,63 @@ var logger = require('koa-logger');
 var parser = require('koa-body');
 var render = require("./lib/render");
 var addon = require('../../build/Release/bike');
+
+// Set up monk
+var monk = require('monk');
+var wrap = require('co-monk');
+var db = monk('localhost/bikeSharing');
+
+// Wrap monk in generator goodness
+var stationDb = wrap(db.get('stations'));
 // logger
 
 app.use(logger());
 
 // response
 
-app.use(route.get('/randomrun', function*() {
-	var datas = addon.randomData(10);
-	var path = addon.runMerge();
-	console.log(datas);
-	console.log(path);
-	var point = [];
-	this.body = yield render("index",{point:point,path:path});
+app.use(route.get('/randomrun', function* () {
+    var datas = addon.randomData(10);
+    var path = addon.runMerge();
+    console.log(datas);
+    console.log(path);
+    var point = [];
+    this.body = yield render("index", { point: point, path: path });
 }));
 
 app.use(route.post('/run', parser()));
 
-app.use(route.post('/run', function*() {
+app.use(route.post('/run', function* () {
     // console.log(this);
     // data = yield parser(this);
     // console.log("xx");
     console.log(this.request.body);
     var stationList = this.request.body.stationList;
     var distance = this.request.body.distance;
-    var depot = this.request.body.depot; 
+    var depot = this.request.body.depot;
+    yield stationDb.insert({ stationList: stationList, depot: depot });
     addon.input(stationList.length, stationList, distance);
     var path = addon.runMerge();
     console.log(path);
     this.type = 'json';
     this.body = path;
-    
+
 }));
 
-app.use(route.get('/', function*() {
-	this.body = yield render("input");
+app.use(route.get('/', function* () {
+    var data = yield stationDb.findOne(
+        {},
+        { sort: { _id: -1 } }
+    );
+    console.log(data);
+    if (!data) {
+        var stationList = [];
+        var depot = { x: 0, y: 0 };
+    } else {
+        var stationList = data.stationList;
+        var depot = data.depot;
+    }
+    console.log(stationList);
+    this.body = yield render("input", { stationList: stationList, depot: depot });
 }));
 
 app.listen(3000);

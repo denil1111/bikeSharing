@@ -40,7 +40,6 @@
     <div id="demandInput" title="Input Demand">
         <form>
         <label>Demand:</label><input id="demandInputData" type="text"></input>
-
         </form>
     </div>
     <div id="demandChange" title="Input Demand">
@@ -52,6 +51,10 @@
 </body>
     <script type="text/javascript" src="/jquery.min.js"></script>
     <script type="text/javascript" src="/jquery-ui.min.js"></script>
+    <script>
+        var stationList = {{stationList|json_encode|raw}};
+        var depot = {{depot|json_encode|raw}};
+    </script>
     <script type="text/javascript" src="/mymap.js"></script>
     <script>
     $(function() {
