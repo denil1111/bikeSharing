@@ -1,79 +1,13 @@
 #include"uncapacitatedBSP.h"
 
 
-UncapacitatedBSP::UncapacitatedBSP(int num) :TspBase(num){
-	// used for UncapacitatedBSP:
+UncapacitatedBSP::UncapacitatedBSP(TspBase &tspbase){
+	_tspBase = tspbase;
 	_startStationUncapacitatedBSP = -1;
 }
 
 UncapacitatedBSP::~UncapacitatedBSP(){
 
-}
-
-bool UncapacitatedBSP::isExistNotVisitedPositiveStation(){
-	return true;
-}
-
-bool UncapacitatedBSP::isAPositiveStation(int number){
-	return _stationDemand[number] >= 0;
-}
-
-int UncapacitatedBSP::getStartStation(){
-	_positiveStationVisiteFlag.clear();
-
-	vector<int>::const_iterator it = _path.begin();
-	while (isExistNotVisitedPositiveStation()){
-		// if a positive demond station have been visited:
-		vector<int>::iterator result = find(_positiveStationVisiteFlag.begin(), _positiveStationVisiteFlag.end(), *it);
-		if (result != _positiveStationVisiteFlag.end()){
-			cout << "No solution!!!!!" << endl;
-			break;
-		}
-
-		// find a station which demond is positive:
-		if (isAPositiveStation(*it)){
-			_positiveStationVisiteFlag.push_back(*it);
-			_startStationUncapacitatedBSP = *it;
-			int tempSum = _stationDemand[*it];
-			int tempNum = 1;
-
-			while (tempSum >= 0 && tempNum < _stationNum){
-				++it;
-				++tempNum;
-				if (it == _path.end()){
-					it = _path.begin();
-				}
-				tempSum += _stationDemand[*it];
-
-			}
-
-			if (tempNum == _stationNum){
-				PRINTFReuslt
-					return _startStationUncapacitatedBSP;
-			}
-
-			// 
-			if (tempSum < 0){
-				++it;
-				++tempNum;
-				if (it == _path.end()){
-					it = _path.begin();
-				}
-				while (_stationDemand[*it] < 0){
-					tempSum += _stationDemand[*it];
-					++it;
-					if (it == _path.end()){
-						it = _path.begin();
-					}
-				}
-			}
-		}// if 
-		else {
-			++it;
-		}
-	}// while
-
-	return -1;
 }
 
 // Get a Random TSP sequence
@@ -82,9 +16,9 @@ template <typename TSP>
 void UncapacitatedBSP::getTspTour(const std::string &alg_name) {
 	GRAPH_TYPEDEFS(FullGraph);
 
-	TSP alg(*g, *cost);
+	TSP alg(*_tspBase.g, *_tspBase.cost);
 
-	_tspSum = alg.run();
+	_tspBase._tspSum = alg.run();
 
 	std::vector<Node> vec;
 	alg.tourNodes(std::back_inserter(vec));
@@ -92,11 +26,95 @@ void UncapacitatedBSP::getTspTour(const std::string &alg_name) {
 	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		FullGraph::Node node = *it;
-		_path.push_back((*g).index(node));
+		_tspBase._path.push_back((*_tspBase.g).index(node));
 	}
 
 	PRINTFTSPtour
 }
+
+bool UncapacitatedBSP::isExistNotVisitedPositiveStation(){
+	return true;
+}
+
+bool UncapacitatedBSP::isAPositiveStation(int number){
+	return _tspBase._stationDemand[number] >= 0;
+}
+
+int UncapacitatedBSP::getStartStation(){
+	_positiveStationVisiteFlag.clear();
+	_startPoint = 0;
+	vector<int>::const_iterator it = _tspBase._path.begin();
+	while (isExistNotVisitedPositiveStation()){
+		// if a positive demond station have been visited:
+		vector<int>::iterator result = find(_positiveStationVisiteFlag.begin(), _positiveStationVisiteFlag.end(), *it);
+		if (result != _positiveStationVisiteFlag.end()){
+			cout << "No solution!!!!!" << endl;
+			break;
+		}
+		//cout << "*";
+		// find a station which demond is positive:
+		if (isAPositiveStation(*it)){
+			
+			_positiveStationVisiteFlag.push_back(*it);
+			_startStationUncapacitatedBSP = *it;
+			int tempSum = _tspBase._stationDemand[*it];
+			int tempNum = 1;
+
+			while (tempSum >= 0 && tempNum < _tspBase._stationNum){
+				++it;
+				++tempNum;
+				if (it == _tspBase._path.end()){
+					it = _tspBase._path.begin();
+				}
+				tempSum += _tspBase._stationDemand[*it];
+
+			}
+
+			if (tempNum == _tspBase._stationNum){
+				//cout << endl;
+				return _startStationUncapacitatedBSP;
+			}
+
+			// 
+			if (tempSum < 0){
+				++it;
+				++tempNum;
+				if (it == _tspBase._path.end()){
+					it = _tspBase._path.begin();
+				}
+				while (_tspBase._stationDemand[*it] < 0){
+					tempSum += _tspBase._stationDemand[*it];
+					++it;
+					if (it == _tspBase._path.end()){
+						it = _tspBase._path.begin();
+					}
+				}
+			}
+		}// if 
+		else {
+			++it;
+		}
+		++_startPoint;
+	}// while
+	//cout << endl;
+	return -1;
+}
+
+void UncapacitatedBSP::revertPath(){
+	for (vector<int>::iterator it = _tspBase._path.begin(); it < _tspBase._path.end(); ++it){
+		_minCostPath.push_back(*it);
+	}
+
+	for (int i = 0; i < _startPoint; i++){
+		//cout << "*";
+		int temp = *_minCostPath.begin();
+		_minCostPath.erase(_minCostPath.begin());
+		_minCostPath.push_back(temp);
+	}
+	//cout << endl;
+}
+
+
 
 void UncapacitatedBSP::run(){
 
@@ -108,20 +126,40 @@ void UncapacitatedBSP::run(){
 	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
+	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
 
 	totaltime0 = finish - sum;
 
-	// Uncapacitated BSP:
-	cout << endl << "UncapacitatedBSP:" << endl;
+	cout << "UncapacitatedBSP:" << endl;
 	sum = clock();
 	start = clock();
 	getStartStation();
+	revertPath();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetStartStation:" << totaltime << "ms!" << endl;
+	//cout << "\ngetStartStation:" << totaltime << "ms!" << endl;
 
 	totaltime1 = (double)(finish - sum) / CLOCKS_PER_SEC * 1000;
-	cout << "\nUncapacitated BSP time:" << totaltime1 << "ms! Sum cost:" << _tspSum << endl << endl;
 
+	PRINTFFinalPath
+
+	cout << "Uncapacitated BSP sum cost:" << _tspBase._tspSum << endl << endl;
+
+}
+
+void UncapacitatedBSP::printFinalPath(){
+	cout << "_minCostPath Path:" << _minCostPath.size() << endl;
+	for (int i = 0; i < _minCostPath.size(); i++){
+		cout << _minCostPath[i] << "(" << _tspBase._stationDemand[_minCostPath[i]] << ") ";
+	}
+
+	int sum = 0;
+	for (int i = 0; i < _minCostPath.size(); i++){
+		sum += _tspBase._stationDemand[_minCostPath[i]];
+	}
+	if (sum != 0){
+		cout << "_minCostPath sum != 0!!!!!!!" << endl;
+	}
+
+	cout << endl;
 }

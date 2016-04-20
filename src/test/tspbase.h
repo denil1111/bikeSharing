@@ -39,10 +39,12 @@ class TspBase
 public:
 
 	point _depot;
+
 	vector<int> _stationDemand;
 	vector<int> _allStationDemand;
 	vector<int> _mapPartToAll;
 	vector<int> _mapAllToPart;
+
 	vector<point> _point;
 	vector<vector<double> > _cost;
 	void randomData();
@@ -50,8 +52,8 @@ public:
 
 public:
 
-	const int K = STATION_CAPACITY;
-	const int Q = VEHICLE_CAPACITY;
+	int STATION_CAPACITY;
+	int VEHICLE_CAPACITY;
 	int _stationNum;
 	FullGraph::NodeMap<dim2::Point<double> > *pos;
 	FullGraph *g;
@@ -61,9 +63,9 @@ public:
 	int _tspSum;
 
 public:
-
-	TspBase(int num);
-	TspBase(int num, double x, double y);
+	TspBase();
+	TspBase(int num, int stationcapacity, int vehiclecapacity);
+	TspBase(int num, int stationcapacity, int vehiclecapacity, double x, double y);
 	~TspBase();
 
 	template <typename TSP>

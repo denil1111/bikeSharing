@@ -1,6 +1,12 @@
 #include"tspbase.h"
 
-TspBase::TspBase(int num){
+TspBase::TspBase(){
+
+}
+
+TspBase::TspBase(int num, int stationcapacity, int vehiclecapacity){
+	STATION_CAPACITY = stationcapacity;
+	VEHICLE_CAPACITY = vehiclecapacity;
 	_tspSum = 0;
 	_stationNum = num;
 	g = new FullGraph(num);
@@ -10,7 +16,9 @@ TspBase::TspBase(int num){
 	_depot.b = 0;
 }
 
-TspBase::TspBase(int num, double x, double y){
+TspBase::TspBase(int num, int stationcapacity, int vehiclecapacity, double x, double y){
+	STATION_CAPACITY = stationcapacity;
+	VEHICLE_CAPACITY = vehiclecapacity;
 	_tspSum = 0;
 	_stationNum = num;
 	g = new FullGraph(num);
@@ -21,9 +29,9 @@ TspBase::TspBase(int num, double x, double y){
 }
 
 TspBase::~TspBase(){
-	delete g;
-	delete cost;
-	delete pos;
+	//delete g;
+	//delete cost;
+	//delete pos;
 }
 
 
@@ -120,7 +128,7 @@ void TspBase::checkDemand(){
 		cout << "Sum of demand wrong!!!" << endl;
 	}
 	else{
-		cout << "Sum of demand equal zero." << endl;
+		//cout << "Sum of demand equal zero." << endl;
 	}
 }
 
@@ -225,19 +233,19 @@ void TspBase::data(){
 	getDemand();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
+	//cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
 
 	start = clock();
 	getPoints();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
+	//cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
 
 	start = clock();
 	getCost();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetCost:" << totaltime << "ms!" << endl;
+	//cout << "\ngetCost:" << totaltime << "ms!" << endl;
 
 }
 
@@ -249,24 +257,25 @@ void TspBase::randomData(){
 
 	cout << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
 	cout << "station capacity:" << STATION_CAPACITY << endl;
+	cout << endl;
 
 	start = clock();
 	getRandomDemand();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
+	//cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
 
 	start = clock();
 	getRandomPoints();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
+	//cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
 
 	start = clock();
 	getRandomCost();
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	cout << "\ngetCost:" << totaltime << "ms!" << endl;
+	//cout << "\ngetCost:" << totaltime << "ms!" << endl;
 
 }
 

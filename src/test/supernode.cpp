@@ -57,6 +57,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			_pieceTypeFlag = PIECE_P;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
 			temp.stationId = *currentIt;
 			temp.stationDemand = _excessNumber;
 			_stationidAndDemand.push_back(temp);
@@ -69,6 +70,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			_pieceTypeFlag = PIECE_N;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
 			temp.stationId = *currentIt;
 			temp.stationDemand = -_excessNumber;
 			_stationidAndDemand.push_back(temp);
@@ -82,6 +84,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++stopflag;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
 			temp.stationId = *currentIt;
 			temp.stationDemand = _excessNumber;
 			_stationidAndDemand.push_back(temp);
@@ -98,6 +101,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++stopflag;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
 			temp.stationId = *currentIt;
 			temp.stationDemand = -_excessNumber;
 			_stationidAndDemand.push_back(temp);
@@ -112,6 +116,12 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		++stopflag;
 
 		StationidAndDemand temp;
+		if (surplusdemand > 0){
+			temp.isCutPoint = PIECE_P;
+		}
+		else{
+			temp.isCutPoint = PIECE_N;
+		}
 		temp.stationId = *currentIt;
 		temp.stationDemand = surplusdemand;
 		_stationidAndDemand.push_back(temp);
@@ -122,7 +132,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 	}
 
 	while (stopflag < stationnum){
-		flag = false;
+		flag = false;	
 		sum += demand[*currentIt];
 		++_nodeNumberInSuperNode;
 
@@ -134,6 +144,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 				++stopflag;
 
 				StationidAndDemand temp;
+				temp.isCutPoint = PIECE_NULL;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt];
 				_stationidAndDemand.push_back(temp);
@@ -144,6 +155,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			}
 			else{
 				StationidAndDemand temp;
+				temp.isCutPoint = PIECE_0;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt] - sum;
 				_stationidAndDemand.push_back(temp);
@@ -158,6 +170,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 				++stopflag;
 
 				StationidAndDemand temp;
+				temp.isCutPoint = PIECE_NULL;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt];
 				_stationidAndDemand.push_back(temp);
@@ -168,6 +181,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			}
 			else{
 				StationidAndDemand temp;
+				temp.isCutPoint = PIECE_0;
 				temp.stationId = *currentIt;
 				temp.stationDemand = demand[*currentIt] - sum;
 				_stationidAndDemand.push_back(temp);
@@ -180,7 +194,8 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			_pieceTypeFlag = PIECE_P;
 			++stopflag;
 
-			StationidAndDemand temp;
+			StationidAndDemand temp; 
+			temp.isCutPoint = PIECE_NULL;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt];
 			_stationidAndDemand.push_back(temp);
@@ -195,6 +210,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			_pieceTypeFlag = PIECE_P;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt] - (sum - _excessNumber);
 			_stationidAndDemand.push_back(temp);
@@ -207,6 +223,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			++stopflag;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_NULL;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt];
 			_stationidAndDemand.push_back(temp);
@@ -221,6 +238,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 			_pieceTypeFlag = PIECE_N;
 
 			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
 			temp.stationId = *currentIt;
 			temp.stationDemand = demand[*currentIt] - (sum + _excessNumber);
 			_stationidAndDemand.push_back(temp);
@@ -229,6 +247,7 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		++stopflag;
 
 		StationidAndDemand temp;
+		temp.isCutPoint = PIECE_NULL;
 		temp.stationId = *currentIt;
 		temp.stationDemand = demand[*currentIt];
 		_stationidAndDemand.push_back(temp);
@@ -248,10 +267,190 @@ int SuperNode::getASuperNode(vector<int> &path, vector<int> &demand, int startno
 		_pieceTypeFlag = PIECE_0;
 
 		StationidAndDemand temp;
+		temp.isCutPoint = PIECE_NULL;
 		temp.stationId = *currentIt;
 		temp.stationDemand = demand[*currentIt];
 		_stationidAndDemand.push_back(temp);
 		cout << "The sum should be :" << sum << endl;
+		return 0;
+	}
+}
+
+int SuperNode::getASuperNodeNoZero(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum){
+	_startIt = currentIt;
+
+	double sum = 0;
+
+	if (surplusdemand != 0){
+		if (surplusdemand > _excessNumber){
+			++_nodeNumberInSuperNode;
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_P;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
+			temp.stationId = *currentIt;
+			temp.stationDemand = _excessNumber;
+			_stationidAndDemand.push_back(temp);
+
+			return surplusdemand - _excessNumber;
+		}
+		else if (surplusdemand < -_excessNumber){
+			++_nodeNumberInSuperNode;
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_N;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
+			temp.stationId = *currentIt;
+			temp.stationDemand = -_excessNumber;
+			_stationidAndDemand.push_back(temp);
+
+			return surplusdemand - _excessNumber;
+		}
+		else if (surplusdemand == _excessNumber){
+			++_nodeNumberInSuperNode;
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_P;
+			++stopflag;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
+			temp.stationId = *currentIt;
+			temp.stationDemand = _excessNumber;
+			_stationidAndDemand.push_back(temp);
+
+			if ((++currentIt) == path.end()){
+				currentIt = path.begin();
+			}
+			return 0;
+		}
+		else if (surplusdemand == -_excessNumber){
+			++_nodeNumberInSuperNode;
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_N;
+			++stopflag;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
+			temp.stationId = *currentIt;
+			temp.stationDemand = -_excessNumber;
+			_stationidAndDemand.push_back(temp);
+
+			if ((++currentIt) == path.end()){
+				currentIt = path.begin();
+			}
+			return 0;
+		}
+		sum += surplusdemand;
+		++_nodeNumberInSuperNode;
+		++stopflag;
+
+		StationidAndDemand temp;
+		if (surplusdemand > 0){
+			temp.isCutPoint = PIECE_P;
+		}
+		else{
+			temp.isCutPoint = PIECE_N;
+		}
+		temp.stationId = *currentIt;
+		temp.stationDemand = surplusdemand;
+		_stationidAndDemand.push_back(temp);
+
+		if ((++currentIt) == path.end()){
+			currentIt = path.begin();
+		}
+	}
+
+	while (stopflag < stationnum){
+		flag = false;
+		sum += demand[*currentIt];
+		++_nodeNumberInSuperNode;
+
+		// needn't cut:
+		if (sum == _excessNumber){
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_P;
+			++stopflag;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_NULL;
+			temp.stationId = *currentIt;
+			temp.stationDemand = demand[*currentIt];
+			_stationidAndDemand.push_back(temp);
+			if ((++currentIt) == path.end()){
+				currentIt = path.begin();
+			}
+			return 0;
+		}
+		// need cut:
+		else if (sum > _excessNumber){
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_P;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_P;
+			temp.stationId = *currentIt;
+			temp.stationDemand = demand[*currentIt] - (sum - _excessNumber);
+			_stationidAndDemand.push_back(temp);
+			return sum - _excessNumber;
+		}
+		// needn't cut:
+		else if (sum == -_excessNumber){
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_N;
+			++stopflag;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_NULL;
+			temp.stationId = *currentIt;
+			temp.stationDemand = demand[*currentIt];
+			_stationidAndDemand.push_back(temp);
+			if ((++currentIt) == path.end()){
+				currentIt = path.begin();
+			}
+			return 0;
+		}
+		// need cut:
+		else if (sum < -_excessNumber){
+			_endIt = currentIt;
+			_pieceTypeFlag = PIECE_N;
+
+			StationidAndDemand temp;
+			temp.isCutPoint = PIECE_N;
+			temp.stationId = *currentIt;
+			temp.stationDemand = demand[*currentIt] - (sum + _excessNumber);
+			_stationidAndDemand.push_back(temp);
+			return sum + _excessNumber;
+		}
+		++stopflag;
+
+		StationidAndDemand temp;
+		temp.isCutPoint = PIECE_NULL;
+		temp.stationId = *currentIt;
+		temp.stationDemand = demand[*currentIt];
+		_stationidAndDemand.push_back(temp);
+		if ((++currentIt) == path.end()){
+			currentIt = path.begin();
+		}
+
+	}// while
+	// last one may be a zero piece:
+	if (*currentIt == startnode){
+		if ((currentIt) == path.begin()){
+			_endIt = path.end() - 1;
+		}
+		else{
+			_endIt = currentIt - 1;
+		}
+		_pieceTypeFlag = PIECE_0;
+
+		//StationidAndDemand temp;
+		//temp.isCutPoint = PIECE_NULL;
+		//temp.stationId = *currentIt;
+		//temp.stationDemand = demand[*currentIt];
+		//_stationidAndDemand.push_back(temp);
+		//cout << "The sum should be :" << sum << endl;
 		return 0;
 	}
 }

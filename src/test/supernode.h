@@ -35,17 +35,20 @@ struct MinCostOfTwoSuperNode{
 	int cost;
 	vector<int>::iterator firstNodeIt;
 	vector<int>::iterator secondNodeIt;
+	int first;
+	int second;
 };
 
 struct StationidAndDemand{
 	int stationId;
 	int stationDemand;
+	int isCutPoint;
 };
 
 class SuperNode{
 
 private:
-	
+
 	vector<int> _zeroCostPoint;
 	int _zeroCostPointNumber;
 	int _nowPieceTypeFlag;
@@ -76,6 +79,17 @@ private:
 
 public:
 
+	// used for calculate min cost between positive node and negative node:
+	int _positiveEnd;
+	int _positiveReverseEnd;
+	int _positiveNext;
+	int _positiveReverseNext;
+	int _negativeEnd;
+	int _negativeReverseEnd;
+	int _negativeNext;
+	int _negativeReverseNext;
+
+
 	SuperNode(int excessnumber);
 
 	vector<StationidAndDemand> _stationidAndDemand;
@@ -95,7 +109,7 @@ public:
 	int getPieceTypeFlag();
 
 	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);
-	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand);
+	int getASuperNodeNoZero(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);
 };
 
 #endif
