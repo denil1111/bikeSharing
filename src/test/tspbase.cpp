@@ -9,6 +9,7 @@ TspBase::TspBase(int num, int stationcapacity, int vehiclecapacity){
 	VEHICLE_CAPACITY = vehiclecapacity;
 	_tspSum = 0;
 	_stationNum = num;
+	_allStationNum = num;
 	g = new FullGraph(num);
 	cost = new DoubleEdgeMap(*g);
 	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
@@ -21,6 +22,7 @@ TspBase::TspBase(int num, int stationcapacity, int vehiclecapacity, double x, do
 	VEHICLE_CAPACITY = vehiclecapacity;
 	_tspSum = 0;
 	_stationNum = num;
+	_allStationNum = num;
 	g = new FullGraph(num);
 	cost = new DoubleEdgeMap(*g);
 	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
@@ -50,19 +52,20 @@ void TspBase::getRandomDemand(){
 		while ((temp = rand() % (STATION_CAPACITY * 2 + 1) - STATION_CAPACITY) == 0){
 			;
 		}
-		_stationDemand.push_back(temp);
+		_allStationDemand.push_back(temp);
 		sum += temp;
 	}
 	sum -= temp;
 	srand((unsigned)time(NULL));
 	int pointnum;
 	if (sum > STATION_CAPACITY){
-		_stationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
+		_allStationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
 		while (sum >= STATION_CAPACITY){
 			pointnum = rand() % _stationNum;
-			_stationDemand.insert(_stationDemand.begin() + pointnum, -STATION_CAPACITY);
+			_allStationDemand.insert(_allStationDemand.begin() + pointnum, -STATION_CAPACITY);
 			sum -= STATION_CAPACITY;
 			++_stationNum;
+			++_allStationNum;
 		}
 		delete g;
 		delete cost;
@@ -72,12 +75,13 @@ void TspBase::getRandomDemand(){
 		pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
 	}
 	else if (sum < -STATION_CAPACITY){
-		_stationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
+		_allStationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
 		while (sum <= -STATION_CAPACITY){
 			pointnum = rand() % _stationNum;
-			_stationDemand.insert(_stationDemand.begin() + pointnum, STATION_CAPACITY);
+			_allStationDemand.insert(_allStationDemand.begin() + pointnum, STATION_CAPACITY);
 			sum += STATION_CAPACITY;
 			++_stationNum;
+			++_allStationNum;
 		}
 		delete g;
 		delete cost;
@@ -87,7 +91,7 @@ void TspBase::getRandomDemand(){
 		pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
 	}
 	else{
-		_stationDemand[_stationNum - 1] = -sum;
+		_allStationDemand[_stationNum - 1] = -sum;
 	}
 
 	checkDemand();
@@ -122,7 +126,7 @@ void TspBase::getDemand(){
 void TspBase::checkDemand(){
 	int sum = 0;
 	for (int i = 0; i < _stationNum; i++){
-		sum += _stationDemand[i];
+		sum += _allStationDemand[i];
 	}
 	if (sum != 0){
 		cout << "Sum of demand wrong!!!" << endl;
@@ -174,9 +178,9 @@ void TspBase::getRandomCost(){
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
 		int j = 0;
 		vector<double> costrow;
-		for (FullGraph::NodeIt v = u; v != INVALID; ++v, ++j) {
+		for (FullGraph::NodeIt v(*g); v != INVALID; ++v, ++j) {
 			if (u != v) {
-				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = (double)sqrt(((*pos)[u] - (*pos)[v]).normSquare());
+				//(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = (double)sqrt(((*pos)[u] - (*pos)[v]).normSquare());
 				costrow.push_back((double)sqrt(((*pos)[u] - (*pos)[v]).normSquare()));
 			}
 			else{
@@ -187,7 +191,7 @@ void TspBase::getRandomCost(){
 		_cost.push_back(costrow);
 	}
 
-	// for depot:
+	// for depot:last row
 	vector<double> costrow;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
 		costrow.push_back((double)sqrt(((*pos)[u]).normSquare()));
@@ -226,8 +230,10 @@ void TspBase::data(){
 	double totaltime, totaltime0, totaltime1, totaltime2;
 	sum = clock();
 
+	cout << endl;
 	cout << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
 	cout << "station capacity:" << STATION_CAPACITY << endl;
+	cout << endl;
 
 	start = clock();
 	getDemand();
@@ -247,6 +253,7 @@ void TspBase::data(){
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	//cout << "\ngetCost:" << totaltime << "ms!" << endl;
 
+	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
 }
 
 void TspBase::randomData(){
@@ -254,10 +261,6 @@ void TspBase::randomData(){
 	clock_t start, finish, sum;
 	double totaltime, totaltime0, totaltime1, totaltime2;
 	sum = clock();
-
-	cout << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
-	cout << "station capacity:" << STATION_CAPACITY << endl;
-	cout << endl;
 
 	start = clock();
 	getRandomDemand();
