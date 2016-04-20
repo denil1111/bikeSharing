@@ -31,6 +31,7 @@
 #include <lemon/random.h>
 #include <lemon/dim2.h>
 #include <lemon/christofides_tsp.h>
+#include <lemon/opt2_tsp.h>
 
 #include "supernode.h"
 #include "debug.h"

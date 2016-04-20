@@ -40,13 +40,10 @@ var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40, 27));
 var depotMarker = new BMap.Marker(new BMap.Point(depot.x, depot.y), {
   icon: depotIcon
 });
-function addStation(x, y, demand) {
-  stationList.push({
-    d: demand,
-    x: x,
-    y: y
-  });
-  var index = stationList.length - 1;
+function addStation(station) {
+  var x = station.x;
+  var y = station.y;
+  var demand = station.d;
   var stationMarker = new BMap.Marker(new BMap.Point(x, y), {
     icon: bikeIcon
   });
@@ -57,36 +54,43 @@ function addStation(x, y, demand) {
   stationMarker.addEventListener("click", function() {
     if (deleteTag == true) {
       map.removeOverlay(this);
-    }
-    $("#demandChange").dialog({
-      autoOpen: false,
-      open: function() {
-        $("#demandChangeData").attr("placeholder", stationList[index].d);
-        $(this).off('submit').on('submit', function() {
-          var demand = $("#demandChangeData").val();
-          $("#demandChangeData").val("");
-          $(this).dialog('close');
-          stationList[index].d = demand;
-          stationMarker.getLabel().setContent(stationList[index].d);
-          return false;
-        });
-      },
-      buttons: {
-        "Ok": function() {
-          $(this).find('form').submit();
-          $(this).dialog("close");
-        },
-        "Cancel": function() {
-          $(this).dialog("close");
+      for (var p = 0; p < stationList.length; p++) {
+        if (stationList[p] === station) {
+          stationList.splice(p, 1);
+          break;
         }
       }
-    });
-    $("#demandChange").dialog("open");
+    } else {
+      $("#demandChange").dialog({
+        autoOpen: false,
+        open: function() {
+          $("#demandChangeData").attr("placeholder", station.d);
+          $(this).off('submit').on('submit', function() {
+            var demand = $("#demandChangeData").val();
+            $("#demandChangeData").val("");
+            $(this).dialog('close');
+            station.d = demand;
+            stationMarker.getLabel().setContent(station.d);
+            return false;
+          });
+        },
+        buttons: {
+          "Ok": function() {
+            $(this).find('form').submit();
+            $(this).dialog("close");
+          },
+          "Cancel": function() {
+            $(this).dialog("close");
+          }
+        }
+      });
+      $("#demandChange").dialog("open");
+    }
   });
   map.addOverlay(stationMarker);
 }
 stationList.forEach(function(station) {
-  addStation(station.x, station.y, station.d);
+  addStation(station);
 })
 map.addOverlay(depotMarker);
 var distance = [
@@ -106,7 +110,14 @@ map.addEventListener("click", function(e) {
         var demand = $("#demandInputData").val();
         $("#demandInputData").val("");
         $(this).dialog('close');
-        addStation(e.point.lng, e.point.lat, demand);
+        var station = {
+          d: demand,
+          x: e.point.lng,
+          y: e.point.lat
+        }
+        stationList.push(station);
+        var index = stationList.length - 1;
+        addStation(station, index);
         return false;
       });
     },
@@ -215,6 +226,8 @@ function run() {
     stationWithDepot.push(stationList[i]);
   }
   stationWithDepot.push(depot);
+  console.log(stationWithDepot);
+  console.log(k);
   stationWithDepot.forEach(function(station_i, i) {
     stationWithDepot.forEach(function(station_j, j) {
       if (i != j) {
@@ -225,8 +238,10 @@ function run() {
             }
             var plan = results.getPlan(0);
             distance[i][j] = plan.getDistance(false);
+            console.log(k);
             k++;
             if (k == stationWithDepot.length * (stationWithDepot.length - 1)) {
+              console.log("post");
               postData();
             }
           }
@@ -239,7 +254,6 @@ function run() {
       }
     });
   });
-  console.log(distance);
   // $.post("/run",
   // {
   //   x:"xx"

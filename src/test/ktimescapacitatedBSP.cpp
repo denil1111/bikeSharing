@@ -333,7 +333,7 @@ void KTimesCapacitatedBSP::pushbackStationidAndDemand(vector<StationidAndDemand>
 	number += temp.stationDemand;
 
 	tempVector[num - 1].stationDemand = number;
-	cout << "ºÏ²¢£º" << tempVector[num - 1].stationId << endl;
+	cout << "ï¿½Ï²ï¿½ï¿½ï¿½" << tempVector[num - 1].stationId << endl;
 	haha.push_back(temp);
 	}*/
 	/*else if ((*(tempVector.end() - 1)).stationId == temp.stationId){
@@ -813,13 +813,13 @@ void KTimesCapacitatedBSP::revertPath(){
 }
 
 void KTimesCapacitatedBSP::run(){
-
+    _tspBase.data();
 	clock_t start, finish, sum;
 	double totaltime, totaltime0, totaltime1, totaltime2;
 	sum = clock();
 
 	start = clock();
-	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+	getTspTour<Opt2Tsp<DoubleEdgeMap > >("Opt2Tsp");
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;

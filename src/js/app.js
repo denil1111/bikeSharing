@@ -41,11 +41,11 @@ app.use(route.post('/run', function* () {
     var distance = this.request.body.distance;
     var depot = this.request.body.depot;
     yield stationDb.insert({ stationList: stationList, depot: depot });
-    addon.input(stationList.length, stationList, distance);
-    var path = addon.runMerge();
+    addon.input(stationList.length, 20, stationList, distance);
+    var path = addon.runAlgorithm(1);
     console.log(path);
     this.type = 'json';
-    this.body = path;
+    this.body = path.result;
 
 }));
 
