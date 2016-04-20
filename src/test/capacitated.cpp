@@ -201,14 +201,29 @@ void CapacitatedBSP::beginPositive(int positivesupernode, int negativesupernode)
 	endnode = (*_tspbase.g)(negativeend);
 
 	int min = MM;
-	int disA, disB;
+	int disA, disB, disC = 0;
+
+	if (positivesupernode < _superNodeNumber_PIECE_P - 1){
+		vector<StationidAndDemand>::iterator c = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.end() - 1;
+		vector<StationidAndDemand>::iterator d = _superNodeVector_PIECE_P[positivesupernode + 1]._stationidAndDemand.begin();
+		FullGraph::Node mnode, nnode;
+		mnode = (*_tspbase.g)((*c).stationId);
+		nnode = (*_tspbase.g)((*d).stationId);
+		if (mnode != nnode){
+			disC = (*_tspbase.cost)[(*_tspbase.g).edge(mnode, nnode)];
+		}
+		else{
+			disC = 0;
+		}
+	}
+
 	for (vector<StationidAndDemand>::iterator it = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin();
 		it < _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.end() - 1; ++it){
 		unode = (*_tspbase.g)((*it).stationId);
 		vnode = (*_tspbase.g)((*(it + 1)).stationId);
 		disA = (*_tspbase.cost)[(*_tspbase.g).edge(unode, beginnode)];
 		disB = (*_tspbase.cost)[(*_tspbase.g).edge(vnode, endnode)];
-		if (disA + disB < min){
+		if (disA + disB + disC < min){
 			min = disA + disB;
 			first = (*it).stationId;
 		}
@@ -218,7 +233,7 @@ void CapacitatedBSP::beginPositive(int positivesupernode, int negativesupernode)
 	vnode = (*_tspbase.g)(_superNodeVector_PIECE_P[positivesupernode]._positiveNext);
 	disA = (*_tspbase.cost)[(*_tspbase.g).edge(unode, beginnode)];
 	disB = (*_tspbase.cost)[(*_tspbase.g).edge(vnode, endnode)];
-	if (disA + disB < min){
+	if (disA + disB + disC < min){
 		min = disA + disB;
 		first = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand[_superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.size() - 1].stationId;
 	}
@@ -346,44 +361,54 @@ void CapacitatedBSP::beginNegativeReverse(int positivesupernode, int negativesup
 
 void CapacitatedBSP::calculateMinCostAmongSuperNode(){
 	initMinCostAmongSuperNode();
-	if (_startFromWhichPiece == PIECE_N){
-		//cout << "calculateFromWhichPiece:PIECE_N" << endl;
-		for (int i = 0; i < _superNodeNumber / 2; i++){
-			for (int j = 0; j < _superNodeNumber / 2; j++){
-				beginNegative(i, j);
-			}
-		}
-		machingSuperNode();
-		getPathBeginNegative();
 
-		initMinCostAmongSuperNode();
-		for (int i = 0; i < _superNodeNumber / 2; i++){
-			for (int j = 0; j < _superNodeNumber / 2; j++){
-				beginPositiveReverse(i, j);
-			}
+	for (int i = 0; i < _superNodeNumber / 2; i++){
+		for (int j = 0; j < _superNodeNumber / 2; j++){
+			beginPositive(i, j);
 		}
-		machingSuperNode();
-		getPathBeginPositiveReverse();
 	}
-	else{
-		//cout << "calculateFromWhichPiece:PIECE_P" << endl;
-		for (int i = 0; i < _superNodeNumber / 2; i++){
-			for (int j = 0; j < _superNodeNumber / 2; j++){
-				beginPositive(i, j);
-			}
-		}
-		machingSuperNode();
-		getPathBeginPositive();
+	machingSuperNode();
+	getPathBeginPositive();
 
-		initMinCostAmongSuperNode();
-		for (int i = 0; i < _superNodeNumber / 2; i++){
-			for (int j = 0; j < _superNodeNumber / 2; j++){
-				beginNegativeReverse(i, j);
-			}
-		}
-		machingSuperNode();
-		getPathBeginNegativeReverse();
-	}
+
+	//if (_startFromWhichPiece == PIECE_N){
+	//	//cout << "calculateFromWhichPiece:PIECE_N" << endl;
+	//	for (int i = 0; i < _superNodeNumber / 2; i++){
+	//		for (int j = 0; j < _superNodeNumber / 2; j++){
+	//			beginNegative(i, j);
+	//		}
+	//	}
+	//	machingSuperNode();
+	//	getPathBeginNegative();
+
+	//	initMinCostAmongSuperNode();
+	//	for (int i = 0; i < _superNodeNumber / 2; i++){
+	//		for (int j = 0; j < _superNodeNumber / 2; j++){
+	//			beginPositiveReverse(i, j);
+	//		}
+	//	}
+	//	machingSuperNode();
+	//	getPathBeginPositiveReverse();
+	//}
+	//else{
+	//	//cout << "calculateFromWhichPiece:PIECE_P" << endl;
+	//	for (int i = 0; i < _superNodeNumber / 2; i++){
+	//		for (int j = 0; j < _superNodeNumber / 2; j++){
+	//			beginPositive(i, j);
+	//		}
+	//	}
+	//	machingSuperNode();
+	//	getPathBeginPositive();
+
+	//	initMinCostAmongSuperNode();
+	//	for (int i = 0; i < _superNodeNumber / 2; i++){
+	//		for (int j = 0; j < _superNodeNumber / 2; j++){
+	//			beginNegativeReverse(i, j);
+	//		}
+	//	}
+	//	machingSuperNode();
+	//	getPathBeginNegativeReverse();
+	//}
 }
 
 //void CapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode, int negativesupernode){
@@ -695,7 +720,7 @@ void CapacitatedBSP::getPathBeginPositiveReverse(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetNegative(tempVector);
+	//tryToMeetNegative(tempVector);
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -765,7 +790,9 @@ void CapacitatedBSP::getPathBeginPositive(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetPositive(tempVector);
+
+	//tryToMeetPositive(tempVector);
+
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -860,7 +887,7 @@ void CapacitatedBSP::getPathBeginNegativeReverse(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetNegative(tempVector);
+	//tryToMeetNegative(tempVector);
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -931,7 +958,10 @@ void CapacitatedBSP::getPathBeginNegative(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetPositive(tempVector);
+
+	//tryToMeetPositive(tempVector);
+
+
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -1064,9 +1094,9 @@ void CapacitatedBSP::tryToMeetPositive(vector<StationidAndDemand> &mincostpath){
 			for (vector<StationidAndDemand>::iterator itt = it + 1; itt < mincostpath.end(); ++itt){
 				if ((*itt).stationId == (*it).stationId && (*it).stationDemand != 0){
 					if (vehiclecapacity + (*itt).stationDemand <= _tspbase.VEHICLE_CAPACITY){
+						vehiclecapacity += (*itt).stationDemand;
 						(*it).stationDemand += (*itt).stationDemand;
 						(*itt).stationDemand = 0;
-						vehiclecapacity += (*itt).stationDemand;
 					}
 					else {
 						(*it).stationDemand += _tspbase.VEHICLE_CAPACITY - vehiclecapacity;
@@ -1112,9 +1142,9 @@ void CapacitatedBSP::tryToMeetNegative(vector<StationidAndDemand> &mincostpath){
 				if ((*itt).stationId == (*it).stationId){
 					if (vehiclecapacity + (*itt).stationDemand >= 0){
 						//cout << "get one" << endl;
+						vehiclecapacity += (*itt).stationDemand;
 						(*it).stationDemand += (*itt).stationDemand;
 						(*itt).stationDemand = 0;
-						vehiclecapacity += (*itt).stationDemand;
 					}
 					else {
 						//cout << "get part one" << endl;

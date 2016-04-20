@@ -399,7 +399,7 @@ void NoZeroCapacitatedBSP::getPathBeginPositiveReverse(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetPositive(tempVector);
+	//tryToMeetPositive(tempVector);
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -438,8 +438,30 @@ void NoZeroCapacitatedBSP::getPathBeginPositive(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetPositive(tempVector);
-	tryToMeetNegative(tempVector);
+
+	cout << endl;
+	int sum = 0;
+	for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+		sum += (*it).stationDemand;
+		cout << (*it).stationId << "(" << (*it).stationDemand << ") ";
+		if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+			cout << "positive cao!!!!!!!!!!!!" << endl;
+			break;
+		}
+	}
+	cout << endl;
+	//tryToMeetPositive(tempVector);
+	sum = 0;
+	for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+		sum += (*it).stationDemand;
+		cout << (*it).stationId << "(" << (*it).stationDemand << ") ";
+
+		//if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+		//	cout << "positive after cao!!!!!!!!!!!!" << endl;
+		//	break;
+		//}
+	}
+	cout << endl;
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -477,7 +499,7 @@ void NoZeroCapacitatedBSP::getPathBeginNegativeReverse(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetPositive(tempVector);
+	//tryToMeetPositive(tempVector);
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -515,8 +537,31 @@ void NoZeroCapacitatedBSP::getPathBeginNegative(){
 	deleteRepeatStationPoint(tempVector);
 	getStartStationCapacitated(tempVector);
 	revertPath(tempVector);
-	tryToMeetNegative(tempVector);
-	tryToMeetPositive(tempVector);
+
+	cout << endl;
+	int sum = 0;
+	for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+		sum += (*it).stationDemand;
+		cout <<(*it).stationId << "(" << (*it).stationDemand << ") ";
+		if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+			cout << "negative cao!!!!!!!!!!!!" << endl;
+			break;
+		}
+	}
+	cout << endl;
+	//tryToMeetNegative(tempVector);
+	sum = 0;
+	for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+		sum += (*it).stationDemand;
+		cout << (*it).stationId << "(" << (*it).stationDemand << ") ";
+		/*if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+			cout << "negative after cao!!!!!!!!!!!!" << endl;
+			break;
+		}*/
+	}
+	cout << endl;
+
+
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
@@ -643,16 +688,22 @@ void NoZeroCapacitatedBSP::tryToMeetPositive(vector<StationidAndDemand> &mincost
 		vehiclecapacity += (*it).stationDemand;
 		if ((*it).isCutPoint == PIECE_P){
 			for (vector<StationidAndDemand>::iterator itt = it + 1; itt < mincostpath.end(); ++itt){
-				if ((*itt).stationId == (*it).stationId && (*it).stationDemand != 0){
+				if ((*itt).stationId == (*it).stationId ){
 					if (vehiclecapacity + (*itt).stationDemand <= _tspBase.VEHICLE_CAPACITY){
+					//	cout << (*itt).stationId << "ha(" << (*itt).stationDemand;
+						vehiclecapacity += (*itt).stationDemand;
+					//	cout << " vv" << vehiclecapacity << " ";
 						(*it).stationDemand += (*itt).stationDemand;
 						(*itt).stationDemand = 0;
-						vehiclecapacity += (*itt).stationDemand;
+					//	cout << "," << (*itt).stationDemand << ") ";
 					}
 					else {
+						//cout << (*itt).stationId << "(" << (*itt).stationDemand;
+						//cout << " vv"<<vehiclecapacity<<" ";
 						(*it).stationDemand += _tspBase.VEHICLE_CAPACITY - vehiclecapacity;
 						(*itt).stationDemand -= _tspBase.VEHICLE_CAPACITY - vehiclecapacity;
 						vehiclecapacity = _tspBase.VEHICLE_CAPACITY;
+						//cout << "," << (*itt).stationDemand << ") ";
 						break;
 					}
 				}
@@ -678,6 +729,15 @@ void NoZeroCapacitatedBSP::tryToMeetPositive(vector<StationidAndDemand> &mincost
 		temp.stationId = (*it).stationId;
 		temp.stationDemand = (*it).stationDemand;
 		mincostpath.push_back(temp);
+	}
+
+	int sum = 0;
+	for (vector<StationidAndDemand>::iterator it = mincostpath.begin(); it < mincostpath.end(); ++it){
+		sum += (*it).stationDemand;
+		if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+			cout << "tryToMeetPositive cao!!!!!!!!!!!!" << endl;
+			break;
+		}
 	}
 }
 
@@ -688,20 +748,26 @@ void NoZeroCapacitatedBSP::tryToMeetNegative(vector<StationidAndDemand> &mincost
 	// set zero:
 	for (vector<StationidAndDemand>::iterator it = mincostpath.begin(); it < mincostpath.end(); ++it){
 		vehiclecapacity += (*it).stationDemand;
-		if ((*it).isCutPoint == PIECE_N){
+		//cout << " lala" << vehiclecapacity << " ";
+
+		if ((*it).isCutPoint == PIECE_N && (*it).stationDemand != 0){
 			for (vector<StationidAndDemand>::iterator itt = it + 1; itt < mincostpath.end(); ++itt){
 				if ((*itt).stationId == (*it).stationId){
 					if (vehiclecapacity + (*itt).stationDemand >= 0){
-						//cout << "get one" << endl;
+						//cout << (*itt).stationId << "ha(" << (*itt).stationDemand;
+						vehiclecapacity += (*itt).stationDemand;
+						//cout << " tt" << vehiclecapacity << " ";
 						(*it).stationDemand += (*itt).stationDemand;
 						(*itt).stationDemand = 0;
-						vehiclecapacity += (*itt).stationDemand;
+						//cout << "," << (*itt).stationDemand << ") ";
 					}
 					else {
-						//cout << "get part one" << endl;
+						//cout << (*itt).stationId << "(" << (*itt).stationDemand;
+						//cout << " vv" << vehiclecapacity << " ";
 						(*it).stationDemand += 0 - vehiclecapacity;
 						(*itt).stationDemand += vehiclecapacity;
 						vehiclecapacity = 0;
+					//	cout << "," << (*itt).stationDemand << ") ";
 						break;
 					}
 				}
@@ -727,6 +793,15 @@ void NoZeroCapacitatedBSP::tryToMeetNegative(vector<StationidAndDemand> &mincost
 		temp.stationId = (*it).stationId;
 		temp.stationDemand = (*it).stationDemand;
 		mincostpath.push_back(temp);
+	}
+
+	int sum = 0;
+	for (vector<StationidAndDemand>::iterator it = mincostpath.begin(); it < mincostpath.end(); ++it){
+		sum += (*it).stationDemand;
+		if (sum < 0 || sum > _tspBase.VEHICLE_CAPACITY){
+			cout << "tryToMeetNegative cao!!!!!!!!!!!!" << endl;
+			break;
+		}
 	}
 
 }
