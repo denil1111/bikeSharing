@@ -24,9 +24,11 @@ void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
 	TSP alg(*_tspBase.g, *_tspBase.cost);
 
 	_tspBase._tspSum = alg.run();
-
+	
+	Opt2Tsp<DoubleEdgeMap> o2Alg(*_tspBase.g, *_tspBase.cost);
+	o2Alg.run(alg.tourNodes());
 	std::vector<Node> vec;
-	alg.tourNodes(std::back_inserter(vec));
+	o2Alg.tourNodes(std::back_inserter(vec));
 
 	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
@@ -819,7 +821,7 @@ void KTimesCapacitatedBSP::run(){
 	sum = clock();
 
 	start = clock();
-	getTspTour<Opt2Tsp<DoubleEdgeMap > >("Opt2Tsp");
+	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("ChristofidesTsp");
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
