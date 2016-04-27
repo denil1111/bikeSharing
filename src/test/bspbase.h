@@ -83,8 +83,8 @@ public:
 	void initSuperNode();
 	void getSuperNodePieces(int number);
 	void getSuperNodePiecesNoZero(int number);
-	void calculateMinCostOfTwoSuperNode(int first, int second);
-	void calculateMinCostAmongSuperNode();
+	virtual void calculateMinCostOfTwoSuperNode(int first, int second);
+	virtual void calculateMinCostAmongSuperNode();
 	string getLGF();
 	void machingSuperNode();
 
@@ -97,12 +97,12 @@ public:
 	void getZeroPathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getZeroPathInFront(vector<StationidAndDemand> &tempVector);
 	void getZeroPathInBehind(vector<StationidAndDemand> &tempVector);
-	void getPathBeginPositive();
-	void getPathBeginPositiveReverse();
-	void getPathBeginNegative();
-	void getPathBeginNegativeReverse();
+	virtual void getPathBeginPositive();
+	virtual void getPathBeginPositiveReverse();
+	virtual void getPathBeginNegative();
+	virtual void getPathBeginNegativeReverse();
 
-	int  getStartStationCapacitated(vector<StationidAndDemand> &mincostpath);
+	int  getStartStation(vector<StationidAndDemand> &mincostpath);
 	void deleteRepeatStationPoint(vector<StationidAndDemand> &mincostpath);
 	void revertPath(vector<StationidAndDemand> &mincostpath);
 	void tryToMeetPositive(vector<StationidAndDemand> &mincostpath);
@@ -119,7 +119,6 @@ public:
 	void printTspPath();
 	void printTempPath(vector<StationidAndDemand> temp);
 	void printFinalPath();
-
 };
 
 #endif

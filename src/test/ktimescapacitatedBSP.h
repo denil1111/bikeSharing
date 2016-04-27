@@ -8,17 +8,15 @@ class KTimesCapacitatedBSP:public BspBase
 public:
 
 	void run();
-	void runRandom();
 
 public:
 
 	KTimesCapacitatedBSP(TspBase &tspbase);
 	~KTimesCapacitatedBSP();
 
-	template <typename TSP>
-	void getTspTour(const std::string &alg_name);
-	void getSuperNodePieces(int number);
 	
+	void getSuperNodePieces(int number);
+	void calculateMinCostAmongSuperNode();
 
 };
 

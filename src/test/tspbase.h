@@ -40,6 +40,8 @@ public:
 
 	point _depot;
 
+	int _stationNum;
+	int _allStationNum;
 	vector<int> _stationDemand;
 	vector<int> _allStationDemand;
 	vector<int> _mapPartToAll;
@@ -54,7 +56,7 @@ public:
 
 	int STATION_CAPACITY;
 	int VEHICLE_CAPACITY;
-	int _stationNum;
+	
 	FullGraph::NodeMap<dim2::Point<double> > *pos;
 	FullGraph *g;
 	DoubleEdgeMap *cost;

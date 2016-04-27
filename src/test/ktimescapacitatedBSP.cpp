@@ -16,30 +16,6 @@ KTimesCapacitatedBSP::~KTimesCapacitatedBSP(){
 
 }
 
-// getTspSequence<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
-template <typename TSP>
-void KTimesCapacitatedBSP::getTspTour(const std::string &alg_name) {
-	GRAPH_TYPEDEFS(FullGraph);
-
-	TSP alg(*_tspBase.g, *_tspBase.cost);
-
-	_tspBase._tspSum = alg.run();
-	
-	Opt2Tsp<DoubleEdgeMap> o2Alg(*_tspBase.g, *_tspBase.cost);
-	o2Alg.run(alg.tourNodes());
-	std::vector<Node> vec;
-	o2Alg.tourNodes(std::back_inserter(vec));
-
-	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
-	{
-		FullGraph::Node node = *it;
-		_tspBase._path.push_back((*_tspBase.g).index(node));
-
-	}
-
-	PRINTFTspPath
-}
-
 void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 	int startstation;
 	// used for opposite direction:
@@ -132,39 +108,13 @@ void KTimesCapacitatedBSP::getSuperNodePieces(int number){
 	//cout << "_zeroSuperNodeNumberInFront:" << _zeroSuperNodeNumberInFront << " _zeroSuperNodeNumberInEnd:" << _zeroSuperNodeNumberInEnd << endl << endl;
 }
 
-
-
-void KTimesCapacitatedBSP::runRandom(){
-
-	clock_t start, finish, sum;
-	double totaltime, totaltime0, totaltime1, totaltime2;
-	sum = clock();
-
-	start = clock();
-	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
-
-	cout << endl << "ktimescapacitatedBSP:" << endl;
-
-	for (int i = 0; i < _tspBase.VEHICLE_CAPACITY / 2; i++){
-		initSuperNode();
-		getSuperNodePieces(i);
-		calculateMinCostAmongSuperNode();
-		machingSuperNode();
-		getPath();
-		//cout << "Get a path " << i << endl << endl;
+void KTimesCapacitatedBSP::calculateMinCostAmongSuperNode(){
+	initMinCostAmongSuperNode();
+	for (int i = 0; i < _superNodeNumber / 2; i++){
+		for (int j = 0; j < _superNodeNumber / 2; j++){
+			calculateMinCostOfTwoSuperNode(i, j);
+		}
 	}
-
-	deleteRepeatStationPoint(_minCostPath);
-	getStartStationCapacitated(_minCostPath);
-	revertPath(_minCostPath);
-
-
-	PRINTFFinalPath
-
-	cout << "ktimescapacitatedBSP sum cost:" << _minSum << endl;
 }
 
 void KTimesCapacitatedBSP::run(){
@@ -174,7 +124,6 @@ void KTimesCapacitatedBSP::run(){
 	sum = clock();
 
 	start = clock();
-	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("ChristofidesTsp");
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
 	//cout << "\ngetTspTour:" << totaltime << "ms!" << endl;
@@ -190,10 +139,11 @@ void KTimesCapacitatedBSP::run(){
 		
 		//cout << "Get a path " << i << endl << endl;
 	}
+	
+	deleteRepeatStationPoint(_minCostPath);
+	getStartStation(_minCostPath);
+	revertPath(_minCostPath);
 	mapPath();
-	//deleteRepeatStationPoint(_minCostPath);
-	//getStartStationCapacitated(_minCostPath);
-	//revertPath(_minCostPath);
 	
 	PRINTFFinalPath
 

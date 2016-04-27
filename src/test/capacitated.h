@@ -13,21 +13,14 @@ class CapacitatedBSP :public BspBase
 public:
 
 	void run();
-	void runRandom();
 
 public:
 	
 	CapacitatedBSP(TspBase &tspbase);
 	~CapacitatedBSP();
 
-	template <typename TSP>
-	void getTspTour(const std::string &alg_name);
-
-	
 	void calculateMinCostAmongSuperNode();
 	void getPath();
-
-	
 
 	// new 
 	void beginPositive(int positivesupernode, int negativesupernode);

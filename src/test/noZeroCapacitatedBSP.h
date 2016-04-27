@@ -13,7 +13,6 @@ class NoZeroCapacitatedBSP:public BspBase
 public:
 
 	void run();
-	void runRandom();
 
 
 public:
@@ -21,15 +20,17 @@ public:
 	NoZeroCapacitatedBSP(TspBase &tspbase);
 	~NoZeroCapacitatedBSP();
 
-	template <typename TSP>
-	void getTspTour(const std::string &alg_name);
+	
 
-	void calculateMinCostOfTwoSuperNode(int first, int second);
+	/*void calculateMinCostOfTwoSuperNode(int first, int second);*/
+	virtual void calculateMinCostOfTwoSuperNode(int first, int second);
+	virtual void calculateMinCostAmongSuperNode();
 
-	void getPathBeginPositive();
-	void getPathBeginNegative();
-	void getPathBeginPositiveReverse();
-	void getPathBeginNegativeReverse();
+	virtual void getPathBeginPositive();
+	virtual void getPathBeginNegative();
+	virtual void getPathBeginPositiveReverse();
+	virtual void getPathBeginNegativeReverse();
+
 
 	// calculate cost among two super node:
 	void beginPositive(int positivesupernode, int negativesupernode);
