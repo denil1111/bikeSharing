@@ -73,6 +73,7 @@ public:
 	vector<SuperNode> _superNodeVector_PIECE_0;
 
 	vector<vector<MinCostOfTwoSuperNode> > _minCostAmongSuperNode;
+	virtual void run()=0;
 
 public:
 	BspBase();

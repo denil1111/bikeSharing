@@ -40,7 +40,7 @@ Algorithm describe:
 */
 
 
-//#define DEBUG haha
+#define DEBUG haha
 
 #ifdef  DEBUG
 

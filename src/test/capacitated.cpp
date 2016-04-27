@@ -1,4 +1,4 @@
- #include"capacitated.h"
+ #include "capacitated.h"
 
 CapacitatedBSP::CapacitatedBSP(TspBase &tspbase):BspBase(tspbase){
 	//_tspBase = tspbase;
@@ -274,7 +274,7 @@ void CapacitatedBSP::run(){
 	//for (int i = 0; i < VEHICLE_CAPACITY / 2; i++){
 	int i = 0;
 	initSuperNode();
-	getSuperNodePieces(i);
+	getSuperNodePieces(_tspBase.VEHICLE_CAPACITY / 2);
 	calculateMinCostAmongSuperNode();
 	//machingSuperNode();
 	//getPath();
@@ -283,6 +283,7 @@ void CapacitatedBSP::run(){
 	deleteRepeatStationPoint(_minCostPath);
 	getStartStation(_minCostPath);
 	revertPath(_minCostPath);
+	_minSum = getFinalSum(_minCostPath);
 	mapPath();
 
 	PRINTFFinalPath

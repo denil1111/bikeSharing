@@ -20,7 +20,7 @@ public:
 	~CapacitatedBSP();
 
 	void calculateMinCostAmongSuperNode();
-	void getPath();
+	// void getPath();
 
 	// new 
 	void beginPositive(int positivesupernode, int negativesupernode);

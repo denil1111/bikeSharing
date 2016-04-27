@@ -42,7 +42,7 @@ void TspBase::setDepot(double x, double y){
 	_depot.b = y;
 }
 
-// random:£¨ -STATION_CAPACITY£¬STATION_CAPACITY £©
+// random:ï¿½ï¿½ -STATION_CAPACITYï¿½ï¿½STATION_CAPACITY ï¿½ï¿½
 void TspBase::getRandomDemand(){
 	int temp;
 	int sum = 0;
@@ -157,20 +157,42 @@ void TspBase::getPoints(){
 
 void TspBase::getCost(){
 	int i = 0;
-	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
+	cout<<"_mapAllToPart:";
+	for (int i=0;i<_mapAllToPart.size();i++)
+	{
+		cout<<_mapAllToPart[i]<<",";
+	}
+	cout<<endl;
+	FullGraph::NodeIt start(*g);
+	for (FullGraph::NodeIt u = start;u != INVALID; ++u, ++i) {
 		while (_mapAllToPart[i] == -1){
 			++i;
 		}
-		int j = 0;
-		for (FullGraph::NodeIt v = u; v != INVALID; ++v, ++j) {
+		int j=0;
+		for (FullGraph::NodeIt v = start; v != INVALID; ++v, ++j) {
 			while (_mapAllToPart[j] == -1){
 				++j;
 			}
 			if (u != v) {
-				(*cost)[(*g).edge(v, u)] = (*cost)[(*g).edge(u, v)] = _cost[i][j];
+				cout<<"("<<i<<","<<j<<")"<<_cost[i][j];
+				(*cost)[(*g).edge(u, v)] = _cost[i][j];
 			}
+			
 		}
+		cout<<endl;
 	}
+	{
+		for (FullGraph::NodeIt u = start ; u != INVALID; ++u)
+		{
+			for (FullGraph::NodeIt v = start; v != INVALID; ++v)
+			{
+				cout<<(*cost)[(*g).edge(u, v)]<<" ";
+			}
+			cout<<endl;
+		}
+		cout<<endl;
+	}
+	
 }
 
 void TspBase::getRandomCost(){

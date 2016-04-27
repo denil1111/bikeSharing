@@ -15,7 +15,7 @@ public:
 	~KTimesCapacitatedBSP();
 
 	
-	void getSuperNodePieces(int number);
+	// void getSuperNodePieces(int number);
 	void calculateMinCostAmongSuperNode();
 
 };

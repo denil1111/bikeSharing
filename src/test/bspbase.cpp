@@ -70,7 +70,7 @@ void BspBase::getSuperNodePieces(int number){
 
 		SuperNode newpiece(_tspBase.VEHICLE_CAPACITY / 2);
 		surplusdemand = newpiece.getASuperNode(_tspBase._path, _tspBase._stationDemand, startstation, it, surplusdemand, stopflag, _tspBase._stationNum);
-
+		// cout<<"stopflag:"<<stopflag<<endl;
 		if (newpiece.getPieceTypeFlag() == PIECE_P){
 			// used for calculate min cost between positive node and negative node:
 			newpiece._positiveEnd = newpiece._stationidAndDemand[newpiece._stationidAndDemand.size() - 1].stationId;
@@ -99,7 +99,7 @@ void BspBase::getSuperNodePieces(int number){
 			// used for record first non-zero super node.
 			if (_startFromWhichPiece == PIECE_0){
 				_startFromWhichPiece = PIECE_P;
-				//cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+				// cout << "startpoint demond" << *newpiece.getStartIt() << " " << _tspBase._stationDemand[*newpiece.getStartIt()] << endl;
 			}
 
 		}
@@ -130,7 +130,7 @@ void BspBase::getSuperNodePieces(int number){
 			// used for record first non-zero super node.
 			if (_startFromWhichPiece == PIECE_0){
 				_startFromWhichPiece = PIECE_N;
-				//cout << "startpoint demond" << *newpiece.getStartIt() << " " << _stationDemand[*newpiece.getStartIt()] << endl;
+				// cout << "startpoint demond" << *newpiece.getStartIt() << " " << _tspBase._stationDemand[*newpiece.getStartIt()] << endl;
 			}
 
 		}
@@ -426,6 +426,7 @@ void BspBase::getPositivePath(int currentnumberofzeropiece, vector<StationidAndD
 	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.begin();
 	for (itt; itt < _superNodeVector_PIECE_P[currentnumberofzeropiece]._stationidAndDemand.end(); ++itt){
 		pushbackStationidAndDemand(tempVector, *itt);
+		cout<<itt->stationDemand<<",id"<<itt->stationId<<endl;
 	}
 }
 
@@ -433,6 +434,7 @@ void BspBase::getNegativePath(int currentnumberofzeropiece, vector<StationidAndD
 	vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.begin();
 	for (itt; itt < _superNodeVector_PIECE_N[currentnumberofzeropiece]._stationidAndDemand.end(); ++itt){
 		pushbackStationidAndDemand(tempVector, *itt);
+		cout<<itt->stationDemand<<",id"<<itt->stationId<<endl;
 	}
 }
 
@@ -565,12 +567,7 @@ void BspBase::getPathBeginPositiveReverse(){
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
-	int depotA = 0, depotB = 0;
-	StationidAndDemand start = tempVector[0];
-	StationidAndDemand end = tempVector[tempVector.size() - 1];
-	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum - 1];
-	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum - 1];
-	if ((tempsum = getFinalSum(tempVector) + depotA + depotB) < _minSum){
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
 		_minCostPath.clear();
@@ -640,12 +637,7 @@ void BspBase::getPathBeginPositive(){
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
-	int depotA = 0, depotB = 0;
-	StationidAndDemand start = tempVector[0];
-	StationidAndDemand end = tempVector[tempVector.size() - 1];
-	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum - 1];
-	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum - 1];
-	if ((tempsum = getFinalSum(tempVector) + depotA + depotB) < _minSum){
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
 		_minCostPath.clear();
@@ -740,12 +732,7 @@ void BspBase::getPathBeginNegativeReverse(){
 	_pathSet.push_back(tempVector);
 
 	int tempsum = 0;
-	int depotA = 0, depotB = 0;
-	StationidAndDemand start = tempVector[0];
-	StationidAndDemand end = tempVector[tempVector.size() - 1];
-	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum - 1];
-	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum - 1];
-	if ((tempsum = getFinalSum(tempVector) + depotA + depotB) < _minSum){
+	if ((tempsum = getFinalSum(tempVector)) < _minSum){
 
 		_minSum = tempsum;
 		_minCostPath.clear();
@@ -778,6 +765,7 @@ void BspBase::getPathBeginNegative(){
 			vector<StationidAndDemand>::iterator itt = _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin();
 			for (itt; itt < _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.end(); ++itt){
 				pushbackStationidAndDemand(tempVector, *itt);
+				cout<<itt->stationDemand<<",id"<<itt->stationId<<endl;
 				// matching station:
 				//if ((*itt).stationId == *(_minCostAmongSuperNode[positivesupernode][negativesupernode].secondNodeIt)){
 				if ((*itt).stationId == _minCostAmongSuperNode[positivesupernode][negativesupernode].second){
@@ -792,8 +780,8 @@ void BspBase::getPathBeginNegative(){
 						}
 					}
 
-					pushbackStationidAndDemand(tempVector, *itt);
-					tempVector[tempVector.size() - 1].stationDemand = 0;
+					// pushbackStationidAndDemand(tempVector, *itt);
+					// tempVector[tempVector.size() - 1].stationDemand = 0;
 				}
 
 				if (itt == _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.end() - 1){
@@ -810,31 +798,30 @@ void BspBase::getPathBeginNegative(){
 	}// if (_superNodeNumber >= 2)
 
 	deleteRepeatStationPoint(tempVector);
-	getStartStation(tempVector);
-	revertPath(tempVector);
-	//tryToMeetPositive(tempVector);
-	_pathSet.push_back(tempVector);
+	_startPoint = 0;
+	while (getStartStation(tempVector)==0)
+	{
+		revertPath(tempVector);
+		//tryToMeetPositive(tempVector);
+		_pathSet.push_back(tempVector);
 
-	int tempsum = 0;
-	int depotA = 0, depotB = 0;
-	StationidAndDemand start = tempVector[0];
-	StationidAndDemand end = tempVector[tempVector.size() - 1];
-	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum - 1];
-	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum - 1];
-	if ((tempsum = getFinalSum(tempVector) + depotA + depotB) < _minSum){
-
-		_minSum = tempsum;
-		_minCostPath.clear();
-		for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
-			StationidAndDemand tt;
-			tt.isCutPoint = (*it).isCutPoint;
-			tt.stationId = (*it).stationId;
-			tt.stationDemand = (*it).stationDemand;
-			_minCostPath.push_back(tt);
+		int tempsum = 0;
+		if ((tempsum = getFinalSum(tempVector)) < _minSum){
+			_minSum = tempsum;
+			cout<<"new minSum"<<_minSum<<endl;
+			_minCostPath.clear();
+			for (vector<StationidAndDemand>::iterator it = tempVector.begin(); it < tempVector.end(); ++it){
+				StationidAndDemand tt;
+				tt.isCutPoint = (*it).isCutPoint;
+				tt.stationId = (*it).stationId;
+				tt.stationDemand = (*it).stationDemand;
+				_minCostPath.push_back(tt);
+			}
 		}
+		_startPoint++;
+		PRINTFTempPath
 	}
-
-	PRINTFTempPath
+	
 
 }
 
@@ -843,7 +830,7 @@ void BspBase::getPathBeginNegative(){
 int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath){
 	vector<StationidAndDemand>::const_iterator it = mincostpath.begin();
 	vector<StationidAndDemand>::const_iterator itt = mincostpath.begin();
-	_startPoint = 0;
+	int NowMinSum = -1;
 	if (checkSum()){
 		//if (true){
 		while (true){
@@ -863,10 +850,10 @@ int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath){
 					tempSum += (*it).stationDemand;
 
 				}
-
+				
 				if (tempNum == mincostpath.size()){
-					//cout << endl;
-					return _startStationCapacitatedBSP;
+					// cout << endl;
+					return 0;
 				}
 			}
 
@@ -875,6 +862,10 @@ int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath){
 			}
 			it = itt;
 			_startPoint++;
+			if (_startPoint > mincostpath.size())
+			{
+				return -1;
+			}
 		}// while
 	}// if
 
@@ -1064,13 +1055,12 @@ void BspBase::mapPath(){
 
 void BspBase::getPath(){
 	if (_startFromWhichPiece == PIECE_P){
-		//cout << "_startFromWhichPiece:PIECE_P" << endl;
-		getPathBeginPositive();
+		cout << "_startFromWhichPiece:PIECE_P" << endl;
 		getPathBeginPositive();
 		getPathBeginNegativeReverse();					
 	}
 	else{
-		//cout << "_startFromWhichPiece:PIECE_N" << endl;
+		cout << "_startFromWhichPiece:PIECE_N" << endl;
 		getPathBeginNegative();
 		getPathBeginPositiveReverse();
 	}
@@ -1078,19 +1068,32 @@ void BspBase::getPath(){
 
 int BspBase::getFinalSum(vector<StationidAndDemand> temp){
 	FullGraph::Node unode, vnode;
+	int uid,vid;
 	int i = 0;
 	int tempsum = 0;
 	vector<StationidAndDemand>::iterator it = temp.begin();
-
-	unode = (*_tspBase.g)((*it++).stationId);
-	for (; it < temp.end() - 1; ++it){
-		vnode = (*_tspBase.g)((*it).stationId);
+	int depotA = 0, depotB = 0;
+	StationidAndDemand start = temp[0];
+	StationidAndDemand end = temp[temp.size() - 1];
+	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum];
+	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum];
+	tempsum += depotA + depotB;
+	cout<<depotA<<"--";
+	uid = (*it++).stationId;
+	unode = (*_tspBase.g)(uid);
+	for (; it < temp.end(); ++it){
+		vid  = (*it).stationId;
+		vnode = (*_tspBase.g)(vid);
+		cout<<"("<<uid<<","<<vid<<")";
 		if (vnode != unode){
-			tempsum += (*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)];
+			// tempsum += (*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)];
+			tempsum += _tspBase._cost[uid][vid];
+			cout<<(*_tspBase.cost)[(*_tspBase.g).edge(unode, vnode)]<<"xx"<<_tspBase._cost[uid][vid]<<"--";
 		}
 		unode = vnode;
+		uid = vid;
 	}
-
+	cout<<depotB<<endl;
 	return tempsum;
 }
 
@@ -1157,5 +1160,6 @@ void BspBase::printTempPath(vector<StationidAndDemand> temp){
 		sum += temp[i].stationDemand;
 	}
 	cout << "sum: " << sum << endl;
+	cout << "cost: "<<getFinalSum(temp) <<endl;
 	cout << endl;
 }

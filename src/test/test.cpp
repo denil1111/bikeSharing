@@ -6,6 +6,7 @@
 #include "capacitated.h"
 #include "ktimescapacitatedBSP.h"
 #include "NoZeroCapacitatedBSP.h"
+#include "bspbase.h"
 
 
 TspBase *MainBSP = nullptr;
@@ -59,26 +60,16 @@ void runAlgorithm(const Nan::FunctionCallbackInfo<v8::Value>& info)
     // }
     std::vector<StationidAndDemand> resultPath;
     std::vector<int> tspPath;
-    if (arg0 == 1)
+    BspBase *bsp;
+    switch(arg0)
     {
-        KTimesCapacitatedBSP kbsp(*MainBSP);
-        kbsp.run();
-        resultPath = kbsp._minCostPath;
-        tspPath = kbsp._tspBase._path;
-        
+        case 1: bsp = new KTimesCapacitatedBSP(*MainBSP);break;
+        case 2: bsp = new CapacitatedBSP(*MainBSP);break;
+        case 3: bsp = new NoZeroCapacitatedBSP(*MainBSP);break;
     }
-    if (arg0 == 2)
-    {
-        CapacitatedBSP cbsp(*MainBSP);
-        cbsp.run();   
-        resultPath = cbsp._minCostPath;
-    }
-    if (arg0 == 3)
-    {
-        NoZeroCapacitatedBSP nzcbsp(*MainBSP);
-        nzcbsp.run();
-        resultPath = nzcbsp._minCostPath;
-    }
+    bsp->run();
+    resultPath = bsp->_minCostPath;
+    tspPath = bsp->_tspBase._path;
     v8::Local<v8::Array> retResultPath = Nan::New<v8::Array>(resultPath.size());
     v8::Local<v8::Array> retTspPath = Nan::New<v8::Array>(tspPath.size());
     for (int i = 0; i < resultPath.size(); i++) {
