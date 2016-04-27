@@ -46,7 +46,8 @@
         "src/test/test.cpp",
         "src/test/ktimescapacitatedBSP.cpp",
         "src/test/tspbase.cpp",
-        "src/test/noZeroCapacitatedBSP.h"
+        "src/test/noZeroCapacitatedBSP.h",
+        "src/test/bspbase.cpp"
       ]
     }
   ]

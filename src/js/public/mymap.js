@@ -188,7 +188,7 @@ function postData() {
   console.log(JSON.stringify({
     stationList: stationList,
     distance: distance
-  }))
+  }));
   $.ajax({
     url: "/run",
     type: 'POST',
