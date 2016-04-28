@@ -281,7 +281,7 @@ void CapacitatedBSP::run(){
 	//cout << "Get a path " << i << endl << endl;
 	//}
 	deleteRepeatStationPoint(_minCostPath);
-	getStartStation(_minCostPath);
+	// getStartStation(_minCostPath);
 	revertPath(_minCostPath);
 	_minSum = getFinalSum(_minCostPath);
 	mapPath();

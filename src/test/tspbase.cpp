@@ -163,15 +163,6 @@ void TspBase::getCost(){
 		cout<<_mapAllToPart[i]<<",";
 	}
 	cout<<endl;
-	FullGraph::NodeIt start(*g);
-	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
-		if ((*g)(i) == u){
-			cout<<"yes"<<endl;
-		}
-		else {
-			cout<<"no"<<endl;
-		}
-	}
 	for (int i=0;i<g->nodeNum();i++)
 	{
 		for (int j=0;j<g->nodeNum();j++)

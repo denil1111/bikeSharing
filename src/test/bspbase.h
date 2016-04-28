@@ -90,20 +90,28 @@ public:
 	void machingSuperNode();
 
 	void pushbackStationidAndDemand(vector<StationidAndDemand> &tempVector, StationidAndDemand temp);
+	
 	void getPositivePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getPositivePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getNegativePath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getNegativePathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getZeroPath(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
 	void getZeroPathReverse(int currentnumberofzeropiece, vector<StationidAndDemand> &tempVector);
-	void getZeroPathInFront(vector<StationidAndDemand> &tempVector);
-	void getZeroPathInBehind(vector<StationidAndDemand> &tempVector);
+	
+	void getSuperPath(SuperNode,vector<StationidAndDemand> &tempVector);
+	void getSuperPathReverse(SuperNode super,vector<StationidAndDemand> &tempVector);
+	
 	virtual void getPathBeginPositive();
 	virtual void getPathBeginPositiveReverse();
-	virtual void getPathBeginNegative();
 	virtual void getPathBeginNegativeReverse();
+	virtual void getPathBeginNegative();
+	
+	void getZeroPathInFront(vector<StationidAndDemand> &tempVector);
+	void getZeroPathInBehind(vector<StationidAndDemand> &tempVector);
+	virtual void getOrderPath(vector<SuperNode>,vector<SuperNode>);
+	// virtual void getReversePath(vector<SuperNode>,vector<SuperNode>);
 
-	int  getStartStation(vector<StationidAndDemand> &mincostpath);
+	int  getStartStation(vector<StationidAndDemand> &mincostpath,vector<StationidAndDemand> &resultpath,int &minSum);
 	void deleteRepeatStationPoint(vector<StationidAndDemand> &mincostpath);
 	void revertPath(vector<StationidAndDemand> &mincostpath);
 	void tryToMeetPositive(vector<StationidAndDemand> &mincostpath);

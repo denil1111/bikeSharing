@@ -147,7 +147,7 @@ void UncapacitatedBSP::run(){
 	sum = clock();
 	start = clock();
 	//getStartStation();
-	getStartStation(_minCostPath);
+	// getStartStation(_minCostPath);
 	revertPath(_minCostPath);
 	finish = clock();
 	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
