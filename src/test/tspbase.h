@@ -22,6 +22,7 @@
 #include <lemon/random.h>
 #include <lemon/dim2.h>
 #include <lemon/christofides_tsp.h>
+#include <lemon/opt2_tsp.h>
 
 using namespace lemon;
 using namespace std;

@@ -164,29 +164,29 @@ void TspBase::getCost(){
 	}
 	cout<<endl;
 	FullGraph::NodeIt start(*g);
-	for (FullGraph::NodeIt u = start;u != INVALID; ++u, ++i) {
-		while (_mapAllToPart[i] == -1){
-			++i;
+	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
+		if ((*g)(i) == u){
+			cout<<"yes"<<endl;
 		}
-		int j=0;
-		for (FullGraph::NodeIt v = start; v != INVALID; ++v, ++j) {
-			while (_mapAllToPart[j] == -1){
-				++j;
-			}
-			if (u != v) {
-				cout<<"("<<i<<","<<j<<")"<<_cost[i][j];
-				(*cost)[(*g).edge(u, v)] = _cost[i][j];
-			}
-			
+		else {
+			cout<<"no"<<endl;
+		}
+	}
+	for (int i=0;i<g->nodeNum();i++)
+	{
+		for (int j=0;j<g->nodeNum();j++)
+		{
+			(*cost)[(*g).edge((*g)(i), (*g)(j))] = _cost[i][j];
 		}
 		cout<<endl;
 	}
+	cout<<endl;
 	{
-		for (FullGraph::NodeIt u = start ; u != INVALID; ++u)
+		for (int i=0;i<g->nodeNum();i++)
 		{
-			for (FullGraph::NodeIt v = start; v != INVALID; ++v)
+			for (int j=0;j<g->nodeNum();j++)
 			{
-				cout<<(*cost)[(*g).edge(u, v)]<<" ";
+				cout<<(*cost)[(*g).edge((*g)(i), (*g)(j))]<<" ";
 			}
 			cout<<endl;
 		}
@@ -231,12 +231,13 @@ void TspBase::getTspTour(const std::string &alg_name) {
 	GRAPH_TYPEDEFS(FullGraph);
 
 	TSP alg(*g, *cost);
-
-	_tspSum = alg.run();
-
+	Opt2Tsp<DoubleEdgeMap > alg2(*g,*cost);
+	std::vector<Node> s1;
+	alg.run();
+	alg.tourNodes(std::back_inserter(s1));
+	_tspSum = alg2.run(s1);
 	std::vector<Node> vec;
-	alg.tourNodes(std::back_inserter(vec));
-
+	alg2.tourNodes(std::back_inserter(vec));
 	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		FullGraph::Node node = *it;

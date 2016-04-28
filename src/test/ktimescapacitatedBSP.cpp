@@ -139,13 +139,6 @@ void KTimesCapacitatedBSP::run(){
 		
 		//cout << "Get a path " << i << endl << endl;
 	}
-	//test
-	// initSuperNode();
-	// getSuperNodePieces(_tspBase.VEHICLE_CAPACITY);
-	// calculateMinCostAmongSuperNode();
-	// machingSuperNode();
-	// getPath();
-	//test over 
 	// deleteRepeatStationPoint(_minCostPath);
 	// getStartStation(_minCostPath);
 	// revertPath(_minCostPath);
