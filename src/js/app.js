@@ -66,6 +66,24 @@ app.use(route.get('/', function* () {
     this.body = yield render("input", { stationList: stationList, depot: depot });
 }));
 
+app.use(route.get('/history/:id', function* (id) {
+    var datas = yield stationDb.find(
+        {},
+        { sort: { _id: -1 } }
+    );
+    var data = datas[id];
+    console.log(data);
+    if (!data) {
+        var stationList = [];
+        var depot = { x: 0, y: 0 };
+    } else {
+        var stationList = data.stationList;
+        var depot = data.depot;
+    }
+    console.log(stationList);
+    this.body = yield render("input", { stationList: stationList, depot: depot });
+}));
+
 app.listen(3000);
 app.use(serve(__dirname + '/public'));
 console.log('listening on port 3000');

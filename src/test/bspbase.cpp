@@ -862,7 +862,7 @@ int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath){
 			}
 			it = itt;
 			_startPoint++;
-			if (_startPoint > mincostpath.size())
+			if (_startPoint >= mincostpath.size())
 			{
 				return -1;
 			}
