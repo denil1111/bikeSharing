@@ -43,11 +43,13 @@ struct StationidAndDemand{
 	int stationId;
 	int stationDemand;
 	int isCutPoint;
+	int formerPosition;
+	int latterPosition;
 };
 
 class SuperNode{
 
-private:
+public:
 
 	vector<int> _zeroCostPoint;
 	int _zeroCostPointNumber;

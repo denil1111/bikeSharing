@@ -51,6 +51,7 @@ public:
 	vector<point> _point;
 	vector<vector<double> > _cost;
 	void randomData();
+	void inputData();
 	void data();
 
 public:
@@ -75,11 +76,17 @@ public:
 	void getTspTour(const std::string &alg_name);
 
 	void setDepot(double x, double y);
+
 	void getRandomPoints();
+	void getInputPoints();
 	void getPoints();
+	
 	void getRandomCost();
+	void getInputCost();
 	void getCost();
+	
 	void getRandomDemand();
+	void getInputDemand();
 	void getDemand();
 
 	// print something

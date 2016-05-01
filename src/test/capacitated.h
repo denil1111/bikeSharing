@@ -19,10 +19,8 @@ public:
 	CapacitatedBSP(TspBase &tspbase);
 	~CapacitatedBSP();
 
-	void calculateMinCostAmongSuperNode();
-	// void getPath();
+	virtual void calculateMinCostAmongSuperNode();
 
-	// new 
 	void beginPositive(int positivesupernode, int negativesupernode);
 	void beginPositiveReverse(int positivesupernode, int negativesupernode);
 	void beginNegative(int positivesupernode, int negativesupernode);
