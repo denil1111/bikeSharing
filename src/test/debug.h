@@ -40,7 +40,7 @@ Algorithm describe:
 */
 
 
-#define DEBUG haha
+//#define DEBUG haha
 
 #ifdef  DEBUG
 
@@ -53,6 +53,7 @@ Algorithm describe:
 #define PRINTFReuslt			;
 #define PRINTFTempPath			printTempPath(tempVector);
 #define PRINTFTspPath			printTspPath();
+#define PRINTFSuperNodeInformation printSuperNodeInformation();
 
 #else
 
@@ -65,5 +66,6 @@ Algorithm describe:
 #define PRINTFTspPath			;
 #define PRINTFTempPath			;
 #define PRINTFFinalPath			printFinalPath();
+#define PRINTFSuperNodeInformation printSuperNodeInformation();
 
 #endif

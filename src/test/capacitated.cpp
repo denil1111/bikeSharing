@@ -1,16 +1,7 @@
  #include "capacitated.h"
 
 CapacitatedBSP::CapacitatedBSP(TspBase &tspbase):BspBase(tspbase){
-	//_tspBase = tspbase;
-
-	//_startFromWhichPiece = PIECE_0;
-	_startStationCapacitatedBSP = -1;
-	//_superNodeNumber = 0;
-	_minSum = MM;
-	_superNodeNumber_PIECE_P = 0;
-	_superNodeNumber_PIECE_N = 0;
-	_superNodeNumber_PIECE_0 = 0;
-	_zeroSuperNodeNumberInFront = 0;
+	capacityFlag = true;
 }
 
 CapacitatedBSP::~CapacitatedBSP(){
@@ -49,7 +40,7 @@ void CapacitatedBSP::beginPositive(int positivesupernode, int negativesupernode)
 		disA = (*_tspBase.cost)[(*_tspBase.g).edge(unode, beginnode)];
 		disB = (*_tspBase.cost)[(*_tspBase.g).edge(vnode, endnode)];
 		if (disA + disB + disC < min){
-			min = disA + disB;
+			min = disA + disB + disC;
 			first = (*it).stationId;
 		}
 	}
@@ -59,7 +50,7 @@ void CapacitatedBSP::beginPositive(int positivesupernode, int negativesupernode)
 	disA = (*_tspBase.cost)[(*_tspBase.g).edge(unode, beginnode)];
 	disB = (*_tspBase.cost)[(*_tspBase.g).edge(vnode, endnode)];
 	if (disA + disB + disC < min){
-		min = disA + disB;
+		min = disA + disB + disC;
 		first = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand[_superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.size() - 1].stationId;
 	}
 
@@ -129,7 +120,7 @@ void CapacitatedBSP::beginPositiveReverse(int positivesupernode, int negativesup
 	int min = MM;
 	int disA, disB, disC = 0;
 
-	if (positivesupernode > 1){
+	if (positivesupernode >= 1){
 		vector<StationidAndDemand>::iterator c = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.begin();
 		vector<StationidAndDemand>::iterator d = _superNodeVector_PIECE_P[positivesupernode - 1]._stationidAndDemand.end() - 1;
 		FullGraph::Node mnode, nnode;
@@ -180,9 +171,9 @@ void CapacitatedBSP::beginNegativeReverse(int positivesupernode, int negativesup
 	int min = MM;
 	int disA, disB, disC = 0;
 
-	if (negativesupernode > 1){
+	if (negativesupernode >= 1){
 		vector<StationidAndDemand>::iterator c = _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand.begin();
-		vector<StationidAndDemand>::iterator d = _superNodeVector_PIECE_N[negativesupernode + 1]._stationidAndDemand.end() - 1;
+		vector<StationidAndDemand>::iterator d = _superNodeVector_PIECE_N[negativesupernode - 1]._stationidAndDemand.end() - 1;
 		FullGraph::Node mnode, nnode;
 		mnode = (*_tspBase.g)((*c).stationId);
 		nnode = (*_tspBase.g)((*d).stationId);
@@ -200,8 +191,8 @@ void CapacitatedBSP::beginNegativeReverse(int positivesupernode, int negativesup
 		vnode = (*_tspBase.g)((*(it - 1)).stationId);
 		disA = (*_tspBase.cost)[(*_tspBase.g).edge(unode, beginnode)];
 		disB = (*_tspBase.cost)[(*_tspBase.g).edge(vnode, endnode)];
-		if (disA + disB < min){
-			min = disA + disB;
+		if (disA + disB + disC  < min){
+			min = disA + disB + disC;
 			second = (*it).stationId;
 		}
 	}
@@ -210,8 +201,8 @@ void CapacitatedBSP::beginNegativeReverse(int positivesupernode, int negativesup
 	vnode = (*_tspBase.g)(_superNodeVector_PIECE_N[negativesupernode]._negativeReverseNext);
 	disA = (*_tspBase.cost)[(*_tspBase.g).edge(unode, beginnode)];
 	disB = (*_tspBase.cost)[(*_tspBase.g).edge(vnode, endnode)];
-	if (disA + disB < min){
-		min = disA + disB;
+	if (disA + disB + disC  < min){
+		min = disA + disB + disC;
 		second = _superNodeVector_PIECE_N[negativesupernode]._stationidAndDemand[0].stationId;
 	}
 
@@ -230,7 +221,7 @@ void CapacitatedBSP::calculateMinCostAmongSuperNode(){
 			}
 		}
 		machingSuperNode();
-		getPathBeginNegative();
+		getOrderPath(_superNodeVector_PIECE_N, _superNodeVector_PIECE_P);
 
 		initMinCostAmongSuperNode();
 		for (int i = 0; i < _superNodeNumber / 2; i++){
@@ -239,7 +230,7 @@ void CapacitatedBSP::calculateMinCostAmongSuperNode(){
 			}
 		}
 		machingSuperNode();
-		getPathBeginPositiveReverse();
+		getReversePath(_superNodeVector_PIECE_P, _superNodeVector_PIECE_N);
 	}
 	else{
 		//cout << "calculateFromWhichPiece:PIECE_P" << endl;
@@ -250,7 +241,7 @@ void CapacitatedBSP::calculateMinCostAmongSuperNode(){
 			}
 		}
 		machingSuperNode();
-		getPathBeginPositive();
+		getOrderPath(_superNodeVector_PIECE_P, _superNodeVector_PIECE_N);
 
 		initMinCostAmongSuperNode();
 		for (int i = 0; i < _superNodeNumber / 2; i++){
@@ -259,34 +250,25 @@ void CapacitatedBSP::calculateMinCostAmongSuperNode(){
 			}
 		}
 		machingSuperNode();
-		getPathBeginNegativeReverse();
+		getReversePath(_superNodeVector_PIECE_N, _superNodeVector_PIECE_P);
 	}
 }
 
 void CapacitatedBSP::run(){
-
-	clock_t start, finish, sum;
-	double totaltime, totaltime0, totaltime1, totaltime2;
-	sum = clock();
+	// _tspBase.data();
 
 	cout <<endl<<"CapacitatedBSP:" << endl;
 
-	//for (int i = 0; i < VEHICLE_CAPACITY / 2; i++){
-	int i = 0;
-	initSuperNode();
-	getSuperNodePieces(_tspBase.VEHICLE_CAPACITY / 2);
-	calculateMinCostAmongSuperNode();
-	//machingSuperNode();
-	//getPath();
-	//cout << "Get a path " << i << endl << endl;
-	//}
-	deleteRepeatStationPoint(_minCostPath);
-	// getStartStation(_minCostPath);
-	revertPath(_minCostPath);
-	_minSum = getFinalSum(_minCostPath);
-	mapPath();
+	for (int i = 0; i < _tspBase._stationNum; i++){
+		getSuperNodePieces(i);
+		calculateMinCostAmongSuperNode();
+		//machingSuperNode();
+		//getPath();
+	}
+//	mapPath();
 
 	PRINTFFinalPath
+	PRINTFSuperNodeInformation
 
 	cout << "Capacitated BSP sum cost:" << _minSum << endl << endl;
 }
