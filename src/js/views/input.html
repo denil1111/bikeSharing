@@ -15,11 +15,18 @@
             font-family: "微软雅黑";
         }
         
-        #allmap {
-            height: 300px;
+        .map {
+            height: 400px;
             width: 100%;
         }
-        
+        .map-container {
+            width: 49%;
+            display: inline-block;
+            border: 2px solid #000;
+        }
+        .map-container-set {
+            text-align: center;
+        }
         #r-result,
         #r-result table {
             width: 100%;
@@ -36,7 +43,30 @@
     <input type="button" onclick="run()" value="go" />
     <input type="button" onclick="reset()" value="Reset" />
     <input type="button" onclick="/save" value="save" />
-    <div id="allmap"></div>
+    <div class = "map-container-set">
+        <div class="map" id="inputMap"></div>
+        <div class="map-container">
+            <div class="map" id="map1"></div>
+            <label>tsp | cost:</label>
+            <label id="cost1"></label>
+        </div>
+        <div class="map-container">
+            <div class="map" id="map2"></div>
+            <label>Ktimes | cost:</label>
+            <label id="cost2"></label>
+        </div>
+        <div class="map-container">
+            <div class="map" id="map3"></div>
+            <label>Ktimes+improved matching cost| cost:</label>
+            <label id="cost3"></label>
+        </div>
+        <div class="map-container">
+            <div class="map" id="map4"></div>
+            <label>NoZero |cost:</label>
+            <label id="cost4"></label>
+        </div>
+    </div>
+    
     <div id="r-result"></dv>
     <div id="demandInput" title="Input Demand">
         <form>

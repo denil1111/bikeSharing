@@ -885,7 +885,7 @@ int BspBase::getFinalSum(vector<StationidAndDemand> temp){
 	int depotA = 0, depotB = 0;
 	StationidAndDemand start = temp[0];
 	StationidAndDemand end = temp[temp.size() - 1];
-	depotA = _tspBase._cost[_tspBase._mapPartToAll[start.stationId]][_tspBase._allStationNum];
+	depotA = _tspBase._cost[_tspBase._allStationNum][_tspBase._mapPartToAll[start.stationId]];
 	depotB = _tspBase._cost[_tspBase._mapPartToAll[end.stationId]][_tspBase._allStationNum];
 	tempsum += depotA + depotB;
 	//cout<<depotA<<"--";

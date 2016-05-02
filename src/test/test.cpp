@@ -9,22 +9,22 @@
 #include "bspbase.h"
 
 
-TspBase *MainBSP = nullptr;
+TspBase *MainTSP = nullptr;
 // int randomDataScript(int num,v8::Local<v8::Array> &retArr)
 // {
 
-// 	MainBSP = new MergeBSP(num);
-// 	MainBSP->randomData();
+// 	MainTSP = new MergeBSP(num);
+// 	MainTSP->randomData();
 // 	retArr = Nan::New<v8::Array>(num);
 // 	for (int i = 0; i < num;i++) {  
 // 		v8::Local<v8::Object> pointI = Nan::New<v8::Object>();
-// 		std::cout<<MainBSP->_point[i].a<<std::endl;
+// 		std::cout<<MainTSP->_point[i].a<<std::endl;
 // 		Nan::Set(pointI,Nan::New("x").ToLocalChecked(),
-//                 Nan::New(MainBSP->_point[i].a));
+//                 Nan::New(MainTSP->_point[i].a));
 // 		Nan::Set(pointI,Nan::New("y").ToLocalChecked(),
-//                 Nan::New(MainBSP->_point[i].b));
+//                 Nan::New(MainTSP->_point[i].b));
 // 		Nan::Set(pointI,Nan::New("d").ToLocalChecked(),
-//                 Nan::New(MainBSP->_stationDemand[i]));
+//                 Nan::New(MainTSP->_stationDemand[i]));
 //   		Nan::Set(retArr, i, pointI);
 // 	}
 
@@ -55,23 +55,20 @@ void runAlgorithm(const Nan::FunctionCallbackInfo<v8::Value>& info)
     int arg0 = info[0]->NumberValue();
     // if (arg0 == 0)
     // {
-    //     UncapacitatedBSP ubsp(*MainBSP);
+    //     UncapacitatedBSP ubsp(*MainTSP);
     //     ubsp.run();
     // }
     std::vector<StationidAndDemand> resultPath;
-    std::vector<int> tspPath;
     BspBase *bsp;
     switch(arg0)
     {
-        case 1: bsp = new KTimesCapacitatedBSP(*MainBSP);break;
-        case 2: bsp = new CapacitatedBSP(*MainBSP);break;
-        case 3: bsp = new NoZeroCapacitatedBSP(*MainBSP);break;
+        case 1: bsp = new KTimesCapacitatedBSP(*MainTSP);break;
+        case 2: bsp = new CapacitatedBSP(*MainTSP);break;
+        case 3: bsp = new NoZeroCapacitatedBSP(*MainTSP);break;
     }
     bsp->run();
     resultPath = bsp->_minCostPath;
-    tspPath = bsp->_tspBase._path;
     v8::Local<v8::Array> retResultPath = Nan::New<v8::Array>(resultPath.size());
-    v8::Local<v8::Array> retTspPath = Nan::New<v8::Array>(tspPath.size());
     for (int i = 0; i < resultPath.size(); i++) {
         v8::Local<v8::Object> pointI = Nan::New<v8::Object>();
         Nan::Set(pointI,Nan::New("id").ToLocalChecked(),
@@ -81,29 +78,22 @@ void runAlgorithm(const Nan::FunctionCallbackInfo<v8::Value>& info)
   		Nan::Set(retResultPath, i, pointI);
 	}
     std::cout<<"result record success"<<std::endl;
-    for (int i = 0;i<tspPath.size();i++) {
-        Nan::Set(retTspPath, i, Nan::New(tspPath[i]));
-    }
-    std::cout<<"tsp record success"<<std::endl;
-    Nan::Set(ret,Nan::New("result").ToLocalChecked(),retResultPath);
-    Nan::Set(ret,Nan::New("tsp").ToLocalChecked(),retTspPath);             
-    std::cout<<"json create success"<<std::endl;
-	info.GetReturnValue().Set(ret);  
+	info.GetReturnValue().Set(retResultPath);  
 }
 
 void input(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     int stationNum = info[0]->NumberValue();
     int capacity = info[1]->NumberValue();
     std::cout<<"capacity:"<<capacity<<std::endl;
-    MainBSP = new TspBase(stationNum,100,capacity);
+    MainTSP = new TspBase(stationNum,100,capacity);
     for (int i=0;i<stationNum;i++)
     {
         point x;
         x.a = info[2]->ToObject()->Get(i)->ToObject()->Get(Nan::New("x").ToLocalChecked())->NumberValue();
         x.b = info[2]->ToObject()->Get(i)->ToObject()->Get(Nan::New("y").ToLocalChecked())->NumberValue();
         int demand = info[2]->ToObject()->Get(i)->ToObject()->Get(Nan::New("d").ToLocalChecked())->NumberValue(); 
-        MainBSP->_point.push_back(x);
-        MainBSP->_allStationDemand.push_back(demand);
+        MainTSP->_point.push_back(x);
+        MainTSP->_allStationDemand.push_back(demand);
         std::cout<<"x:"<<x.a<<","<<x.b<<"d:"<<demand<<std::endl;
     }
     for (int i=0;i<stationNum+1;i++) {
@@ -112,9 +102,24 @@ void input(const Nan::FunctionCallbackInfo<v8::Value>& info) {
             v.push_back(info[3]->ToObject()->Get(i)->ToObject()->Get(j)->NumberValue());
             std::cout<<" "<<v[j];
         }
-        MainBSP->_cost.push_back(v);
+        MainTSP->_cost.push_back(v);
         std::cout<<std::endl;
     }
+    std::vector<int> tspPath;
+    MainTSP->data();
+    tspPath = MainTSP->_path;
+    v8::Local<v8::Array> retTspPath = Nan::New<v8::Array>(tspPath.size());
+    for (int i = 0;i<tspPath.size();i++) {
+         v8::Local<v8::Object> pointI = Nan::New<v8::Object>();
+        Nan::Set(pointI,Nan::New("id").ToLocalChecked(),
+                 Nan::New(tspPath[i]));
+        Nan::Set(pointI,Nan::New("d").ToLocalChecked(),
+                 Nan::New(0));
+  		Nan::Set(retTspPath, i, pointI);
+    }
+    info.GetReturnValue().Set(retTspPath);  
+    std::cout<<"tsp record success"<<std::endl;
+    
 }
 void Init(v8::Local<v8::Object> exports) {
     exports->Set(Nan::New("runAlgorithm").ToLocalChecked(),

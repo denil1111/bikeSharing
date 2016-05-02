@@ -41,11 +41,19 @@ app.use(route.post('/run', function* () {
     var distance = this.request.body.distance;
     var depot = this.request.body.depot;
     yield stationDb.insert({ stationList: stationList, depot: depot });
-    addon.input(stationList.length, 20, stationList, distance);
-    var path = addon.runAlgorithm(1);
-    console.log(path);
+    var tspPath = yield addon.input(stationList.length, 20, stationList, distance);
+    var resultPath = [];
+    for (var i=1;i<=3;i++)
+    {
+        var path = yield addon.runAlgorithm(i);
+        resultPath.push(path);
+    }
+    var data = {
+        tspPath : tspPath,
+        resultPath : resultPath
+    }
     this.type = 'json';
-    this.body = path.result;
+    this.body = data;
 
 }));
 
