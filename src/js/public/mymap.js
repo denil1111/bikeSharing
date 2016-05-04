@@ -2,6 +2,12 @@
  *  Function define
  */
 
+/**
+ * Global Icon
+ */
+var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32, 32));
+var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64, 51));
+var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40, 27));
 
 /**
  * create A map;
@@ -47,6 +53,7 @@ function addDepot(map)
     icon: depotIcon
   });
   map.addOverlay(depotMarker);
+  return depotMarker;
 }
 function addStation(map,station,stationMList,mode) {
   var x = station.x;
@@ -146,13 +153,6 @@ document.onkeydown = function(event) {
 };
 
 /**
- * Global Icon
- */
-var bikeIcon = new BMap.Icon("/image/bike.png", new BMap.Size(32, 32));
-var depotIcon = new BMap.Icon("/image/depot.png", new BMap.Size(64, 51));
-var vehicleIcon = new BMap.Icon("/image/vehicle.png", new BMap.Size(40, 27));
-
-/**
  * initial input map
  */
 var createTag = false;
@@ -170,7 +170,7 @@ var map = createMap("inputMap");
 stationList.forEach(function(station) {
   addStation(map,station,stationMList,"input");
 });
-addDepot(map);
+var depotMarker = addDepot(map);
 $("#demandInput").dialog({
   autoOpen: false,
 });
@@ -192,7 +192,7 @@ map.addEventListener("click", function(e) {
         }
         stationList.push(station);
         var index = stationList.length - 1;
-        addStation(station, index);
+        addStation(map, station, stationMList, "input");
         return false;
       });
     },
