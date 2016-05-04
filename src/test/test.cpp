@@ -5,7 +5,7 @@
 #include "uncapacitatedBSP.h"
 #include "capacitated.h"
 #include "ktimescapacitatedBSP.h"
-#include "NoZeroCapacitatedBSP.h"
+#include "noZeroCapacitatedBSP.h"
 #include "bspbase.h"
 
 

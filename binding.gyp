@@ -32,7 +32,7 @@
           "OS=='linux'",
           {
             "libraries": [
-              "-llemon",
+              "-lemon",
               "-L /usr/local/lib/"
             ]
           }
