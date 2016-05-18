@@ -104,7 +104,7 @@ public:
 	virtual void getOrderPath(vector<SuperNode>,vector<SuperNode>);
 	virtual void getReversePath(vector<SuperNode>,vector<SuperNode>);
 
-	int  getStartStation(vector<StationidAndDemand> &mincostpath,vector<StationidAndDemand> &resultpath,int &minSum);
+	virtual int  getStartStation(vector<StationidAndDemand> &mincostpath,vector<StationidAndDemand> &resultpath,int &minSum);
 	void deleteRepeatStationPoint(vector<StationidAndDemand> &mincostpath);
 	void revertPath(vector<StationidAndDemand> &mincostpath);
 	void tryToMeetPositive(vector<StationidAndDemand> &mincostpath);
@@ -114,7 +114,7 @@ public:
 	int  getFinalSum(vector<StationidAndDemand> temp);
 
 	// check:
-	bool checkSum();
+	bool checkSum(vector<StationidAndDemand> &mincostpath);
 
 	// printf something:
 	void printSuperNodeInformation();

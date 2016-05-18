@@ -16,6 +16,7 @@ public:
 	~UncapacitatedBSP();
 
 	void getPath();
+	int  getStartStation(vector<StationidAndDemand> &mincostpath, vector<StationidAndDemand> &resultpath, int &minSum);
 	void run();
 
 };

@@ -259,13 +259,15 @@ void CapacitatedBSP::run(){
 
 	cout <<endl<<"CapacitatedBSP:" << endl;
 
-	for (int i = 0; i < _tspBase._stationNum; i++){
-		getSuperNodePieces(i);
-		calculateMinCostAmongSuperNode();
-		//machingSuperNode();
-		//getPath();
-	}
-//	mapPath();
+	//for (int i = 0; i < _tspBase._stationNum; i++){
+	//	getSuperNodePieces(i);
+	//	calculateMinCostAmongSuperNode();
+	//	//machingSuperNode();
+	//	//getPath();
+	//}
+	getSuperNodePieces(0);
+	calculateMinCostAmongSuperNode();
+
 
 	PRINTFFinalPath
 	PRINTFSuperNodeInformation

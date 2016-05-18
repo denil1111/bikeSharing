@@ -9,21 +9,24 @@ KTimesCapacitatedBSP::~KTimesCapacitatedBSP(){
 }
 
 void KTimesCapacitatedBSP::run(){
-   // _tspBase.data();
 
 	cout << endl << "ktimescapacitatedBSP:" << endl;
 
-	for (int i = 0; i < _tspBase._stationNum; i++){
-	//int i = 0;
+	//for (int i = 0; i < _tspBase._stationNum; i++){
+	//	getSuperNodePieces(i);
+	//	calculateMinCostAmongSuperNode();
+	//	machingSuperNode();
+	//	getPath();
+	//}
+	int i = 9;
 	getSuperNodePieces(i);
-		calculateMinCostAmongSuperNode();
-		machingSuperNode();
-		getPath();
-		
-		//cout << "Get a path " << i << endl << endl;
-	}
-	_minSum = getFinalSum(_minCostPath);
-//	mapPath();
+	calculateMinCostAmongSuperNode();
+	machingSuperNode();
+	getPath();
+
+
+//	_minSum = getFinalSum(_minCostPath);
+
 	
 	PRINTFFinalPath
 	PRINTFSuperNodeInformation

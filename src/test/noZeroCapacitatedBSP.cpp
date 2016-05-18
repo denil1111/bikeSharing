@@ -125,13 +125,16 @@ void NoZeroCapacitatedBSP::run(){
 
 	cout << endl << "NoZeroCapacitatedBSP:" << endl;
 
-	for (int i = 0; i < _tspBase._stationNum; i++){
-		getSuperNodePiecesNoZero(i);
-		calculateMinCostAmongSuperNode();
-		machingSuperNode();
-		getPath();
-		//cout << "Get a path " << i << endl << endl;
-	}
+	//for (int i = 0; i < _tspBase._stationNum; i++){
+	//	getSuperNodePiecesNoZero(i);
+	//	calculateMinCostAmongSuperNode();
+	//	machingSuperNode();
+	//	getPath();
+	//}
+	getSuperNodePiecesNoZero(0);
+	calculateMinCostAmongSuperNode();
+	machingSuperNode();
+	getPath();
 
 	PRINTFFinalPath
 	PRINTFSuperNodeInformation

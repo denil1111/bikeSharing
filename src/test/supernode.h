@@ -51,13 +51,16 @@ class SuperNode{
 
 public:
 
+	int _numberOfZeroPieceBehind;
+	int _numberOfZeroPieceFront;
+	vector<int> _zeroPieceIndexFront;
+	vector<int> _zeroPieceIndexBehind;
+
+
 	vector<int> _zeroCostPoint;
 	int _zeroCostPointNumber;
 	int _nowPieceTypeFlag;
 	bool _isFirstTime;
-	int _numberOfZeroPieceBehind;
-	//  opposite direction:
-	int _numberOfZeroPieceFront;
 
 	//int _lastNodeDemand;
 	//// matching number to another super node
