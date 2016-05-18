@@ -117,6 +117,7 @@ public:
 	bool checkSum(vector<StationidAndDemand> &mincostpath);
 
 	// printf something:
+	void printTempSuperNodeInformation();
 	void printSuperNodeInformation();
 	void printTspPath();
 	void printTempPath(vector<StationidAndDemand> temp);

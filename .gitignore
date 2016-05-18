@@ -41,3 +41,5 @@ build
 #cpp excute
 *.out
 *.exe
+*.o
+testbike
