@@ -92,7 +92,7 @@ void UncapacitatedBSP::run(){
 
 	getPath();
 
-	PRINTFFinalPath
+	//PRINTFFinalPath
 
 	cout << "Uncapacitated BSP sum cost:" << _minSum << endl << endl;
 

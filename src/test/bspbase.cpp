@@ -180,6 +180,140 @@ void BspBase::getSuperNodePieces(int number){
 	//cout << "_zeroSuperNodeNumberInFront:" << _zeroSuperNodeNumberInFront << " _zeroSuperNodeNumberInEnd:" << _zeroSuperNodeNumberInEnd << endl << endl;
 }
 
+void BspBase::getSuperNodePiecesZeroOnlyAfterPositive(int number){
+	initSuperNode();
+	int startstation;
+	// used for opposite direction:
+	int previousupernode = PIECE_0;
+	int previouszeronumber = 0;
+	// used for forward direction to record last one super node:
+	int lastsupernodeflag = PIECE_NULL;
+
+	vector<int>::iterator it = _tspBase._path.begin();
+	for (int i = 0; i < number; i++){
+		if (++it == _tspBase._path.end()){
+			it = _tspBase._path.begin();
+		}
+	}
+	startstation = *it;
+
+	//cout << "Start station id:" << startstation << " "<<_stationDemand[*it] <<endl << endl;
+	int surplusdemand = 0;
+
+	int flag = true;
+	int stopflag = 0;
+	while (stopflag < _tspBase._stationNum){
+		flag = false;
+
+		SuperNode newpiece(_tspBase.VEHICLE_CAPACITY / 2);
+		surplusdemand = newpiece.getASuperNode(_tspBase._path, _tspBase._stationDemand, startstation, it, surplusdemand, stopflag, _tspBase._stationNum);
+		// cout<<"stopflag:"<<stopflag<<endl;
+		if (newpiece.getPieceTypeFlag() == PIECE_P){
+			// used for calculate min cost between positive node and negative node:
+			newpiece._positiveEnd = newpiece._stationidAndDemand[newpiece._stationidAndDemand.size() - 1].stationId;
+			newpiece._positiveReverseEnd = newpiece._stationidAndDemand[0].stationId;
+			newpiece._positiveNext = newpiece._stationidAndDemand[newpiece._stationidAndDemand.size() - 1].stationId;
+			newpiece._positiveReverseNext = newpiece._stationidAndDemand[0].stationId;
+
+
+			_superNodeNumber_PIECE_P++;
+			++_superNodeNumber;
+
+			// used for opposite direction:
+			if (previouszeronumber != 0){
+				newpiece.setNumberOfZeroPieceFront(previouszeronumber);
+				for (int i = 0; i < previouszeronumber; i++){
+					newpiece._zeroPieceIndexFront.push_back(_superNodeVector_PIECE_0.size() - 1 - i);
+				}
+
+				// used for calculate min cost between positive node and negative node:
+				newpiece._positiveReverseEnd = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - previouszeronumber]._stationidAndDemand[0].stationId;
+				newpiece._positiveReverseNext = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand[_superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand.size() - 1].stationId;
+
+				previouszeronumber = 0;
+			}
+
+			_superNodeVector_PIECE_P.push_back(newpiece);
+			lastsupernodeflag = PIECE_P;
+
+			// used for record first non-zero super node.
+			if (_startFromWhichPiece == PIECE_0){
+				_startFromWhichPiece = PIECE_P;
+				// cout << "startpoint demond" << *newpiece.getStartIt() << " " << _tspBase._stationDemand[*newpiece.getStartIt()] << endl;
+			}
+
+		}
+		else if (newpiece.getPieceTypeFlag() == PIECE_N){
+			// used for calculate min cost between positive node and negative node:
+			newpiece._negativeEnd = newpiece._stationidAndDemand[newpiece._stationidAndDemand.size() - 1].stationId;
+			newpiece._negativeReverseEnd = newpiece._stationidAndDemand[0].stationId;
+			newpiece._negativeNext = newpiece._stationidAndDemand[newpiece._stationidAndDemand.size() - 1].stationId;
+			newpiece._negativeReverseNext = newpiece._stationidAndDemand[0].stationId;
+
+
+			_superNodeNumber_PIECE_N++;
+			++_superNodeNumber;
+
+			// used for opposite direction:
+			if (previouszeronumber != 0){
+				newpiece.setNumberOfZeroPieceFront(previouszeronumber);
+				for (int i = 0; i < previouszeronumber; i++){
+					newpiece._zeroPieceIndexFront.push_back(_superNodeVector_PIECE_0.size() - 1 - i);
+				}
+
+				// used for calculate min cost between positive node and negative node:
+				newpiece._negativeReverseEnd = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - previouszeronumber]._stationidAndDemand[0].stationId;
+				newpiece._negativeReverseNext = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand[_superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand.size() - 1].stationId;
+
+				previouszeronumber = 0;
+			}
+
+			_superNodeVector_PIECE_N.push_back(newpiece);
+			lastsupernodeflag = PIECE_N;
+
+			// used for record first non-zero super node.
+			if (_startFromWhichPiece == PIECE_0){
+				_startFromWhichPiece = PIECE_N;
+				// cout << "startpoint demond" << *newpiece.getStartIt() << " " << _tspBase._stationDemand[*newpiece.getStartIt()] << endl;
+			}
+
+		}
+		else{//PIECE_0
+			_superNodeNumber_PIECE_0++;
+			_superNodeVector_PIECE_0.push_back(newpiece);
+			previouszeronumber++;
+
+			// used for forward direction to record zero pieces to P or N super node:
+			if (lastsupernodeflag == PIECE_NULL){
+				++_zeroSuperNodeNumberInFront;
+			}
+			else if (_startFromWhichPiece == PIECE_P){
+				(_superNodeVector_PIECE_P[_superNodeVector_PIECE_P.size() - 1].getNumberOfZeroPieceBehind())++;
+				_superNodeVector_PIECE_P[_superNodeVector_PIECE_P.size() - 1]._zeroPieceIndexBehind.push_back(_superNodeVector_PIECE_0.size() - 1);
+
+				// used for calculate min cost between positive node and negative node:
+				_superNodeVector_PIECE_P[_superNodeVector_PIECE_P.size() - 1]._positiveEnd = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand[_superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand.size() - 1].stationId;
+				_superNodeVector_PIECE_P[_superNodeVector_PIECE_P.size() - 1]._positiveNext = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - (_superNodeVector_PIECE_P[_superNodeVector_PIECE_P.size() - 1].getNumberOfZeroPieceBehind())]._stationidAndDemand[0].stationId;
+
+			}
+			else if (_startFromWhichPiece == PIECE_N){
+				(_superNodeVector_PIECE_N[_superNodeVector_PIECE_N.size() - 1].getNumberOfZeroPieceBehind())++;
+				_superNodeVector_PIECE_N[_superNodeVector_PIECE_N.size() - 1]._zeroPieceIndexBehind.push_back(_superNodeVector_PIECE_0.size() - 1);
+
+				// used for calculate min cost between positive node and negative node:
+				_superNodeVector_PIECE_N[_superNodeVector_PIECE_N.size() - 1]._negativeEnd = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand[_superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - 1]._stationidAndDemand.size() - 1].stationId;
+				_superNodeVector_PIECE_N[_superNodeVector_PIECE_N.size() - 1]._negativeNext = _superNodeVector_PIECE_0[_superNodeVector_PIECE_0.size() - (_superNodeVector_PIECE_N[_superNodeVector_PIECE_N.size() - 1].getNumberOfZeroPieceBehind())]._stationidAndDemand[0].stationId;
+			}
+
+		}
+	}
+
+	// used for opposite direction:
+	_zeroSuperNodeNumberInEnd = previouszeronumber;
+
+	//cout << "_zeroSuperNodeNumberInFront:" << _zeroSuperNodeNumberInFront << " _zeroSuperNodeNumberInEnd:" << _zeroSuperNodeNumberInEnd << endl << endl;
+}
+
 void BspBase::getSuperNodePiecesNoZero(int number){
 	initSuperNode();
 	int startstation;
@@ -586,7 +720,7 @@ void BspBase::getReversePath(vector<SuperNode> firstPIECE, vector<SuperNode> sec
 									getZeroPath(secondPIECE[second]._zeroPieceIndexFront[i], tempVector);
 								}
 								else{
-									getZeroPathReverse(secondPIECE[second]._zeroPieceIndexBehind[i], tempVector);
+									getZeroPathReverse(secondPIECE[second]._zeroPieceIndexFront[i], tempVector);
 								}
 							}
 
@@ -631,7 +765,7 @@ void BspBase::getReversePath(vector<SuperNode> firstPIECE, vector<SuperNode> sec
 									getZeroPath(secondPIECE[second]._zeroPieceIndexFront[i], tempVector);
 								}
 								else{
-									getZeroPathReverse(secondPIECE[second]._zeroPieceIndexBehind[i], tempVector);
+									getZeroPathReverse(secondPIECE[second]._zeroPieceIndexFront[i], tempVector);
 								}
 							}
 
@@ -666,17 +800,17 @@ void BspBase::getPath(){
 		//cout << "_startFromWhichPiece:PIECE_P" << endl;
 		cout << "1" << endl;
 		getOrderPath(_superNodeVector_PIECE_P,_superNodeVector_PIECE_N);
-		cout << "2" << endl;
-		getReversePath(_superNodeVector_PIECE_N, _superNodeVector_PIECE_P);
-		cout << "3" << endl;
+		//cout << "2" << endl;
+		//getReversePath(_superNodeVector_PIECE_N, _superNodeVector_PIECE_P);
+		//cout << "3" << endl;
 	}
 	else{
 		//cout << "_startFromWhichPiece:PIECE_N" << endl;
 		cout << "4" << endl;
 		getOrderPath(_superNodeVector_PIECE_N,_superNodeVector_PIECE_P);
-		cout << "5" << endl;
-		getReversePath(_superNodeVector_PIECE_P, _superNodeVector_PIECE_N);
-		cout << "6" << endl;
+		//cout << "5" << endl;
+		//getReversePath(_superNodeVector_PIECE_P, _superNodeVector_PIECE_N);
+		//cout << "6" << endl;
 	}
 	//getOrderPath(_superNodeVector_PIECE_P, _superNodeVector_PIECE_N);
 }
@@ -687,15 +821,15 @@ int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath,vector<Stat
 	vector<StationidAndDemand>::const_iterator itt = mincostpath.begin();
 	_startPoint = -1;
 
-	for(int i=0; i<mincostpath.size(); i++){
-		cout<<i<<":"<<mincostpath[i].stationId<<"("<<mincostpath[i].stationDemand<<") ";
-		if(i%5 == 0){
-			cout<<endl;
-		}
-	}
-	cout<<endl;
-	printTempSuperNodeInformation();
-	//deleteRepeatStationPoint(mincostpath);
+	//for(int i=0; i<mincostpath.size(); i++){
+	//	cout<<i<<":"<<mincostpath[i].stationId<<"("<<mincostpath[i].stationDemand<<") ";
+	//	if(i%5 == 0){
+	//		cout<<endl;
+	//	}
+	//}
+	//cout<<endl;
+	//printTempSuperNodeInformation();
+	deleteRepeatStationPoint(mincostpath);
 	if (checkSum(mincostpath)){
 		for (int i=0;i<mincostpath.size();i++)
 		{
@@ -711,7 +845,7 @@ int BspBase::getStartStation(vector<StationidAndDemand> &mincostpath,vector<Stat
 			while (tempSum >= 0 && tempSum <= _tspBase.VEHICLE_CAPACITY)
 			{
 				if (tempNum == i && flag == true) {
-					cout << "сн╫ж" << endl;
+					//cout << "сн╫ж" << endl;
 					_startPoint = i;
 					revertPath(temppath);
 					//if (capacityFlag == true){

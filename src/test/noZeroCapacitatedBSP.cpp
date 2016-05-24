@@ -136,8 +136,8 @@ void NoZeroCapacitatedBSP::run(){
 	machingSuperNode();
 	getPath();
 
-	PRINTFFinalPath
-	PRINTFSuperNodeInformation
+	//PRINTFFinalPath
+	//PRINTFSuperNodeInformation
 
 	cout << "noZeroCapacitatedBSP sum cost:" << _minSum << endl;
 	

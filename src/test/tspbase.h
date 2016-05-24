@@ -29,6 +29,7 @@ using namespace std;
 
 typedef FullGraph::EdgeMap<double> DoubleEdgeMap;
 
+// Baidu map point:(a,b)
 struct point{
 	double a;
 	double b;
@@ -39,25 +40,39 @@ class TspBase
 
 public:
 
-	point _depot;
+	int STATION_CAPACITY;
+	int VEHICLE_CAPACITY;
 
-	int _stationNum;
+	
+	// dosen't include depot. All stations include some stations which demand is zero. Corresponding to Baidu map station.
 	int _allStationNum;
-	vector<int> _stationDemand;
+	// dosen't include depot. Exclude the station which demand is zero.
+	int _stationNum;
+	// bike warehouse.
+	point _depot;
+	// 
+	vector<point> _point;
+	// Corresponding to the Baidu map. 
+	vector<vector<double> > _cost;
+	
+	// dosen't include depot. Include station which damand is zero. Corresponding to Baidu map station.
 	vector<int> _allStationDemand;
+	// dosen't include depot. Exclude the station which demand is zero.
+	vector<int> _stationDemand;
+	// station id. _mapPartToAll[i] represent location station i correspond to Baidu map _mapPartToAll[i].
 	vector<int> _mapPartToAll;
+	// _mapAllToPart[i] == -1 represent station i's demand equal zero.
 	vector<int> _mapAllToPart;
 
-	vector<point> _point;
-	vector<vector<double> > _cost;
+	
+	
 	void randomData();
 	void inputData();
 	void data();
 
 public:
 
-	int STATION_CAPACITY;
-	int VEHICLE_CAPACITY;
+	
 	
 	FullGraph::NodeMap<dim2::Point<double> > *pos;
 	FullGraph *g;
@@ -66,6 +81,7 @@ public:
 	
 	int _tspSum;
 
+	Debug debug;
 public:
 	TspBase();
 	TspBase(int num, int stationcapacity, int vehiclecapacity);
@@ -95,9 +111,6 @@ public:
 	void printCost();
 	void printTSPtour();
 
-	// check
-	void checkDemand();
-
-};// class BikeSharing
+};
 
 #endif

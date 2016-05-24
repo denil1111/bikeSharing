@@ -40,22 +40,27 @@ Algorithm describe:
 */
 
 
+#ifndef DEBUG_H
+#define DEBUG_H
+
+
 //#define DEBUG haha
 
-#ifdef  DEBUG
+//#define PRINTFDemand			printDemand();
+//#define PRINTFPoints			printPoints();
+//#define PRINTFCost				printCost();
+//#define PRINTFTSPtour			printTSPtour();
+//#define PRINTFSuperNode			printSuperNodeInformation();
+//#define PRINTFFinalPath			printFinalPath();
+//#define PRINTFReuslt			;
+//#define PRINTFTempPath			printTempPath(tempVector);
+//#define PRINTFTspPath			printTspPath();
+//#define PRINTFSuperNodeInformation printSuperNodeInformation();
 
-#define PRINTFDemand			printDemand();
-#define PRINTFPoints			printPoints();
-#define PRINTFCost				printCost();
-#define PRINTFTSPtour			printTSPtour();
-#define PRINTFSuperNode			printSuperNodeInformation();
-#define PRINTFFinalPath			printFinalPath();
-#define PRINTFReuslt			;
-#define PRINTFTempPath			printTempPath(tempVector);
-#define PRINTFTspPath			printTspPath();
-#define PRINTFSuperNodeInformation printSuperNodeInformation();
 
-#else
+#include <vector>
+#include <iostream>
+
 
 #define PRINTFDemand			;
 #define PRINTFPoints			;
@@ -67,5 +72,20 @@ Algorithm describe:
 #define PRINTFTempPath			;
 #define PRINTFFinalPath			printFinalPath();
 #define PRINTFSuperNodeInformation printSuperNodeInformation();
+
+
+using namespace std;
+
+class Debug{
+
+public:
+
+	Debug();
+	~Debug();
+
+	bool checkDemand(vector<int> demand, int stationcapacity);
+	bool checkCost(vector<vector<double> > cost);
+
+};
 
 #endif

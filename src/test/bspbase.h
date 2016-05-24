@@ -89,6 +89,7 @@ public:
 	void initSuperNode();
 	void getSuperNodePieces(int number);
 	void getSuperNodePiecesNoZero(int number);
+	void getSuperNodePiecesZeroOnlyAfterPositive(int number);
 	virtual void calculateMinCostOfTwoSuperNode(int first, int second);
 	virtual void calculateMinCostAmongSuperNode();
 	string getLGF();

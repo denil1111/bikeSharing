@@ -18,7 +18,7 @@ void KTimesCapacitatedBSP::run(){
 	//	machingSuperNode();
 	//	getPath();
 	//}
-	int i = 0;
+	int i = 9;
 	getSuperNodePieces(i);
 	calculateMinCostAmongSuperNode();
 	machingSuperNode();

@@ -42,7 +42,8 @@ void TspBase::setDepot(double x, double y){
 	_depot.b = y;
 }
 
-// random: -STATION_CAPACITY--STATION_CAPACITY
+// Get random demand to _allStationDemand.
+// random: (-STATION_CAPACITY, STATION_CAPACITY)
 void TspBase::getRandomDemand(){
 	int temp;
 	int sum = 0;
@@ -56,13 +57,21 @@ void TspBase::getRandomDemand(){
 		sum += temp;
 	}
 	sum -= temp;
-	srand((unsigned)time(NULL));
-	int pointnum;
+	int insertposition;
 	if (sum > STATION_CAPACITY){
-		_allStationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
+		if (sum % STATION_CAPACITY == 0){
+			// last one equal to mod.
+			_allStationDemand[_allStationNum - 1] = -STATION_CAPACITY;
+			sum -= STATION_CAPACITY;
+		}
+		else{
+			// last one equal to mod.
+			_allStationDemand[_allStationNum - 1] = -(sum % STATION_CAPACITY);	
+		}
+		// exceed station:
 		while (sum >= STATION_CAPACITY){
-			pointnum = rand() % _stationNum;
-			_allStationDemand.insert(_allStationDemand.begin() + pointnum, -STATION_CAPACITY);
+			insertposition = rand() % _stationNum;
+			_allStationDemand.insert(_allStationDemand.begin() + insertposition, -STATION_CAPACITY);
 			sum -= STATION_CAPACITY;
 			++_stationNum;
 			++_allStationNum;
@@ -75,10 +84,18 @@ void TspBase::getRandomDemand(){
 		pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
 	}
 	else if (sum < -STATION_CAPACITY){
-		_allStationDemand[_stationNum - 1] = -(sum % STATION_CAPACITY);
+		if (abs(sum) % STATION_CAPACITY == 0){
+			// last one equal to mod.
+			_allStationDemand[_allStationNum - 1] = STATION_CAPACITY;
+			sum += STATION_CAPACITY;
+		}
+		else{
+			// last one equal to mod.
+			_allStationDemand[_allStationNum - 1] = (abs(sum) % STATION_CAPACITY);
+		}
 		while (sum <= -STATION_CAPACITY){
-			pointnum = rand() % _stationNum;
-			_allStationDemand.insert(_allStationDemand.begin() + pointnum, STATION_CAPACITY);
+			insertposition = rand() % _stationNum;
+			_allStationDemand.insert(_allStationDemand.begin() + insertposition, STATION_CAPACITY);
 			sum += STATION_CAPACITY;
 			++_stationNum;
 			++_allStationNum;
@@ -94,12 +111,9 @@ void TspBase::getRandomDemand(){
 		_allStationDemand[_stationNum - 1] = -sum;
 	}
 
-	checkDemand();
-	PRINTFDemand
-
 }
 
-// random: -STATION_CAPACITY--STATION_CAPACITY
+// Get input demand to _allStationDemand.
 void TspBase::getInputDemand(){
 	_allStationDemand.push_back(3);
 	_allStationDemand.push_back(5);
@@ -114,13 +128,20 @@ void TspBase::getInputDemand(){
 	_allStationDemand.push_back(-11);
 }
 
+// Get demand from _allStationDemand to _stationDemand.
 void TspBase::getDemand(){
-	int num = _stationNum;
 	int j = 0;
-	for (int i = 0; i < num; i++){
+	for (int i = 0; i < _allStationNum; i++){
 		if (_allStationDemand[i] == 0){
 			_mapAllToPart.push_back(-1);
 			_stationNum--;
+
+			for (int k = 0; k < _cost.size(); k++){
+				_cost[k].erase(_cost[k].begin() + i);
+			}
+			_cost.erase(_cost.begin() + i);
+			_point.erase(_point.begin() + i);
+
 			continue;
 		}
 		_stationDemand.push_back(_allStationDemand[i]);
@@ -135,22 +156,11 @@ void TspBase::getDemand(){
 	cost = new DoubleEdgeMap(*g);
 	pos = new FullGraph::NodeMap<dim2::Point<double> >(*g);
 
-	checkDemand();
+	debug.checkDemand(_stationDemand, STATION_CAPACITY);
+	PRINTFDemand
 }
 
-void TspBase::checkDemand(){
-	int sum = 0;
-	for (int i = 0; i < _stationNum; i++){
-		sum += _allStationDemand[i];
-	}
-	if (sum != 0){
-		cout << "Sum of demand wrong!!!" << endl;
-	}
-	else{
-		//cout << "Sum of demand equal zero." << endl;
-	}
-}
-
+// Get random points to _point(Baidu map point) and *pos.
 void TspBase::getRandomPoints(){
 	srand((unsigned)time(NULL));
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
@@ -189,6 +199,7 @@ void TspBase::getInputPoints(){
 	_point.push_back(temp);
 }
 
+// Get point from _point(Baidu map point) to *pos.
 void TspBase::getPoints(){
 	int i = 0;
 	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
@@ -205,18 +216,18 @@ void TspBase::getInputCost(){
 		}
 		_cost.push_back(temp);
 	}
-	//  _cost[0] = { 0, 2395, 1389, 2596, 3424, 1467, 3437, 3747, 6006, 2380, 2370, 1432 };
-	//  _cost[1] = { 2329, 0, 1925, 1308, 2439, 2115, 2149, 2459, 4718, 1092, 2006, 3173 };
-	//  _cost[2] = { 2152, 2093, 0, 2342, 2711, 1938, 3183, 2731, 5752, 2126, 932, 2301 };
-	//  _cost[3] = { 2436, 2157, 1738, 0, 1914, 2222, 1893, 2272, 4496, 836, 1819, 2986 };
-	//  _cost[4] = { 3907, 3412, 2996, 1622, 0, 3761, 2287, 1977, 3564, 1799, 2358, 4244 };
-	//  _cost[5] = { 2766, 2487, 3083, 2945, 3520, 0, 1954, 4096, 4935, 2729, 3643, 4229 };
-	//  _cost[6] = { 1940, 1661, 2257, 2119, 1867, 1726, 0, 3270, 4111, 1903, 3205, 3403 };
-	//  _cost[7] = { 3672, 3393, 2974, 1292, 1600, 3458, 2763, 0, 4622, 2072, 2022, 4126 };
-	//  _cost[8] = { 2896, 2617, 3213, 2621, 2062, 2682, 1364, 2931, 0, 2238, 3357, 4359 };
-	//  _cost[9] = { 2807, 2312, 1896, 1311, 1133, 2661, 1108, 2002, 3715, 0, 2020, 3144 };
-	//  _cost[10] = { 2412, 1566, 1501, 1381, 1858, 2449, 3011, 1878, 4870, 1584, 0, 2471 };
-	//  _cost[11] = { 1594, 2847, 1841, 3048, 3876, 2694, 3889, 4199, 6458, 2832, 2332, 0 };
+	  _cost[0] = { 0, 2395, 1389, 2596, 3424, 1467, 3437, 3747, 6006, 2380, 2370, 1432 };
+	  _cost[1] = { 2329, 0, 1925, 1308, 2439, 2115, 2149, 2459, 4718, 1092, 2006, 3173 };
+	  _cost[2] = { 2152, 2093, 0, 2342, 2711, 1938, 3183, 2731, 5752, 2126, 932, 2301 };
+	  _cost[3] = { 2436, 2157, 1738, 0, 1914, 2222, 1893, 2272, 4496, 836, 1819, 2986 };
+	  _cost[4] = { 3907, 3412, 2996, 1622, 0, 3761, 2287, 1977, 3564, 1799, 2358, 4244 };
+	  _cost[5] = { 2766, 2487, 3083, 2945, 3520, 0, 1954, 4096, 4935, 2729, 3643, 4229 };
+	  _cost[6] = { 1940, 1661, 2257, 2119, 1867, 1726, 0, 3270, 4111, 1903, 3205, 3403 };
+	  _cost[7] = { 3672, 3393, 2974, 1292, 1600, 3458, 2763, 0, 4622, 2072, 2022, 4126 };
+	  _cost[8] = { 2896, 2617, 3213, 2621, 2062, 2682, 1364, 2931, 0, 2238, 3357, 4359 };
+	  _cost[9] = { 2807, 2312, 1896, 1311, 1133, 2661, 1108, 2002, 3715, 0, 2020, 3144 };
+	  _cost[10] = { 2412, 1566, 1501, 1381, 1858, 2449, 3011, 1878, 4870, 1584, 0, 2471 };
+	  _cost[11] = { 1594, 2847, 1841, 3048, 3876, 2694, 3889, 4199, 6458, 2832, 2332, 0 };
 
 }
 
@@ -267,6 +278,7 @@ void TspBase::getRandomCost(){
 				costrow.push_back(0);
 			}
 		}
+		// for depot:last col.
 		costrow.push_back((double)sqrt(((*pos)[u]).normSquare()));
 		_cost.push_back(costrow);
 	}

@@ -47,7 +47,9 @@
         "src/test/ktimescapacitatedBSP.cpp",
         "src/test/tspbase.cpp",
         "src/test/noZeroCapacitatedBSP.cpp",
-        "src/test/bspbase.cpp"
+        "src/test/bspbase.cpp",
+		"src/test/debug.cpp",
+		"src/test/zeroonlyafterpositivepiece.cpp"
       ]
     }
   ]
