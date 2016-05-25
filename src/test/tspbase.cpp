@@ -115,13 +115,13 @@ void TspBase::getRandomDemand(){
 
 // Get input demand to _allStationDemand.
 void TspBase::getInputDemand(){
-	_allStationDemand.push_back(3);
+	_allStationDemand.push_back(0);
 	_allStationDemand.push_back(5);
 	_allStationDemand.push_back(-8);
-	_allStationDemand.push_back(5);
-	_allStationDemand.push_back(-5);
+	_allStationDemand.push_back(0);
+	_allStationDemand.push_back(0);
 	_allStationDemand.push_back(8);
-	_allStationDemand.push_back(-7);
+	_allStationDemand.push_back(-4);
 	_allStationDemand.push_back(-1);
 	_allStationDemand.push_back(23);
 	_allStationDemand.push_back(-12);
@@ -135,13 +135,6 @@ void TspBase::getDemand(){
 		if (_allStationDemand[i] == 0){
 			_mapAllToPart.push_back(-1);
 			_stationNum--;
-
-			for (int k = 0; k < _cost.size(); k++){
-				_cost[k].erase(_cost[k].begin() + i);
-			}
-			_cost.erase(_cost.begin() + i);
-			_point.erase(_point.begin() + i);
-
 			continue;
 		}
 		_stationDemand.push_back(_allStationDemand[i]);
@@ -167,6 +160,27 @@ void TspBase::getRandomPoints(){
 		point poss;
 		poss.a = rand() % POINT_RANGE;
 		poss.b = rand() % POINT_RANGE;
+		(*pos)[u] = dim2::Point<double>(poss.a, poss.b);
+		_point.push_back(poss);
+	}
+}
+
+// Get random points to _point(Baidu map point) and *pos.
+void TspBase::getRandomPointsSplitRegion(){
+	srand((unsigned)time(NULL));
+	int i = 0;
+	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
+		point poss;
+		
+		if (_allStationDemand[i++] > 0){
+			poss.a = rand() % POSITIVE_POINT_RANGE + 30;
+			poss.b = rand() % POSITIVE_POINT_RANGE + 30;
+		}
+		else{
+			poss.a = -(rand() % POSITIVE_POINT_RANGE + 30);
+			poss.b = -(rand() % POSITIVE_POINT_RANGE + 30);
+		}
+		
 		(*pos)[u] = dim2::Point<double>(poss.a, poss.b);
 		_point.push_back(poss);
 	}
@@ -201,8 +215,11 @@ void TspBase::getInputPoints(){
 
 // Get point from _point(Baidu map point) to *pos.
 void TspBase::getPoints(){
-	int i = 0;
-	for (FullGraph::NodeIt u(*g); u != INVALID; ++u, ++i) {
+	int i = -1;
+	for (FullGraph::NodeIt u(*g); u != INVALID; ++u) {
+		while (_allStationDemand[++i] == 0){
+			;
+		}
 		(*pos)[u] = dim2::Point<double>(_point[i].a, _point[i].b);
 	}
 	PRINTFPoints
@@ -232,35 +249,23 @@ void TspBase::getInputCost(){
 }
 
 void TspBase::getCost(){
-
+	int m = -1, n = -1;
 	for (int i=0;i<g->nodeNum();i++)
 	{
+		while (_allStationDemand[++m] == 0){
+			;
+		}
+		n = -1;
 		for (int j=0;j<g->nodeNum();j++)
 		{
+			while (_allStationDemand[++n] == 0){
+				;
+			}
 			if (i != j){
-				(*cost)[(*g).edge((*g)(i), (*g)(j))] = _cost[i][j];
+				(*cost)[(*g).edge((*g)(i), (*g)(j))] = _cost[m][n];
 			}
 		}
-		//cout<<endl;
 	}
-	//cout<<endl;
-	//{
-	//	for (int i=0;i<g->nodeNum();i++)
-	//	{
-	//		for (int j=0;j<g->nodeNum();j++)
-	//		{
-	//			if (i != j){
-	//				cout << (*cost)[(*g).edge((*g)(i), (*g)(j))] << " ";
-	//			}
-	//			else{
-	//				cout << "0 ";
-	//			}
-	//
-	//		}
-	//		cout<<endl;
-	//	}
-	//	cout<<endl;
-	//}
 
 }
 
@@ -317,61 +322,54 @@ void TspBase::getTspTour(const std::string &alg_name) {
 	PRINTFTSPtour
 }
 
+// Get a Random TSP sequence
+// getTspSequence<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+template <typename TSP>
+void TspBase::getTspTourGeneral(const std::string &alg_name) {
+	GRAPH_TYPEDEFS(FullGraph);
+
+	TSP alg(*g, *cost);
+	std::vector<Node> vec;
+	_tspSum = alg.run();
+	alg.tourNodes(std::back_inserter(vec));
+
+	for (vector<Node>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+	{
+		FullGraph::Node node = *it;
+		_path.push_back((*g).index(node));
+	}
+
+	PRINTFTSPtour
+}
+
+void TspBase::dataGeneral(){
+	_path.clear();
+	getTspTourGeneral<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+}
+
 void TspBase::data(){
 
-	clock_t start, finish, sum;
-	double totaltime, totaltime0, totaltime1, totaltime2;
-	sum = clock();
+	//cout << endl << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
+	//cout << "station capacity:" << STATION_CAPACITY << endl << endl;
 
-	cout << endl;
-	cout << "vehicle capacity:" << VEHICLE_CAPACITY << endl;
-	cout << "station capacity:" << STATION_CAPACITY << endl;
-	cout << endl;
-
-	start = clock();
 	getDemand();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
-
-	start = clock();
 	getPoints();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
-
-	start = clock();
 	getCost();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetCost:" << totaltime << "ms!" << endl;
-
 	getTspTour<ChristofidesTsp<DoubleEdgeMap > >("Christofides");
+
+}
+
+void TspBase::randomDataSplitRegion(){
+	getRandomDemand();
+	getRandomPointsSplitRegion();
+	getRandomCost();
+
 }
 
 void TspBase::randomData(){
-
-	clock_t start, finish, sum;
-	double totaltime, totaltime0, totaltime1, totaltime2;
-	sum = clock();
-
-	start = clock();
 	getRandomDemand();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetRandomDemand:" << totaltime << "ms!" << endl;
-
-	start = clock();
 	getRandomPoints();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetRandomPoints:" << totaltime << "ms!" << endl;
-
-	start = clock();
 	getRandomCost();
-	finish = clock();
-	totaltime = (double)(finish - start) / CLOCKS_PER_SEC * 1000;
-	//cout << "\ngetCost:" << totaltime << "ms!" << endl;
 
 }
 

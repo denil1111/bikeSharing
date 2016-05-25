@@ -10,19 +10,6 @@ NoZeroCapacitatedBSP::~NoZeroCapacitatedBSP(){
 
 }
 
-//void NoZeroCapacitatedBSP::getPath(){
-//	if (_startFromWhichPiece == PIECE_P){
-//		cout << "_startFromWhichPiece:PIECE_P" << endl;
-//		getPathBeginPositive();
-//		getPathBeginNegativeReverse();
-//	}
-//	else{
-//		cout << "_startFromWhichPiece:PIECE_N" << endl;
-//		getPathBeginNegative();
-//		getPathBeginPositiveReverse();
-//	}
-//}
-
 void NoZeroCapacitatedBSP::calculateMinCostOfTwoSuperNode(int positivesupernode, int negativesupernode){
 	// get four points:
 	int positivelastid = _superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand[_superNodeVector_PIECE_P[positivesupernode]._stationidAndDemand.size() - 1].stationId;
@@ -69,7 +56,7 @@ void NoZeroCapacitatedBSP::getOrderPath(vector<SuperNode> firstPIECE, vector<Sup
 			// positive station:
 			getSuperPath(firstPIECE[first], tempVector);
 			// matching negative station:
-			int second = firstPIECE[first].getMatchingNumber();
+			int second = firstPIECE[first]._matchingNumber;
 			getSuperPathReverse(secondPIECE[second], tempVector);
 		}
 	}
@@ -94,7 +81,7 @@ void NoZeroCapacitatedBSP::getReversePath(vector<SuperNode> firstPIECE, vector<S
 			// positive station:
 			getSuperPathReverse(firstPIECE[first], tempVector);
 			// matching negative station:
-			int second = _superNodeVector_PIECE_P[first].getMatchingNumber();
+			int second = _superNodeVector_PIECE_P[first]._matchingNumber;
 			getSuperPath(secondPIECE[second], tempVector);
 		}
 	}
@@ -123,23 +110,23 @@ void NoZeroCapacitatedBSP::run(){
 
 	//_tspBase.data();
 
-	cout << endl << "NoZeroCapacitatedBSP:" << endl;
+	//cout << endl << "NoZeroCapacitatedBSP:" << endl;
 
-	//for (int i = 0; i < _tspBase._stationNum; i++){
-	//	getSuperNodePiecesNoZero(i);
-	//	calculateMinCostAmongSuperNode();
-	//	machingSuperNode();
-	//	getPath();
-	//}
-	getSuperNodePiecesNoZero(0);
-	calculateMinCostAmongSuperNode();
-	machingSuperNode();
-	getPath();
+	for (int i = 0; i < _tspBase._stationNum; i++){
+		getSuperNodePiecesNoZero(i);
+		calculateMinCostAmongSuperNode();
+		machingSuperNode();
+		getPath();
+	}
+	//getSuperNodePiecesNoZero(0);
+	//calculateMinCostAmongSuperNode();
+	//machingSuperNode();
+	//getPath();
 
 	//PRINTFFinalPath
 	//PRINTFSuperNodeInformation
 
-	cout << "noZeroCapacitatedBSP sum cost:" << _minSum << endl;
+	//cout << "noZeroCapacitatedBSP sum cost:" << _minSum << endl;
 	
 }
 

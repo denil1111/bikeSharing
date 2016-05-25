@@ -65,10 +65,11 @@ public:
 	vector<int> _mapAllToPart;
 
 	
-	
+	void randomDataSplitRegion();
 	void randomData();
 	void inputData();
 	void data();
+	void dataGeneral();
 
 public:
 
@@ -90,9 +91,12 @@ public:
 
 	template <typename TSP>
 	void getTspTour(const std::string &alg_name);
+	template <typename TSP>
+	void getTspTourGeneral(const std::string &alg_name);
 
 	void setDepot(double x, double y);
 
+	void getRandomPointsSplitRegion();
 	void getRandomPoints();
 	void getInputPoints();
 	void getPoints();

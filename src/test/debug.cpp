@@ -16,7 +16,7 @@ bool Debug::checkDemand(vector<int> demand, int stationcapacity){
 		sum += *it;
 	}
 	if (sum == 0){
-		cout << "demand OK!" << endl;
+		//cout << "demand OK!" << endl;
 		return true;
 	}
 	else{

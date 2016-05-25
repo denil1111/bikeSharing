@@ -33,8 +33,7 @@ using namespace std;
 
 struct MinCostOfTwoSuperNode{
 	int cost;
-	vector<int>::iterator firstNodeIt;
-	vector<int>::iterator secondNodeIt;
+	// 	symmetric. first represent positive pieces.second represent negative pieces. Whatever clockwise or anticlockwise.
 	int first;
 	int second;
 };
@@ -42,7 +41,9 @@ struct MinCostOfTwoSuperNode{
 struct StationidAndDemand{
 	int stationId;
 	int stationDemand;
-	int isCutPoint;
+	int pieceType;
+	int pieceId;
+	// used for tryToMeetPositive and tryToMeetNegative in bspbase.cpp.
 	int formerPosition;
 	int latterPosition;
 };
@@ -50,41 +51,26 @@ struct StationidAndDemand{
 class SuperNode{
 
 public:
-
-	int _numberOfZeroPieceBehind;
-	int _numberOfZeroPieceFront;
-	vector<int> _zeroPieceIndexFront;
-	vector<int> _zeroPieceIndexBehind;
-
-
-	vector<int> _zeroCostPoint;
-	int _zeroCostPointNumber;
-	int _nowPieceTypeFlag;
-	bool _isFirstTime;
-
-	//int _lastNodeDemand;
-	//// matching number to another super node
+	// used for save all of the station information about this super node.
+	vector<StationidAndDemand> _stationidAndDemand;
+	// matching id to another super node
 	int _matchingNumber;
-	// mincostmatchingnumber
-	int _minCostMatchingNumber;
-	// piece bound
+	// piece bound.
 	int _excessNumber;
-	// number
-	int _nodeNumberInSuperNode;
-	// super node ID
-	int _superNodeId;
-	// start iterator in _path
-	vector<int>::iterator _startIt;
-	// end iterator in _path
-	vector<int>::iterator _endIt;
 	// piece type:( 0: 0-piece, 1:p-piece, -1:n-piece
 	int _pieceTypeFlag;
-	// sum of piece
-	bool flag;
 
-public:
+	// clockwise dirction:
+	int _numberOfZeroPieceBehind;
+	// clockwise dirction : zero piece id.
+	vector<int> _zeroPieceIndexBehind;
+	// anti-clockwise dirction:
+	int _numberOfZeroPieceFront;
+	// anti-clockwise dirction : zero piece id.
+	vector<int> _zeroPieceIndexFront;
 
 	// used for calculate min cost between positive node and negative node:
+	// in ktimescapacitatedBSP.cpp and capacitated.cpp.
 	int _positiveEnd;
 	int _positiveReverseEnd;
 	int _positiveNext;
@@ -94,27 +80,20 @@ public:
 	int _negativeNext;
 	int _negativeReverseNext;
 
+public:
 
 	SuperNode(int excessnumber);
+	~SuperNode();
 
-	vector<StationidAndDemand> _stationidAndDemand;
-
-	void setMinCostMatchingNumber(int number);
-	void setsuperNodeNumber(int supernodeId);
-	void setMatchingNumber(int number);
-	int& getNumberOfZeroPieceBehind();
-	//  opposite direction:
-	int& getNumberOfZeroPieceFront();
-	void setNumberOfZeroPieceFront(int number);
-	int getMatchingNumber();
-	int getSuperNodeId();
-	vector<int>::iterator getStartIt();
-	vector<int>::iterator getEndIt();
-	int getNodeNumberInSuperNode();
-	int getPieceTypeFlag();
-
-	int getASuperNode(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);
-	int getASuperNodeNoZero(vector<int> &path, vector<int> &demand, int startnode, vector<int>::iterator &currentIt, int surplusdemand, int &stopflag, int stationnum);
+	// path:Tsp tour.
+	// currentIt:current iterator in path.
+	// demand:all station demand.
+	// surplusdemand:the previous super node surplus demand which because of segmentation.
+	// startnode:whole partitioning start station id.
+	// stopflag:whether patition finish.
+	// stationnum:whole station which demand dosen't equal zero. heheda.
+	int getASuperNode(vector<int> &path, vector<int>::iterator &currentIt, vector<int> &demand, int surplusdemand, int startnode, int &stopflag, int stationnum);
+	int getASuperNodeNoZero(vector<int> &path, vector<int>::iterator &currentIt, vector<int> &demand, int surplusdemand, int startnode, int &stopflag, int stationnum);
 };
 
 #endif

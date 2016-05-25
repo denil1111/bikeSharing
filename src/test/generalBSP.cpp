@@ -1,33 +1,19 @@
-#include"uncapacitatedBSP.h"
+#include "generalBSP.h"
 
-
-UncapacitatedBSP::UncapacitatedBSP(TspBase &tspbase):BspBase(tspbase){
-	capacityFlag = false;
+GeneralBSP::GeneralBSP(TspBase &tspbase) :BspBase(tspbase){
+	capacityFlag = true;
 }
 
-UncapacitatedBSP::~UncapacitatedBSP(){
+GeneralBSP::~GeneralBSP(){
 
 }
 
-void UncapacitatedBSP::getPath(){
-	vector<StationidAndDemand> tempVector;
-	for (vector<int>::iterator it = _tspBase._path.begin(); it < _tspBase._path.end(); ++it){
-		StationidAndDemand temp;
-		temp.stationId = *it;
-		temp.stationDemand = _tspBase._stationDemand[*it];
-		tempVector.push_back(temp);
-	}
-
-	getStartStation(tempVector, _minCostPath, _minSum);
-}
-
-int UncapacitatedBSP::getStartStation(vector<StationidAndDemand> &mincostpath, vector<StationidAndDemand> &resultpath, int &minSum){
+int GeneralBSP::getStartStation(vector<StationidAndDemand> &mincostpath, vector<StationidAndDemand> &resultpath, int &minSum){
 	vector<StationidAndDemand>::const_iterator it = mincostpath.begin();
 	vector<StationidAndDemand>::const_iterator itt = mincostpath.begin();
 	_startPoint = -1;
 
 	deleteRepeatStationPoint(mincostpath);
-
 	if (checkSum(mincostpath)){
 		for (int i = 0; i<mincostpath.size(); i++)
 		{
@@ -40,11 +26,15 @@ int UncapacitatedBSP::getStartStation(vector<StationidAndDemand> &mincostpath, v
 				temppath.push_back(*it);
 			}
 
-			while (tempSum >= 0)
+			while (tempSum >= 0 && tempSum <= _tspBase.VEHICLE_CAPACITY)
 			{
 				if (tempNum == i && flag == true) {
 					_startPoint = i;
 					revertPath(temppath);
+					//if (capacityFlag == true){
+					//	tryToMeetPositive(temppath);
+					//	tryToMeetNegative(temppath);
+					//}
 					mapPath(temppath);
 					_pathSet.push_back(temppath);
 
@@ -68,7 +58,7 @@ int UncapacitatedBSP::getStartStation(vector<StationidAndDemand> &mincostpath, v
 							_finalSuperNodeVector_PIECE_0.push_back(_superNodeVector_PIECE_0[i]);
 						}
 					}
-					break;
+					return _startPoint;
 				}
 				if (flag == false){
 					flag = true;
@@ -76,24 +66,39 @@ int UncapacitatedBSP::getStartStation(vector<StationidAndDemand> &mincostpath, v
 				tempNum = (tempNum + 1) % temppath.size();
 				tempSum = tempSum + temppath[tempNum].stationDemand;
 			}
+			if (tempSum > _tspBase.VEHICLE_CAPACITY){
+				cout << "i" << i << ":" << tempSum << ":" << tempNum << "   ";
+			}
 		}
+		//cout << endl;
 	}
 
 	return _startPoint;
 }
 
+void GeneralBSP::run(){
 
+	//cout << endl << "GeneralBSP:" << endl;
 
-void UncapacitatedBSP::run(){
-
-	//_tspBase.data();
-
-	//cout << "UncapacitatedBSP:" << endl;
-
+	//for (int i = 0; i < _tspBase._stationNum; i++){
+	//	getSuperNodePiecesZeroOnlyAfterPositive(i);
+	//	calculateMinCostAmongSuperNode();
+	//	machingSuperNode();
+	//	getPath();
+	//}
+	int i = 0;
+	getSuperNodePiecesZeroOnlyAfterPositive(i);
+	calculateMinCostAmongSuperNode();
+	machingSuperNode();
 	getPath();
 
-	//PRINTFFinalPath
 
-	//cout << "Uncapacitated BSP sum cost:" << _minSum << endl << endl;
+	//	_minSum = getFinalSum(_minCostPath);
+
+
+	//PRINTFFinalPath
+	//PRINTFSuperNodeInformation
+
+	//cout << "GeneralBSP sum cost:" << _minSum << endl;
 
 }
